@@ -1,0 +1,15 @@
+#view_login {
+    padding-top: 20px;
+    margin: 20px 0;
+    font-size: 1.1em;
+}
+
+@media (min-width: 767px)
+{
+    .left-border
+    {
+        border-left: 2px solid rgb(213,213,213);
+    }
+}
+
+

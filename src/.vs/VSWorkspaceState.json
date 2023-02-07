@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\actions",
+    "\\common",
+    "\\components",
+    "\\fonts",
+    "\\helpers",
+    "\\reducers",
+    "\\services"
+  ],
+  "SelectedNode": "\\services\\cartekApiService.js",
+  "PreviewInSolutionExplorer": false
+}

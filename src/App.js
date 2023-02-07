@@ -1,25 +1,166 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import "bootstrap/dist/js/bootstrap.min.js";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+
+import Login from "./components/login.component";
+import Home from "./components/home.component";
+import CarsList from "./components/cars-list.component";
+import DriversList from "./components/drivers-list.component";
+import UserForm from "./components/add-user.component";
+import Profile from "./components/profile.component";
+import BoardUser from "./components/board-user.component";
+import BoardModerator from "./components/board-moderator.component";
+import BoardAdmin from "./components/board-admin.component";
+
+import { logout } from "./actions/auth";
+import { clearMessage } from "./actions/message";
+
+import { history } from './helpers/history';
+
+// import AuthVerify from "./common/auth-verify";
+import EventBus from "./common/EventBus";
+import UsersList from "./components/users-list.component";
+
+class App extends Component {
+    constructor(props) {
+        super(props);
+        this.logOut = this.logOut.bind(this);
+
+        this.state = {
+            showModeratorBoard: false,
+            showAdminBoard: false,
+            currentUser: undefined,
+        };
+
+        history.listen((location) => {
+            props.dispatch(clearMessage()); // clear message when changing location
+        });
+    }
+
+    componentDidMount() {
+        const user = this.props.user;
+
+        if (user) {
+            this.setState({
+                currentUser: user,
+                showModeratorBoard: user.identity.isAdmin,
+                showAdminBoard: user.identity.isAdmin,
+            });
+        }
+
+        EventBus.on("logout", () => {
+            this.logOut();
+        });
+    }
+
+    componentWillUnmount() {
+        EventBus.remove("logout");
+    }
+
+    logOut() {
+        this.props.dispatch(logout());
+        this.setState({
+            showModeratorBoard: false,
+            showAdminBoard: false,
+            currentUser: undefined,
+        });
+    }
+
+    render() {
+        const { currentUser, showModeratorBoard, showAdminBoard } = this.state;
+
+        return (
+            <BrowserRouter location={history.location} navigator={history}>
+                <nav className="navbar navbar-expand-lg navbar-light main-nav">
+                    <Link to={"/"} className="navbar-brand">
+                        <img src="/logo.png" height="40" alt="logo" />
+                    </Link>
+
+                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div className="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul className="navbar-nav mr-auto">
+
+                            <li className="nav-item">
+                                <Link to={"/home"} className="nav-link">
+                                    Осмотр
+                                </Link>
+                            </li>
+
+                            <li className="nav-item">
+                                <Link to={"/cars"} className="nav-link">
+                                    Машины
+                                </Link>
+                            </li>
+
+                            {showAdminBoard && (
+                                <li className="nav-item">
+                                    <Link to={"/admin"} className="nav-link">
+                                        Администрирование
+                                    </Link>
+                                </li>
+                            )}
+
+                            {currentUser ? (
+                                <div className="navbar-nav ml-auto">
+                                    <li className="nav-item">
+                                        <Link to={"/profile"} className="nav-link">
+                                            {currentUser.identity.login} ({currentUser.identity.firstName} {currentUser.identity.lastName})
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <a href="/login" className="nav-link" onClick={this.logOut}>
+                                            Выйти
+                                        </a>
+                                    </li>
+                                </div>
+                            ) : (
+                                <div className="navbar-nav ml-auto">
+                                    <li className="nav-item">
+                                        <Link to="/login" className="nav-link">
+                                            {"Войти"}
+                                        </Link>
+                                    </li>
+                                </div>
+                            )}
+                        </ul>
+                    </div>
+                </nav>
+
+                <div className="container mt-3">
+                    <Routes>
+                        <Route exact path="/" element={<Home />} />
+                        <Route exact path="/home" element={<Home />} />
+                        <Route exact path="/login" element={<Login />} />
+                        <Route exact path="/profile" element={<Profile />} />
+                        <Route exact path="/user" element={<BoardUser />} />
+                        <Route exact path="/cars" element={<CarsList />} />
+                        <Route exact path="/mod" element={<BoardModerator />} />
+                        <Route exact path="/admin" element={<BoardAdmin />} />
+                        <Route exact path="/admin/user/" element={<UserForm />} />
+                        <Route exact path="/admin/user/:login" element={<UserForm />} />
+                        <Route exact path="/admin/users" element={<UsersList />} />
+                        <Route exact path="/admin/drivers" element={<DriversList />} />
+                    </Routes>
+                </div>
+
+                {/* <AuthVerify logOut={this.logOut}/> */}
+            </BrowserRouter>
+        );
+    }
 }
 
-export default App;
+function mapStateToProps(state) {
+    const { user } = state.auth;
+    return {
+        user,
+    };
+}
+
+export default connect(mapStateToProps)(App);
