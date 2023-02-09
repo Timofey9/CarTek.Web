@@ -1,6 +1,6 @@
 import axios from "axios";
 import authHeader from "./auth-header";
-const API_URL = "https://localhost:55000/api/";
+const API_URL = "https://localhost:32776/api/";
 
 class ApiService {
 
@@ -27,7 +27,6 @@ class ApiService {
     }
 
     post(url, data, headers = {}) {
-
         const config = {
             method: 'post',
             url,
@@ -50,6 +49,10 @@ class ApiService {
         return this._axios.delete(url);
     }
 
+    testSendFiles(data) {
+        var res = this.post(`questionary`, data, { 'Content-Type': 'multipart/form-data' });
+        console.log(res);
+    }
 
     getUsers(params) {
         const query = new URLSearchParams(params).toString();
@@ -92,6 +95,14 @@ class ApiService {
 
     getCar(carId) {
         return this.get(`cars/getcar/${carId}`);
+    }
+
+    getCarByPlate(plate) {
+        return this.get(`cars/plate/${plate}`);
+    }
+
+    deleteCar(carId) {
+        return this.delete(`cars/deletecar/${carId}`);
     }
 
     login(username, password) {

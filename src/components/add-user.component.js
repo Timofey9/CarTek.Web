@@ -4,17 +4,12 @@ import ApiService from "../services/cartekApiService";
 import  withRouter  from "./withRouter";
 
 class UserForm extends Component {
-
     statuses = {
         active: "Active",
         inactive: "Inactive"
     };
-
     componentDidMount() {
-
         const { login } = this.props.params;
-        console.log(login);
-
         if (login) {
             this.setState({ loading: true });
             ApiService.getAdminUser(login)

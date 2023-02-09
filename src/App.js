@@ -8,6 +8,7 @@ import "./App.css";
 
 import Login from "./components/login.component";
 import Home from "./components/home.component";
+import Questionary from "./components/questionary.component";
 import CarsList from "./components/cars-list.component";
 import DriversList from "./components/drivers-list.component";
 import UserForm from "./components/add-user.component";
@@ -142,6 +143,7 @@ class App extends Component {
                         <Route exact path="/user" element={<BoardUser />} />
                         <Route exact path="/cars" element={<CarsList />} />
                         <Route exact path="/mod" element={<BoardModerator />} />
+                        <Route exact path="/questionary/car/:plate" element={<Questionary />} />
                         <Route exact path="/admin" element={<BoardAdmin />} />
                         <Route exact path="/admin/user/" element={<UserForm />} />
                         <Route exact path="/admin/user/:login" element={<UserForm />} />
