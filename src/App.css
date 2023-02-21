@@ -1,10 +1,12 @@
-body {
-    font-family: "HelvetivaNeueCyr-Black" !important;
-}
-
 label {
   display: block;
   margin-top: 10px;
+}
+
+
+hr.solid {
+    margin-top: 5px;
+    border-top: 3px solid #bbb;
 }
 
 .card-container.card {

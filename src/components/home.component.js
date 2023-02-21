@@ -19,7 +19,6 @@ export default class Home extends Component {
         this.handleSubmit = (event) => {
             event.preventDefault();
             ApiService.getCarByPlate(this.state.carPlate).then(response => {
-                console.log(response);
                 this.setState({ carContent: response.data });
                 this.setState({ car: `Найден автомобиль: ${response.data.brand} ${response.data.model}` });
             }, error => {
