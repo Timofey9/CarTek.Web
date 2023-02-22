@@ -22,9 +22,11 @@ export default class Home extends Component {
                 this.setState({ carContent: response.data });
                 this.setState({ car: `Найден автомобиль: ${response.data.brand} ${response.data.model}` });
             }, error => {
-                console.log(error);
-                this.setState({ errorMessage: "Не найден автомобиль с таким номером"
-                });
+                if (error.code == 'ERR_NETWORK') {
+                    this.setState({ errorMessage: "Ошибка сети" });
+                }
+                else
+                    this.setState({ errorMessage: "Не найден автомобиль с таким номером"});
             });
         }
     }

@@ -48,7 +48,6 @@ export const register = (username, email, password) => (dispatch) => {
 export const login = (username, password) => (dispatch) => {
     return ApiService.login(username, password).then(
       (data) => {
-          console.log(data);
       dispatch({
         type: LOGIN_SUCCESS,
         payload: { user: data },
