@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import ApiService from "../services/cartekApiService";
 import withRouter from "./withRouter";
 import StateRadioButtonGroup from "./radiobuttongroup";
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 class Questionary extends Component {
     constructor(props) {
@@ -9,7 +11,10 @@ class Questionary extends Component {
 
         this.state = {
             car: {},
+            trailer: {},
             plate: {},
+            drivers: [],
+            driver: {},
             file: {},
             nearLight1: '',
             distantLight1: '',
@@ -115,6 +120,7 @@ class Questionary extends Component {
         this.commonPressureChangedEvent = this.commonPressureChangedEvent.bind(this);
         this.commentChanged = this.commentChanged.bind(this);
         this.constructAndCacheRequest = this.constructAndCacheRequest.bind(this);
+        this.driverSelectionChanged = this.driverSelectionChanged.bind(this);
 
         const user = JSON.parse(localStorage.getItem("user"));
         this.state.userLogin = user.identity.login;
@@ -220,25 +226,16 @@ class Questionary extends Component {
             this.state.mileage = cachedQuestionary.carQuestionaryModel.mileage;    
         }
 
-
-
         this.handleSubmit = (event) => {
             event.preventDefault();
 
             var request = this.constructAndCacheRequest();
-
-            console.log(request);
-
             this.state.formData.append("CreatedBy", user.identity.login);
             this.state.formData.append("CarQuestionaryModel", JSON.stringify(request.carQuestionaryModel));
             this.state.formData.append("TrailerQuestionaryModel", JSON.stringify(request.trailerQuestionaryModel));
             this.state.formData.append("Comment", this.state.comment);
-            this.state.formData.append("DriverId", 1);
+            this.state.formData.append("DriverId", this.state.driver.id);
             this.state.formData.append("CarId", this.state.car.id);
-
-            for (const pair of this.state.formData.entries()) {
-                console.log(`${pair[0]}, ${pair[1]}`);
-            }
 
             ApiService.testSendFiles(this.state.formData);
 
@@ -278,7 +275,7 @@ class Questionary extends Component {
         };
 
         var trailerQuestionaryModel = {
-            transportId: this.state.car.trailer.id,
+            transportId: this.state.trailer.id,
             lightsJsonObject:
             {
                 nearLight: this.state.nearLight2,
@@ -399,7 +396,13 @@ class Questionary extends Component {
     }
 
     commonPressureChangedEvent(event, parameterName) {
-        this.setState({ [parameterName]: event.target.value });
+        if (event.target.value < 0) {
+            this.setState({ [parameterName]: 0 });
+        } else if (event.target.value > 15) {
+            this.setState({ [parameterName]: 15 });
+        } else {
+            this.setState({ [parameterName]: event.target.value });
+        }
         this.constructAndCacheRequest();
     }
 
@@ -418,6 +421,10 @@ class Questionary extends Component {
     commentChanged(event) {
         this.setState({ comment: event.target.value });
         this.constructAndCacheRequest();
+    }
+
+    driverSelectionChanged(event, newValue) {
+        this.setState({ driver: newValue });
     }
 
     conditionChanged(event){
@@ -442,12 +449,27 @@ class Questionary extends Component {
         const { plate } = this.props.params;
         if (plate) {
             this.setState({ loading: true });
+
             ApiService.getCarByPlate(plate)
                 .then(({ data }) =>
                 {
                     this.setState({
                         loading: false,
-                        car: data                      
+                        car: data,
+                        trailer: data.trailer
+                    })
+                })
+                .catch((error) => {
+                    this.setState({ loading: false, error })
+                });
+
+            this.setState({ loading: true });
+
+            ApiService.getDrivers()
+                .then(({ data }) => {
+                    this.setState({
+                        loading: false,
+                        drivers: data.list,
                     })
                 })
                 .catch((error) => {
@@ -457,9 +479,8 @@ class Questionary extends Component {
     }
 
     render() {
-        const { generalCondition, car, trailerCondition, errorMessage } = this.state;
+        const { generalCondition, car, trailer, drivers, trailerCondition, errorMessage } = this.state;
 
-        console.log(this.state.nearLight1);
         return (
             <div className="container">
                 <form>
@@ -526,8 +547,8 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState1"} isActive={this.state.tireState1} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState1")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState1"} isActive={this.state.pinsState1} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState1")} />
                                         <div className="form-group">
-                                            <label for="pressure">Давление:</label>
-                                            <input name="pressure" id="pressure1" onChange={(event) => this.commonPressureChangedEvent(event, "pressure1")} />
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="pressure1" value={this.state.pressure1} onChange={(event) => this.commonPressureChangedEvent(event, "pressure1")} />
                                         </div>
                                     </div>
                                 </div>
@@ -538,8 +559,8 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState3"} isActive={this.state.tireState3} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState3")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState3"} isActive={this.state.pinsState3} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState3")} />
                                         <div className="form-group">
-                                            <label for="pressure">Давление:</label>
-                                            <input name="pressure" id="pressure3" onChange={(event) => this.commonPressureChangedEvent(event, "pressure3")} />
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="pressure3" value={this.state.pressure3} onChange={(event) => this.commonPressureChangedEvent(event, "pressure3")} />
                                         </div>
                                     </div>
                                 </div>
@@ -550,8 +571,8 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState5"} isActive={this.state.tireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState5")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState5"} isActive={this.state.pinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState5")} />
                                         <div className="form-group">
-                                            <label for="pressure">Давление:</label>
-                                            <input name="pressure" id="pressure5" onChange={(event) => this.commonPressureChangedEvent(event, "pressure5")} />
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="pressure5" value={this.state.pressure5} onChange={(event) => this.commonPressureChangedEvent(event, "pressure5")} />
                                         </div>
                                     </div>
                                 </div> : <></>}
@@ -567,8 +588,8 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState2"} isActive={this.state.tireState2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState2")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState2"} isActive={this.state.pinsState2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState2")} />
                                     <div className="form-group">
-                                        <label for="pressure">Давление:</label>
-                                        <input name="pressure" id="pressure2" onChange={(event) => this.commonPressureChangedEvent(event, "pressure2")} />
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="pressure2" value={this.state.pressure2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure2")} />
                                     </div>
                                 </div>
                             </div>
@@ -579,8 +600,8 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState4"} isActive={this.state.tireState4} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState4")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState4"} isActive={this.state.pinsState4} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState4")} />
                                     <div className="form-group">
-                                        <label for="pressure">Давление:</label>
-                                        <input name="pressure" id="pressure4" onChange={(event) => this.commonPressureChangedEvent(event, "pressure4")} />
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="pressure4" value={this.state.pressure4} onChange={(event) => this.commonPressureChangedEvent(event, "pressure4")} />
                                     </div>
                                 </div>
                             </div>
@@ -591,8 +612,8 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6"} isActive={this.state.tireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState6")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6"} isActive={this.state.pinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState6")} />
                                     <div className="form-group">
-                                        <label for="pressure">Давление:</label>
-                                        <input name="pressure" id="pressure6" onChange={(event) => this.commonPressureChangedEvent(event, "pressure6")} />
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="pressure6" value={this.state.pressure6} onChange={(event) => this.commonPressureChangedEvent(event, "pressure6")} />
                                     </div>
                                 </div>
                             </div> : <></> }
@@ -648,17 +669,17 @@ class Questionary extends Component {
                         <hr className="solid" />
                     </div>
 
-                    <h2>Полуприцеп {car.brand} {car.model} (гос.номер: {car.plate})</h2>
+                    <h2>Полуприцеп {trailer.brand} {trailer.model} (гос.номер: {trailer.plate})</h2>
 
                     <div className="row">
                         <h3>Световые приборы</h3>
                         <div className="col-md-6">
-                            <StateRadioButtonGroup type={"Габариты"} id={"beamLight2"} isActive={this.state.beamLight2} option1="Исправен" option2="Не исправен" />
+                            <StateRadioButtonGroup type={"Габариты"} id={"beamLight2"} isActive={this.state.beamLight2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "beamLight2")} />
                         </div>
 
                         <div className="col-md-6">
-                            <StateRadioButtonGroup type={"Поворотники"} id={"turn2"} isActive={this.state.turnSignal2} option1="Исправен" option2="Не исправен" />
-                            <StateRadioButtonGroup type={"Стоп-сигналы"} id={"stop2"} isActive={this.state.stopSignal2} option1="Исправен" option2="Не исправен" />
+                            <StateRadioButtonGroup type={"Поворотники"} id={"turn2"} isActive={this.state.turnSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "turn2")} />
+                            <StateRadioButtonGroup type={"Стоп-сигналы"} id={"stop2"} isActive={this.state.stopSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "stop2")} />
                         </div>
                         <hr className="solid" />
                     </div>
@@ -686,8 +707,8 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState1"} isActive={this.state.trailerTireState1} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState1")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState1"} isActive={this.state.trailerPinsState1} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState1")} />
                                         <div className="form-group">
-                                            <label for="pressure">Давление:</label>
-                                            <input name="pressure" id="trailerPressure1" onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure1")} />
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure1" value={this.state.trailerPressure1} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure1")} />
                                         </div>
                                     </div>
                                 </div>
@@ -698,8 +719,8 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState3"} isActive={this.state.trailerTireState3} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState3")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState3"} isActive={this.state.trailerPinsState3} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState3")} />
                                         <div className="form-group">
-                                            <label for="pressure">Давление:</label>
-                                            <input name="pressure" id="trailerPressure3" onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure3")} />
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure3" value={this.state.trailerPressure3} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure3")} />
                                         </div>
                                     </div>
                                 </div>
@@ -710,8 +731,8 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState5"} isActive={this.state.trailerTireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState5")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState5"} isActive={this.state.trailerPinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState5")} />
                                         <div className="form-group">
-                                            <label for="pressure">Давление:</label>
-                                            <input name="pressure" id="trailerPressure5" onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure5")} />
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure5" value={this.state.trailerPressure5} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure5")} />
                                         </div>
                                     </div>
                                 </div> : <></>}
@@ -727,8 +748,8 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState2"} isActive={this.state.trailerTireState2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState2")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState2"} isActive={this.state.trailerPinsState2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState2")} />
                                     <div className="form-group">
-                                        <label for="pressure">Давление:</label>
-                                        <input name="pressure" id="trailerPressure2" onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure2")} />
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure2" value={this.state.trailerPressure2} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure2")} />
                                     </div>
                                 </div>
                             </div>
@@ -739,8 +760,8 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState4"} isActive={this.state.trailerTireState4} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState4")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState4"} isActive={this.state.trailerPinsState4} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState4")} />
                                     <div className="form-group">
-                                        <label for="pressure">Давление:</label>
-                                        <input name="pressure" id="trailerPressure4" onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure4")} />
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure4" value={this.state.trailerPressure4} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure4")} />
                                     </div>
                                 </div>
                             </div>
@@ -751,18 +772,38 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState6"} isActive={this.state.trailerTireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState6")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState6"} isActive={this.state.trailerPinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState6")} />
                                     <div className="form-group">
-                                        <label for="pressure">Давление:</label>
-                                        <input name="pressure" id="trailerPressure6" onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure6")} />
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure6" value={this.state.trailerPressure6} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure6")} />
                                     </div>
                                 </div>
                             </div> : <></>}
                         </div>
-                        <hr className="solid" />
+                        <hr className="solid" />                      
                     </div>
-
-                    <label htmlFor="files">Выбрать файлы</label>
-                    <input type="file" id="files" accept=".jpg, .png" multiple onChange={this.selectFile}></input>
-                    <input value="Отправить" className="btn btn-success" type="button" onClick={this.handleSubmit}></input>
+                    <div className="row mb-3">
+                        <div className="form-row">
+                            <div className="col-md-6">
+                                <label htmlFor="files">Прикрепить фотографии</label>
+                                <input type="file" id="files" accept=".jpg, .png" multiple onChange={this.selectFile}></input>
+                            </div>
+                            <div className="col-md-6">
+                                <label>Выберите водителя</label>
+                                <Autocomplete
+                                    disablePortal
+                                    onChange={(e, newvalue) => this.driverSelectionChanged(e, newvalue)}
+                                    id="combo-box-demo"
+                                    options={drivers}
+                                    sx={{ width: 300 }}
+                                    getOptionLabel={(option) => `${option.lastName} ${option.firstName} ${option.middleName}`}
+                                    renderInput={(params) => <TextField {...params} label="Список водителей" />}/>
+                            </div>
+                        </div>
+                        <div className="form-row mt-3">
+                            <div className="col-md-12">
+                                <input value="Сохранить и передать водителю" className="btn btn-success" type="button" onClick={this.handleSubmit}></input>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         );

@@ -10,11 +10,18 @@ export default class Home extends Component {
         this.state = {
             carPlate: "",
             car: "",
+            cachedQuestionary: {},
             carContent: {},
             errorMessage: ""
         };
+
+        this.state.cachedQuestionary = JSON.parse(localStorage.getItem("questionary"));
          
         this.handleCarPlateChange = this.handleCarPlateChange.bind(this);
+
+        this.clearStorage = (event) => {
+            localStorage.removeItem("questionary");
+        };
 
         this.handleSubmit = (event) => {
             event.preventDefault();
@@ -61,6 +68,28 @@ export default class Home extends Component {
         const { car, errorMessage } = this.state;
     return (
         <div className="container">
+
+            {this.state.cachedQuestionary ?
+                <div>
+                    <div className="row">
+                        <div className="col d-flex justify-content-center">
+                            <label htmlFor="goToQuestionary">Имеется неоконченный осмотр для тягача {this.state.cachedQuestionary.car.brand} {this.state.cachedQuestionary.car.model} с гос.номером: {this.state.cachedQuestionary.car.plate}</label>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col d-flex justify-content-center mt-3">
+                            <Link id="goToQuestionary" to={`/questionary/car/${this.state.cachedQuestionary.car.plate}`} className="btn btn-warning">Завершить осмотр</Link>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col d-flex justify-content-center mt-3">
+                            <label>Или начните новый осмотр. <b>Это приведет к удалению незавершенного осмотра!</b></label>
+                        </div>
+                    </div>
+                </div>
+                : <div></div>}
+
             <div className="row">
                 <form className="d-flex justify-content-center">
                     <div className="form-group">
@@ -80,11 +109,12 @@ export default class Home extends Component {
                                 (<div>
                                     <label htmlFor="goToQuestionary">{car}</label>
                                     <div className="col d-flex justify-content-center mt-3">
-                                        <Link id="goToQuestionary" to={`/questionary/car/${this.state.carPlate}`} className="btn btn-warning">Перейти к осмотру</Link>
+                                        <Link id="goToQuestionary" to={`/questionary/car/${this.state.carPlate}`} onClick={this.clearStorage} className="btn btn-warning">Перейти к осмотру</Link>
                                     </div>
                                 </div>) : (<div>{errorMessage}</div>)}
                         </div>
                     </div>
+                 
                 </form>
             </div>
       </div>

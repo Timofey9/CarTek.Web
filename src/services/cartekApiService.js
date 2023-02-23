@@ -1,6 +1,6 @@
 import axios from "axios";
 import authHeader from "./auth-header";
-const API_URL = "https://localhost:32774/api/";
+const API_URL = "https://localhost:32768/api/";
 
 class ApiService {
 
@@ -82,6 +82,11 @@ class ApiService {
     getDrivers(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`drivers/getdrivers/?${query}`);
+    }
+
+    getAllDrivers(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`drivers/getalldrivers/`);
     }
 
     getDriver(carId) {
