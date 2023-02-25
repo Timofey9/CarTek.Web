@@ -16,6 +16,7 @@ import Profile from "./components/profile.component";
 import BoardUser from "./components/board-user.component";
 import BoardModerator from "./components/board-moderator.component";
 import BoardAdmin from "./components/board-admin.component";
+import AcceptanceComponent from "./components/acceptance.component";
 
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
@@ -142,6 +143,7 @@ class App extends Component {
                         <Route exact path="/profile" element={<Profile />} />
                         <Route exact path="/user" element={<BoardUser />} />
                         <Route exact path="/cars" element={<CarsList />} />
+                        <Route exact path="/cars/acceptCar/:uniqueId" element={<AcceptanceComponent/>} />
                         <Route exact path="/mod" element={<BoardModerator />} />
                         <Route exact path="/questionary/car/:plate" element={<Questionary />} />
                         <Route exact path="/admin" element={<BoardAdmin />} />

@@ -4,18 +4,24 @@ import withRouter from "./withRouter";
 import StateRadioButtonGroup from "./radiobuttongroup";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { Link } from "react-router-dom";
 
 class Questionary extends Component {
+
     constructor(props) {
         super(props);
+        const { navigate } = this.props;
 
         this.state = {
+            errorMessage: "",
+            createdQuestionary: {},
             car: {},
             trailer: {},
             plate: {},
             drivers: [],
             driver: {},
             file: {},
+            approvedByDriver: false,
             nearLight1: '',
             distantLight1: '',
             //габариты
@@ -23,8 +29,6 @@ class Questionary extends Component {
             turnSignal1: '',
             stopSignal1: '',
 
-            nearLight2: '',
-            distantLight2: '',
             //габариты
             beamLight2: '',
             turnSignal2: '',
@@ -121,6 +125,8 @@ class Questionary extends Component {
         this.commentChanged = this.commentChanged.bind(this);
         this.constructAndCacheRequest = this.constructAndCacheRequest.bind(this);
         this.driverSelectionChanged = this.driverSelectionChanged.bind(this);
+        this.validateForm = this.validateForm.bind(this);
+
 
         const user = JSON.parse(localStorage.getItem("user"));
         this.state.userLogin = user.identity.login;
@@ -207,19 +213,19 @@ class Questionary extends Component {
                 //trailerTireState6: cachedQuestionary.carQuestionaryModel.trailerTireState6,
 
             this.state.generalCondition = cachedQuestionary.carQuestionaryModel.generalCondition;
-            this.state.trailerCondition = cachedQuestionary.carQuestionaryModel.trailerCondition;
-
-            this.state.cabinClean = cachedQuestionary.carQuestionaryModel.cabinClean;
+            this.state.trailerCondition = cachedQuestionary.trailerQuestionaryModel.trailerCondition;
+            this.state.cabinCushion = cachedQuestionary.carQuestionaryModel.cabinCushion;
+            this.state.cabinClean = cachedQuestionary.carQuestionaryModel.isCabinClean;
             this.state.platonInPlace = cachedQuestionary.carQuestionaryModel.platonInPlace;
             this.state.platonSwitchedOn = cachedQuestionary.carQuestionaryModel.platonSwitchedOn;
-            this.state.fendersOk1 = cachedQuestionary.carQuestionaryModel.fendersOk1;
-            this.state.fendersMountState1 = cachedQuestionary.carQuestionaryModel.fendersMountState1;
+            this.state.fendersOk1 = cachedQuestionary.carQuestionaryModel.fendersOk;
+            this.state.fendersMountState1 = cachedQuestionary.carQuestionaryModel.fendersMountState;
 
             this.state.trailerFendersOk = cachedQuestionary.carQuestionaryModel.trailerFendersOk;
             this.state.trailerFendersMountState = cachedQuestionary.carQuestionaryModel.trailerFendersMountState;
 
             this.state.rack = cachedQuestionary.carQuestionaryModel.rack;
-            this.state.comment = cachedQuestionary.carQuestionaryModel.comment;
+            this.state.comment = cachedQuestionary.comment;
             this.state.frontSuspension = cachedQuestionary.carQuestionaryModel.frontSuspension;
             this.state.backSuspension = cachedQuestionary.carQuestionaryModel.backSuspension;
             this.state.hydroEq = cachedQuestionary.carQuestionaryModel.hydroEq;
@@ -230,16 +236,26 @@ class Questionary extends Component {
             event.preventDefault();
 
             var request = this.constructAndCacheRequest();
+
             this.state.formData.append("CreatedBy", user.identity.login);
             this.state.formData.append("CarQuestionaryModel", JSON.stringify(request.carQuestionaryModel));
             this.state.formData.append("TrailerQuestionaryModel", JSON.stringify(request.trailerQuestionaryModel));
             this.state.formData.append("Comment", this.state.comment);
             this.state.formData.append("DriverId", this.state.driver.id);
-            this.state.formData.append("CarId", this.state.car.id);
+            this.state.formData.append("CarId", this.state.car.id); 
 
-            ApiService.testSendFiles(this.state.formData);
-
-            localStorage.removeItem("questionary");
+            this.validateForm();
+            ApiService.sendQuestionary(this.state.formData).then(response => {
+                this.setState({ createdQuestionary: response.data });
+                alert("Анкета сохранена");
+                this.props.navigate(`/cars/acceptCar/${response.data.uniqueId}`);
+            }, error => {
+                if (error.code == 'ERR_NETWORK') {
+                    this.setState({ errorMessage: "Ошибка сети" });
+                }
+                else
+                    this.setState({ errorMessage: "Анкета не сохранена" });
+            });
         };
     }
 
@@ -313,6 +329,7 @@ class Questionary extends Component {
                     }
                 }
             },
+            trailerCondition: this.state.trailerCondition,
             fendersOk: this.state.trailerFendersOk,
             fendersMountState: this.state.trailerFendersMountState,
         };
@@ -357,6 +374,7 @@ class Questionary extends Component {
                     }
                 }
             },
+            hydroEq: this.state.hydroEq,
             fendersOk: this.state.fendersOk1,
             fendersMountState: this.state.fendersMountState1,
             isCabinClean: this.state.cabinClean,
@@ -367,6 +385,7 @@ class Questionary extends Component {
             rack: this.state.rack,
             frontSuspension: this.state.frontSuspension,
             backSuspension: this.state.backSuspension,
+            generalCondition: this.state.generalCondition
         };
 
         if (this.state.car.axelsCount > 2) {
@@ -374,6 +393,7 @@ class Questionary extends Component {
         }
 
         var requestObject = {
+            approvedByDriver: this.state.approvedByDriver,
             carQuestionaryModel: carQuestionaryObject,
             trailerQuestionaryModel: trailerQuestionaryModel,
             comment: this.state.comment,
@@ -385,6 +405,112 @@ class Questionary extends Component {
 
         return requestObject;
     };
+
+    validateForm() {
+
+        const validate = (obj, validations) =>
+            validations.every(key => ![undefined, null].includes(key.split('.').reduce((acc, cur) => acc?.[cur], obj)));
+
+        const validations = [
+            'driver',
+            'nearLight1',            
+            'distantLight1',
+            //габариты
+            'beamLight1',
+            'turnSignal1',
+            'stopSignal1',
+
+            //габариты
+            'beamLight2',            
+            'turnSignal2',
+            'stopSignal2',
+
+            'pressure1',            
+            'rimState1',
+            'pinsState1',
+            'tireState1',
+
+            'pressure2',
+            'rimState2',
+            'pinsState2',
+            'tireState2',
+
+            'pressure3',
+            'rimState3',
+            'pinsState3',
+            'tireState3',
+
+            'pressure4',
+            'rimState4',
+            'pinsState4',
+            'tireState4',
+
+            //'pressure5',
+            //'rimState5',
+            //'pinsState5',
+            //'tireState5',
+
+            //'pressure6',
+            //'rimState6',
+            //'pinsState6',
+            //'tireState6',
+
+            'trailerPressure1',
+            'trailerRimState1',
+            'trailerPinsState1',
+            'trailerTireState1',
+
+            'trailerPressure2',
+            'trailerRimState2',
+            'trailerPinsState2',
+            'trailerTireState2',
+
+            'trailerPressure3',
+            'trailerRimState3',
+            'trailerPinsState3',
+            'trailerTireState3',
+
+            'trailerPressure4',
+            'trailerRimState4',
+            'trailerPinsState4',
+            'trailerTireState4',
+
+            //'trailerPressure5',
+            //'trailerRimState5',
+            //'trailerPinsState5',
+            //'trailerTireState5',
+
+            //'trailerPressure6',
+            //'trailerRimState6',
+            //'trailerPinsState6',
+            //'trailerTireState6',
+
+            'generalCondition',
+            'trailerCondition',
+
+            'cabinClean',
+            'platonInPlace',
+            'platonSwitchedOn',
+            'fendersOk1',
+            'fendersMountState1',
+
+            //'trailerFendersOk',
+            //'trailerFendersMountState',
+
+            'rack',
+            'comment',
+            'frontSuspension',
+            'backSuspension',
+            'hydroEq',
+            'mileage',
+            'userLogin'
+        ];
+
+        console.log(this.state);
+
+        console.log(validate(this.state, validations));
+    }
+
 
     commonChangedEvent(event, parameterName) {
         if (event.target.value == 'true') {
@@ -509,10 +635,10 @@ class Questionary extends Component {
                                 <input type="text" id="mileage" value={this.state.mileage} onChange={this.mileageChanged} />
                             </div> 
 
-                            <StateRadioButtonGroup type={"Внешнее состояние"} id={"condition"} isActive={generalCondition} option1="С повреждениями" option2="Без повреждений" onChange={this.conditionChanged} />
+                            <StateRadioButtonGroup type={"Внешнее состояние"} id={"condition"} isActive={this.state.generalCondition} option1="С повреждениями" option2="Без повреждений" onChange={this.conditionChanged} />
                         </div>
 
-                        {generalCondition === true ? <div className="col-md-6"><label htmlFor="comment">Комментарий</label><textarea rows="5" cols="40" type="text" id="comment" onChange={this.commentChanged} /></div> : <span></span>}
+                        {generalCondition === true ? <div className="col-md-6"><label htmlFor="comment">Комментарий</label><textarea rows="5" cols="40" type="text" id="comment" value={this.state.comment} onChange={this.commentChanged}/></div> : <span></span>}
                     </div>
 
                     <div className="row">
@@ -678,8 +804,8 @@ class Questionary extends Component {
                         </div>
 
                         <div className="col-md-6">
-                            <StateRadioButtonGroup type={"Поворотники"} id={"turn2"} isActive={this.state.turnSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "turn2")} />
-                            <StateRadioButtonGroup type={"Стоп-сигналы"} id={"stop2"} isActive={this.state.stopSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "stop2")} />
+                            <StateRadioButtonGroup type={"Поворотники"} id={"turn2"} isActive={this.state.turnSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "turnSignal2")} />
+                            <StateRadioButtonGroup type={"Стоп-сигналы"} id={"stop2"} isActive={this.state.stopSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "stopSignal2")} />
                         </div>
                         <hr className="solid" />
                     </div>
@@ -780,6 +906,21 @@ class Questionary extends Component {
                         </div>
                         <hr className="solid" />                      
                     </div>
+
+                    <div className="row">
+                        <h3>Состояние крыльев</h3>
+
+                        <div className="col-md-6">
+                            <StateRadioButtonGroup type={"Крепления"} id={"trailerFendersOk"} isActive={this.state.trailerFendersOk} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerFendersOk")} />
+                        </div>
+
+                        <div className="col-md-6">
+                            <StateRadioButtonGroup type={"Целостность"} id={"trailerFendersMountState1"} isActive={this.state.trailerFendersMountState} option1="Целые" option2="Повреждения" onChange={(event) => this.commonChangedEvent(event, "trailerFendersMountState")} />
+                        </div>
+
+                        <hr className="solid" />
+                    </div>
+
                     <div className="row mb-3">
                         <div className="form-row">
                             <div className="col-md-6">
@@ -800,15 +941,21 @@ class Questionary extends Component {
                         </div>
                         <div className="form-row mt-3">
                             <div className="col-md-12">
-                                <input value="Сохранить и передать водителю" className="btn btn-success" type="button" onClick={this.handleSubmit}></input>
+                                <input type="button" className="btn btn-success" onClick={this.handleSubmit} value="Сохранить и передать водителю"></input>
                             </div>
                         </div>
+                        {this.state.errorMessage && (
+                            <div className="form-group">
+                                <div className="alert alert-danger mt-2" role="alert">
+                                    {this.state.errorMessage}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </form>
             </div>
         );
     }
 }
-
 
 export default withRouter(Questionary);

@@ -1,14 +1,12 @@
 import axios from "axios";
 import authHeader from "./auth-header";
-const API_URL = "https://localhost:32768/api/";
+const API_URL = "https://localhost:32770/api/";
 
 class ApiService {
 
     createSetAuthInterceptor = config => {
 
         const { identityToken } = authHeader();
-
-        console.log(identityToken);
 
         if (identityToken) {
             config.headers.Authorization = `Bearer ${identityToken}`;
@@ -49,10 +47,21 @@ class ApiService {
         return this._axios.delete(url);
     }
 
-    testSendFiles(data) {
+    sendQuestionary(data) {
         var res = this.post(`questionary`, data, { 'Content-Type': 'multipart/form-data' });
-        console.log(res);
+        return res;
     }
+
+    getQuestionary(uniqueId) {
+        var res = this.get(`questionary/${uniqueId}`);
+        return res;
+    }
+
+    acceptQuestionary(data) {
+        var res = this.post(`questionary/acceptquestionary`, data);
+        return res;
+    }
+
 
     getUsers(params) {
         const query = new URLSearchParams(params).toString();
