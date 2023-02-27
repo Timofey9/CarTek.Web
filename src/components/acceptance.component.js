@@ -24,9 +24,12 @@ function AcceptanceComponent() {
         console.log(request);
 
         ApiService.acceptQuestionary(request)
-         .then(({ data }) => {
-             console.log(data);
-         })
+            .then(({ data }) =>
+
+            {
+                localStorage.removeItem("questionary");
+                console.log(data);
+            })
             .catch((error) => {
                 console.log(error);
             });

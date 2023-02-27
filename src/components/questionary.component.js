@@ -13,6 +13,7 @@ class Questionary extends Component {
         const { navigate } = this.props;
 
         this.state = {
+            submitted: false,
             errorMessage: "",
             createdQuestionary: {},
             car: {},
@@ -134,7 +135,7 @@ class Questionary extends Component {
         var cachedQuestionary = JSON.parse(localStorage.getItem("questionary"));
 
         if (cachedQuestionary) {
-
+            this.state.submitted = cachedQuestionary.submitted;
             this.state.nearLight1 = cachedQuestionary.carQuestionaryModel.lightsJsonObject.nearLight;
             this.state.distantLight1 = cachedQuestionary.carQuestionaryModel.lightsJsonObject.distantLight;
                 //габариты
@@ -247,6 +248,8 @@ class Questionary extends Component {
             this.validateForm();
             ApiService.sendQuestionary(this.state.formData).then(response => {
                 this.setState({ createdQuestionary: response.data });
+                this.setState({ submitted: true });
+                this.constructAndCacheRequest();
                 alert("Анкета сохранена");
                 this.props.navigate(`/cars/acceptCar/${response.data.uniqueId}`);
             }, error => {
@@ -292,6 +295,7 @@ class Questionary extends Component {
 
         var trailerQuestionaryModel = {
             transportId: this.state.trailer.id,
+            generalCondition: this.state.trailerCondition,
             lightsJsonObject:
             {
                 nearLight: this.state.nearLight2,
@@ -336,6 +340,7 @@ class Questionary extends Component {
 
         var carQuestionaryObject = {
             transportId: this.state.car.id,
+            generalCondition: this.state.generalCondition,
             lightsJsonObject:
             {
                 nearLight: this.state.nearLight1,
@@ -389,10 +394,11 @@ class Questionary extends Component {
         };
 
         if (this.state.car.axelsCount > 2) {
-            carQuestionaryObject.wheelsJson.middleAxle = carMiddleAxle;
+            carQuestionaryObject.wheelsJsonObject.middleAxle = carMiddleAxle;
         }
 
         var requestObject = {
+            submitted: this.state.submitted,
             approvedByDriver: this.state.approvedByDriver,
             carQuestionaryModel: carQuestionaryObject,
             trailerQuestionaryModel: trailerQuestionaryModel,
@@ -939,13 +945,13 @@ class Questionary extends Component {
                                     renderInput={(params) => <TextField {...params} label="Список водителей" />}/>
                             </div>
                         </div>
-                        <div className="form-row mt-3">
+                        <div className="row mt-3">
                             <div className="col-md-12">
                                 <input type="button" className="btn btn-success" onClick={this.handleSubmit} value="Сохранить и передать водителю"></input>
                             </div>
                         </div>
                         {this.state.errorMessage && (
-                            <div className="form-group">
+                            <div>
                                 <div className="alert alert-danger mt-2" role="alert">
                                     {this.state.errorMessage}
                                 </div>

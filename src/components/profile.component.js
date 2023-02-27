@@ -6,6 +6,7 @@ class Profile extends Component {
 
   render() {
     const { user: currentUser } = this.props;
+
     if (!currentUser) {
       return <Navigate to="/login" />;
     }

@@ -1,6 +1,7 @@
 import axios from "axios";
+import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
-const API_URL = "https://localhost:32770/api/";
+const API_URL = "https://localhost:32768/api/";
 
 class ApiService {
 
@@ -22,6 +23,17 @@ class ApiService {
         });
 
         this._axios.interceptors.request.use(this.createSetAuthInterceptor);
+
+        this._axios.interceptors.response.use(
+            response => response,
+            error => {
+                const { status } = error.response;
+                if (status === 401) {
+                    EventBus.dispatch("logout", {});
+                }
+                return Promise.reject(error);
+            }
+        );
     }
 
     post(url, data, headers = {}) {
@@ -57,11 +69,25 @@ class ApiService {
         return res;
     }
 
+    getQuestionaryUnit(uniqueId) {
+        var res = this.get(`questionary/getunit/${uniqueId}`);
+        return res;
+    }
+
+    getQuestionaryImages(uniqueId) {
+        var res = this.get(`questionary/getImages/${uniqueId}`);
+        return res;
+    }
+
     acceptQuestionary(data) {
         var res = this.post(`questionary/acceptquestionary`, data);
         return res;
     }
 
+    getQuestionaries(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`questionary/all/?${query}`);
+    }
 
     getUsers(params) {
         const query = new URLSearchParams(params).toString();

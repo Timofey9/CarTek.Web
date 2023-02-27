@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 
 import "bootstrap/dist/js/bootstrap.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -8,15 +8,16 @@ import "./App.css";
 
 import Login from "./components/login.component";
 import Home from "./components/home.component";
+import Car from "./components/car.component"
 import Questionary from "./components/questionary.component";
 import CarsList from "./components/cars-list.component";
 import DriversList from "./components/drivers-list.component";
 import UserForm from "./components/add-user.component";
 import Profile from "./components/profile.component";
 import BoardUser from "./components/board-user.component";
-import BoardModerator from "./components/board-moderator.component";
 import BoardAdmin from "./components/board-admin.component";
 import AcceptanceComponent from "./components/acceptance.component";
+import QuestionaryDetailsComponent from "./components/questionaryDetails.component";
 
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
@@ -26,6 +27,7 @@ import { history } from './helpers/history';
 // import AuthVerify from "./common/auth-verify";
 import EventBus from "./common/EventBus";
 import UsersList from "./components/users-list.component";
+import CarComponent from "./components/car.component";
 
 class App extends Component {
     constructor(props) {
@@ -77,6 +79,7 @@ class App extends Component {
 
         return (
             <BrowserRouter location={history.location} navigator={history}>
+
                 <nav className="navbar navbar-expand-lg navbar-light main-nav">
                     <Link to={"/"} className="navbar-brand">
                         <img src="/logo.png" height="40" alt="logo" />
@@ -137,20 +140,22 @@ class App extends Component {
 
                 <div className="container mt-3">
                     <Routes>
-                        <Route exact path="/" element={<Home />} />
-                        <Route exact path="/home" element={<Home />} />
+                        <Route exact path="/" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
+                        <Route exact path="/home" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />                        
                         <Route exact path="/login" element={<Login />} />
-                        <Route exact path="/profile" element={<Profile />} />
-                        <Route exact path="/user" element={<BoardUser />} />
-                        <Route exact path="/cars" element={<CarsList />} />
-                        <Route exact path="/cars/acceptCar/:uniqueId" element={<AcceptanceComponent/>} />
-                        <Route exact path="/mod" element={<BoardModerator />} />
-                        <Route exact path="/questionary/car/:plate" element={<Questionary />} />
-                        <Route exact path="/admin" element={<BoardAdmin />} />
-                        <Route exact path="/admin/user/" element={<UserForm />} />
-                        <Route exact path="/admin/user/:login" element={<UserForm />} />
-                        <Route exact path="/admin/users" element={<UsersList />} />
-                        <Route exact path="/admin/drivers" element={<DriversList />} />
+                        <Route exact path="/profile" element={<RequireAuth currentUser={currentUser}><Profile /></RequireAuth>} />
+                        <Route exact path="/user" element={<RequireAuth currentUser={currentUser}><BoardUser /></RequireAuth>} />
+                        <Route exact path="/cars" element={<RequireAuth currentUser={currentUser}><CarsList /></RequireAuth>} />
+                        <Route exact path="/cars/car/:plate" element={<RequireAuth currentUser={currentUser}><CarComponent /></RequireAuth>} />
+                        <Route exact path="/admin/cars" element={<RequireAuth currentUser={currentUser}><CarsList /></RequireAuth>} />
+                        <Route exact path="/cars/acceptCar/:uniqueId" element={<RequireAuth currentUser={currentUser}><AcceptanceComponent /></RequireAuth>} />
+                        <Route exact path="/questionary/car/:plate" element={<RequireAuth currentUser={currentUser}><Questionary /></RequireAuth>} />
+                        <Route exact path="/questionary/details/:uniqueId" element={<RequireAuth currentUser={currentUser}><QuestionaryDetailsComponent/></RequireAuth>} />
+                        <Route exact path="/admin" element={<RequireAuth currentUser={currentUser}><BoardAdmin /></RequireAuth>} />
+                        <Route exact path="/admin/user/" element={<RequireAuth currentUser={currentUser}><UserForm /></RequireAuth>} />
+                        <Route exact path="/admin/user/:login" element={<RequireAuth currentUser={currentUser}><UserForm /></RequireAuth>} />
+                        <Route exact path="/admin/users" element={<RequireAuth currentUser={currentUser}><UsersList /></RequireAuth>} />
+                        <Route exact path="/admin/drivers" element={<RequireAuth currentUser={currentUser}><DriversList /></RequireAuth>} />
                     </Routes>
                 </div>
 
@@ -158,6 +163,12 @@ class App extends Component {
             </BrowserRouter>
         );
     }
+}
+
+
+function RequireAuth({ currentUser, children }) {
+    let isAuthenticated = currentUser !== null;
+    return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
 function mapStateToProps(state) {

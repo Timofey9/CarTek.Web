@@ -45,7 +45,7 @@ const CarsList = () => {
         {
             name: "Номер",
             sortBy: "plate",
-            selector: (row, index) => row.plate,
+            selector: (row, index) => <Link to={`/cars/car/${row.plate}`} className={"btn btn-default"}>{row.plate}</Link>,
             sortable: true
         },
         {
