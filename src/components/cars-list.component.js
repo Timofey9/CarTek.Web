@@ -32,6 +32,7 @@ const CarsList = () => {
             pageNumber: pageNumber
         })
             .then(({ data }) => {
+                console.log(data);
                 const { totalNumber, list } = data;
                 !cancelled && setTotalNumber(totalNumber);
                 !cancelled && setLoading(false);
@@ -67,7 +68,7 @@ const CarsList = () => {
         },
         {
             name: "Водитель",
-            selector: (row, index) => row.driver.login,
+            selector: (row, index) => row.driver ? row.driver.fullName  : "Нет водителя",
             sortable: false
         }
     ];

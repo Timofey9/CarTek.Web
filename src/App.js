@@ -6,9 +6,10 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
+import DriverForm from "./components/add-driver.component";
+
 import Login from "./components/login.component";
 import Home from "./components/home.component";
-import Car from "./components/car.component"
 import Questionary from "./components/questionary.component";
 import CarsList from "./components/cars-list.component";
 import DriversList from "./components/drivers-list.component";
@@ -156,6 +157,8 @@ class App extends Component {
                         <Route exact path="/admin/user/:login" element={<RequireAuth currentUser={currentUser}><UserForm /></RequireAuth>} />
                         <Route exact path="/admin/users" element={<RequireAuth currentUser={currentUser}><UsersList /></RequireAuth>} />
                         <Route exact path="/admin/drivers" element={<RequireAuth currentUser={currentUser}><DriversList /></RequireAuth>} />
+                        <Route exact path="/admin/driver" element={<RequireAuth currentUser={currentUser}><DriverForm /></RequireAuth>} />
+                        <Route exact path="/admin/driver/:driverId" element={<RequireAuth currentUser={currentUser}><DriverForm /></RequireAuth>} />
                     </Routes>
                 </div>
 
@@ -167,7 +170,7 @@ class App extends Component {
 
 
 function RequireAuth({ currentUser, children }) {
-    let isAuthenticated = currentUser !== null;
+    let isAuthenticated = currentUser !== undefined;
     return isAuthenticated ? children : <Navigate to="/login" />;
 }
 

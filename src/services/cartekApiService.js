@@ -1,7 +1,7 @@
 import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
-const API_URL = "https://localhost:32768/api/";
+const API_URL = "http://185.46.8.6:5000/api/";
 
 class ApiService {
 
@@ -114,6 +114,23 @@ class ApiService {
         return this.patch(`user/updateuser/${login}`, data);
     };
 
+
+    updateDriver = (driverId, params) => {
+        const data = JSON.stringify(Object.keys(params).map(key => {
+            return {
+                op: "add",
+                path: `/${key}`,
+                value: params[key]
+            }
+        }));
+
+        return this.patch(`drivers/updatedriver/${driverId}`, data);
+    };
+
+    createDriver = (data) => {
+        return this.post("drivers/createdriver", data);
+    };
+
     getDrivers(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`drivers/getdrivers/?${query}`);
@@ -124,13 +141,17 @@ class ApiService {
         return this.get(`drivers/getalldrivers/`);
     }
 
-    getDriver(carId) {
-        return this.get(`drivers/getdriver/${carId}`);
+    getDriver(driverId) {
+        return this.get(`drivers/driver/${driverId}/`);
     }
 
     getCars(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`cars/getcars/?${query}`);
+    }
+
+    getAllCars() {
+        return this.get(`cars/getallcars/`);
     }
 
     getCar(carId) {

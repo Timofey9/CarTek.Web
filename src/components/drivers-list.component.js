@@ -45,7 +45,7 @@ const DriversList = () => {
         {
             name: "Имя",
             sortBy: "lastName",
-            selector: (row, index) => row.fullName,
+            selector: (row, index) => <Link to={`admin/driver/${row.id}`} className="btn btn-default">{row.id}</Link>,
             sortable: true
         },
         {
@@ -96,7 +96,7 @@ const DriversList = () => {
                     </div>
                 </div>
                 <div className="form-group col-md-5">
-                    <Link to="/admin/user" type="submit" className="pull-right btn btn-success mb-2">Добавить водителя</Link>
+                    <Link to="/admin/driver" type="submit" className="pull-right btn btn-success mb-2">Добавить водителя</Link>
                 </div>
             </div>
         </form>

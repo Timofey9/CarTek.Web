@@ -96,7 +96,7 @@ function CarComponent() {
         },
         {
             name: "Водитель",
-            selector: (row, index) => row.driver.fullName,
+            selector: (row, index) => row.driver ? row.driver.fullName : "Не определен",
             sortable: false,
             center: true,
         },
@@ -144,7 +144,7 @@ function CarComponent() {
                             <label><b>Текущий водитель: </b></label>
                         </div>
                         <div className="col-md-6">
-                            <label>{car.driver.fullName}</label>
+                            <label>{car.driver ? car.driver.fullName : "Не определен"}</label>
                         </div>
                     </div>
 

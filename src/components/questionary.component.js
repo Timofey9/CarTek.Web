@@ -171,16 +171,18 @@ class Questionary extends Component {
             this.state.tireState4 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.tireState;
 
 
-                //Обработать количество осей
-                //pressure5: cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pressure,
-                //rimState5: cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.rimState,
-                //pinsState5: cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pinsState,
-                //tireState5: cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.tireState,
+            if (cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle) {
+                this.state.pressure5 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pressure;
+                this.staterimState5 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.rimState;
+                this.state.pinsState5 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pinsState;
+                this.state.tireState5 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.tireState;
 
-                //pressure6: cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pressure,
-                //rimState6: cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.rimState,
-                //pinsState6: cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pinsState,
-                //tireState6: cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.tireState,
+                this.state.pressure6 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pressure;
+                this.state.rimState6 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.rimState;
+                this.state.pinsState6 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pinsState;
+                this.state.tireState6 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.tireState;
+            }
+
 
             this.state.trailerPressure1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.pressure;
             this.state.trailerRimState1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.rimState;
@@ -202,17 +204,19 @@ class Questionary extends Component {
             this.state.trailerPinsState4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.pinsState;
             this.state.trailerTireState4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.tireState;
 
+            if (cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle) {
+
                 //Обработать количество осей
-                //trailerPressure5: cachedQuestionary.carQuestionaryModel.trailerPressure5,
-                //trailerRimState5: cachedQuestionary.carQuestionaryModel.trailerRimState5,
-                //trailerPinsState5: cachedQuestionary.carQuestionaryModel.trailerPinsState5,
-                //trailerTireState5: cachedQuestionary.carQuestionaryModel.trailerTireState5,
+                this.state.trailerPressure5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pressure;
+                this.state.trailerRimState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.rimState;
+                this.state.trailerPinsState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pinsState;
+                this.state.trailerTireState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.tireState;
 
-                //trailerPressure6: cachedQuestionary.carQuestionaryModel.trailerPressure6,
-                //trailerRimState6: cachedQuestionary.carQuestionaryModel.trailerRimState6,
-                //trailerPinsState6: cachedQuestionary.carQuestionaryModel.trailerPinsState6,
-                //trailerTireState6: cachedQuestionary.carQuestionaryModel.trailerTireState6,
-
+                this.state.trailerPressure6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pressure;
+                this.state.trailerRimState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.rimState;
+                this.state.trailerPinsState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pinsState;
+                this.state.trailerTireState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.tireState;
+            }
             this.state.generalCondition = cachedQuestionary.carQuestionaryModel.generalCondition;
             this.state.trailerCondition = cachedQuestionary.trailerQuestionaryModel.trailerCondition;
             this.state.cabinCushion = cachedQuestionary.carQuestionaryModel.cabinCushion;
@@ -397,6 +401,11 @@ class Questionary extends Component {
             carQuestionaryObject.wheelsJsonObject.middleAxle = carMiddleAxle;
         }
 
+        if (this.state.trailer.axelsCount > 2) {
+            trailerQuestionaryModel.wheelsJsonObject.middleAxle = trailerMiddleAxle;
+        }
+
+
         var requestObject = {
             submitted: this.state.submitted,
             approvedByDriver: this.state.approvedByDriver,
@@ -451,15 +460,15 @@ class Questionary extends Component {
             'pinsState4',
             'tireState4',
 
-            //'pressure5',
-            //'rimState5',
-            //'pinsState5',
-            //'tireState5',
+            'pressure5',
+            'rimState5',
+            'pinsState5',
+            'tireState5',
 
-            //'pressure6',
-            //'rimState6',
-            //'pinsState6',
-            //'tireState6',
+            'pressure6',
+            'rimState6',
+            'pinsState6',
+            'tireState6',
 
             'trailerPressure1',
             'trailerRimState1',
@@ -481,15 +490,15 @@ class Questionary extends Component {
             'trailerPinsState4',
             'trailerTireState4',
 
-            //'trailerPressure5',
-            //'trailerRimState5',
-            //'trailerPinsState5',
-            //'trailerTireState5',
+            'trailerPressure5',
+            'trailerRimState5',
+            'trailerPinsState5',
+            'trailerTireState5',
 
-            //'trailerPressure6',
-            //'trailerRimState6',
-            //'trailerPinsState6',
-            //'trailerTireState6',
+            'trailerPressure6',
+            'trailerRimState6',
+            'trailerPinsState6',
+            'trailerTireState6',
 
             'generalCondition',
             'trailerCondition',
@@ -500,8 +509,6 @@ class Questionary extends Component {
             'fendersOk1',
             'fendersMountState1',
 
-            //'trailerFendersOk',
-            //'trailerFendersMountState',
 
             'rack',
             'comment',
@@ -897,7 +904,7 @@ class Questionary extends Component {
                                     </div>
                                 </div>
                             </div>
-                            {car.axelsCount > 2 ? <div className="form-row">
+                            {trailer.axelsCount > 2 ? <div className="form-row">
                                 <h5 className="d-flex justify-content-center">3 ось</h5>
                                 <div className="col-md-12">
                                     <StateRadioButtonGroup type={"Диски"} id={"trailerRimState6"} isActive={this.state.trailerRimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState6")} />
