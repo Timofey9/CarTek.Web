@@ -1,7 +1,7 @@
 import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
-const API_URL = "http://185.46.8.6:5000/api/";
+const API_URL = "https://localhost:32768/api/";
 
 class ApiService {
 
@@ -127,6 +127,30 @@ class ApiService {
         return this.patch(`drivers/updatedriver/${driverId}`, data);
     };
 
+    updateCar = (carId, params) => {
+        const data = JSON.stringify(Object.keys(params).map(key => {
+            return {
+                op: "add",
+                path: `/${key}`,
+                value: params[key]
+            }
+        }));
+
+        return this.patch(`cars/updatecar/${carId}`, data);
+    };
+
+    updateTrailer = (trailerId, params) => {
+        const data = JSON.stringify(Object.keys(params).map(key => {
+            return {
+                op: "add",
+                path: `/${key}`,
+                value: params[key]
+            }
+        }));
+
+        return this.patch(`cars/updatetrailer/${trailerId}`, data);
+    };
+
     createDriver = (data) => {
         return this.post("drivers/createdriver", data);
     };
@@ -154,6 +178,25 @@ class ApiService {
         return this.get(`cars/getallcars/`);
     }
 
+    getAllTrailers() {
+        return this.get(`cars/getalltrailers/`);
+    }
+
+    getTrailers(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`cars/gettrailers/?${query}`);
+    }
+
+    createTrailer(data) {
+        return this.post(`cars/createtrailer/`, data);
+
+    }
+
+    createCar(data) {
+        return this.post(`cars/createcar/`, data);
+
+    }
+
     getCar(carId) {
         return this.get(`cars/getcar/${carId}`);
     }
@@ -161,6 +204,11 @@ class ApiService {
     getCarByPlate(plate) {
         return this.get(`cars/plate/${plate}`);
     }
+
+    getTrailerByPlate(plate) {
+        return this.get(`cars/trailer/${plate}`);
+    }
+
 
     deleteCar(carId) {
         return this.delete(`cars/deletecar/${carId}`);

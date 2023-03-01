@@ -518,10 +518,6 @@ class Questionary extends Component {
             'mileage',
             'userLogin'
         ];
-
-        console.log(this.state);
-
-        console.log(validate(this.state, validations));
     }
 
 
@@ -744,7 +740,8 @@ class Questionary extends Component {
                                     </div>
                                 </div>
                             </div>
-                            {car.axelsCount > 2 ? <div className="form-row">
+                            {car.axelsCount > 2 ?
+                                <div className="form-row">
                                 <h5 className="d-flex justify-content-center">3 ось</h5>
                                 <div className="col-md-12">
                                     <StateRadioButtonGroup type={"Диски"} id={"rimState6"} isActive={this.state.rimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState6")} />
@@ -863,7 +860,7 @@ class Questionary extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                {car.axelsCount > 2 ? <div className="form-row">
+                                {trailer.axelsCount > 2 ? <div className="form-row">
                                     <h5 className="d-flex justify-content-center">3 ось</h5>
                                     <div className="col-md-12">
                                         <StateRadioButtonGroup type={"Диски"} id={"trailerRimState5"} isActive={this.state.trailerRimState5} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState5")} />

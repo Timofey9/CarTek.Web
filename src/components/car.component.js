@@ -102,7 +102,7 @@ function CarComponent() {
         },
         {
             name: "Тип",
-            selector: (row, index) => row.state == 0 ? "На выезд" : "На въезд",
+            selector: (row, index) => row.action == 'departure' ? "На выезд" : "На въезд",
             sortable: false,
             center: true,
         }
@@ -133,7 +133,7 @@ function CarComponent() {
                     <h2>{car.brand} {car.model}, гос.номер: {car.plate}</h2>
                 </div>
                 <div className="col-md-4">
-                    <input type="button" className="btn btn-success pull-right" value="Редактировать"/>
+                    <Link to={`/admin/cars/edit/${car.plate}`} className="btn btn-success pull-right">Редактировать</Link>
                 </div>
             </div>
 
@@ -161,9 +161,10 @@ function CarComponent() {
                         <div className="col-md-3">
                             <label><b>Полуприцеп: </b></label>
                         </div>
-                        <div className="col-md-6">
+                        {car.trailer && <div className="col-md-6">
                             <label>{car.trailer.brand} {car.trailer.model}, гос.номер: {car.trailer.plate}</label>
-                        </div>
+                        </div> }
+
                     </div>
                 </div>
             </div>

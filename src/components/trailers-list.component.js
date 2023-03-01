@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
-const CarsList = () => {
+const TrailersList = () => {
     let cancelled = false;
     const [loading, setLoading] = useState(false);
     const [sortBy, setSortBy] = useState("name");
@@ -13,7 +13,7 @@ const CarsList = () => {
     const [totalNumber, setTotalNumber] = useState(15);
     const [pageSize, setPageSize] = useState(15);
     const [pageNumber, setPageNumber] = useState(1);
-    const [cars, setCars] = useState([]);
+    const [trailers, setTrailers] = useState([]);
     const [reload, setReload] = useState(0);
 
     const search = () => {
@@ -23,7 +23,7 @@ const CarsList = () => {
     useEffect(() => {
         !cancelled && setLoading(true);
 
-        ApiService.getCars({
+        ApiService.getTrailers({
             searchColumn: searchBy,
             search: searchString,
             sortColumn: sortBy,
@@ -35,7 +35,7 @@ const CarsList = () => {
                 const { totalNumber, list } = data;
                 !cancelled && setTotalNumber(totalNumber);
                 !cancelled && setLoading(false);
-                !cancelled && setCars(list);
+                !cancelled && setTrailers(list);
             });
 
         return () => cancelled = true
@@ -45,7 +45,7 @@ const CarsList = () => {
         {
             name: "Номер",
             sortBy: "plate",
-            selector: (row, index) => <Link to={`/cars/car/${row.plate}`} className={"btn btn-default"}>{row.plate}</Link>,
+            selector: (row, index) => <Link to={`/admin/trailer/${row.plate}`} className={"btn btn-default"}>{row.plate}</Link>,
             sortable: true
         },
         {
@@ -61,13 +61,8 @@ const CarsList = () => {
             sortable: false
         },
         {
-            name: "Статус",
-            selector: (row, index) => row.status, 
-            sortable: false
-        },
-        {
-            name: "Водитель",
-            selector: (row, index) => row.driver ? row.driver.fullName  : "Нет водителя",
+            name: "Тягач",
+            selector: (row, index) => row.car ? row.car.plate : "Нет тягача",
             sortable: false
         }
     ];
@@ -106,14 +101,14 @@ const CarsList = () => {
                     </div>
                 </div>
                 <div className="form-group col-md-5">
-                    <Link to="/admin/cars/add" type="submit" className="pull-right btn btn-success mb-2">Добавить тягач</Link>
+                    <Link to="/admin/trailer/add" type="submit" className="pull-right btn btn-success mb-2">Добавить полуприцеп</Link>
                 </div>
             </div>
         </form>
         {
-            cars.length === 0 && !loading ?
+            trailers.length === 0 && !loading ?
                 <section className="empty-view">
-                    <header>Не найдено машин</header>
+                    <header>Не найдено полуприцепов</header>
                 </section>
                 :
                 <DataTable
@@ -132,7 +127,7 @@ const CarsList = () => {
                         !cancelled && setSortBy(column.sortBy);
                         !cancelled && setDir(direction);
                     }}
-                    data={cars}
+                    data={trailers}
                     pagination
                     onChangePage={(page, totalRows) => {
                         !cancelled && setPageNumber(page);
@@ -146,4 +141,4 @@ const CarsList = () => {
     </>;
 };
 
-export default CarsList;
+export default TrailersList;

@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import {Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ApiService from "../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { setMessage } from '../actions/message';
 
-function DriverForm() {
-    const [driver, setDriver] = useState({});
+function TrailerForm() {
     const [cars, setCars] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [firstName, setFirstName] = useState("");
-    const [middleName, setMiddleName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [password, setPassword] = useState("");
     const [carId, setCarId] = useState(0);
-    const [phone, setPhone] = useState(0);
-    const [selectedItem, setSelectedItem] = useState(0);
+    const [trailer, setTrailer] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [plate, setPlate] = useState("");
+    const [brand, setBrand] = useState("");
+    const [model, setModel] = useState("");
+    const [axelsCount, setAxelsCount] = useState(2);
     const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
 
-    let { driverId } = useParams();
+
+    let { trailerPlate } = useParams();
 
     useEffect(() => {
         setLoading(true);
@@ -37,16 +38,14 @@ function DriverForm() {
     useEffect(() => {
         setLoading(true);
 
-        if (driverId) {
-            ApiService.getDriver(driverId)
+        if (trailerPlate) {
+            ApiService.getTrailerByPlate(trailerPlate)
                 .then(({ data }) => {
-                    setDriver(data);
-                    setFirstName(data.firstName);
-                    setMiddleName(data.middleName);
-                    setLastName(data.lastName);
-                    setCarId(data.carId);
-                    setPassword(data.password);
-                    setPhone(data.phone);
+                    setTrailer(data);
+                    setPlate(data.plate);
+                    setBrand(data.brand);
+                    setModel(data.model);
+                    setAxelsCount(data.axelsCount);
                 }).
                 catch((error) => {
                     console.log(error);
@@ -57,32 +56,33 @@ function DriverForm() {
 
     function handleSubmit(event) {
         event.preventDefault();
+        setMessage("");
 
-        const newDriver = {
-            firstName: firstName,
-            middleName: middleName,
-            lastName: lastName,
-            password: password,
-            phone: phone,
+        const newTrailer = {
+            plate: plate,
+            brand: brand,
+            model: model,
+            axelsCount: axelsCount,
             carId: carId
         };
 
-        if (driverId) {
-            ApiService.updateDriver(driverId, newDriver)
+        if (trailerPlate) {
+            ApiService.updateTrailer(trailer.id, newTrailer)
                 .then(({ data }) => {
-                    alert("Водитель обновлен");
+                    alert("Полуприцеп обновлен");
                 }).
                 catch((error) => {
                     console.log(error);
                 });
         } else {
-            ApiService.createDriver(newDriver)
+            ApiService.createTrailer(newTrailer)
                 .then(({ data }) => {
-                    console.log(data);
-                    alert("Водитель создан");
+                    alert("Полуприцеп создан");
                 }).
                 catch((error) => {
-                    console.log(error);
+                    if (error.response.data.message) {
+                        setMessage(error.response.data.message);
+                    }
                 });
         }
     }
@@ -91,73 +91,63 @@ function DriverForm() {
         return <div><h1>ЗАГРУЗКА...</h1></div>
     }
 
-
     return (
         <div>
-          <div className="row justify-content-md-center">
+            <div className="row justify-content-md-center">
                 <div className="col-md-auto">
                     {error}
                 </div>
             </div>
-            <h1>Водитель</h1>
+            <h1>Тягач</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
-                    <label htmlFor="firstName">Имя</label>
+                    <label htmlFor="firstName">Гос. номер</label>
                     <input
                         type="text"
                         className="form-control"
                         form="profile-form"
-                        onChange={(e) => setFirstName(e.target.value)}
-                        value={firstName}
+                        onChange={(e) => setPlate(e.target.value)}
+                        value={plate}
                     />
                 </div>
                 <div className="form-group col-md-6">
-                    <label htmlFor="middleName">Отчество</label>
+                    <label htmlFor="middleName">Марка</label>
                     <input
                         type="text"
                         className="form-control"
                         form="profile-form"
-                        onChange={(e) => setMiddleName(e.target.value)}
-                        value={middleName}/>
+                        onChange={(e) => setBrand(e.target.value)}
+                        value={brand} />
                 </div>
                 <div className="form-group col-md-6">
-                    <label htmlFor="firstName">Фамилия</label>
+                    <label htmlFor="firstName">Модель</label>
                     <input
                         type="text"
                         className="form-control"
                         form="profile-form"
-                        onChange={(e) => setLastName(e.target.value)}
-                        value={lastName}
+                        onChange={(e) => setModel(e.target.value)}
+                        value={model}
                     />
                 </div>
             </div>
             <div className="form-row">
                 <div className="form-group col-md-6">
-                    <label htmlFor="login">Телефон</label>
+                    <label htmlFor="login">Количество осей</label>
                     <input
+                        type="number"
                         className="form-control"
                         form="profile-form"
-                        onChange={(e) => setPhone(e.target.value)}
-                        value={phone} />
+                        onChange={(e) => setAxelsCount(e.target.value)}
+                        value={axelsCount} />
                 </div>
 
-                <div className="form-group col-md-6">
-                    <label htmlFor="login">Пароль</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        form="profile-form"
-                        onChange={(e) => setPassword(e.target.value)}
-                        value={password} />
-                </div>
-
-                {driver.car ? <div className="form-group col-md-6">
-                    <label htmlFor="car">Текущий тягач: {driver.car.brand} {driver.car.model}, гос.номер {driver.car.plate}</label>
+                {trailer.car ? <div className="form-group col-md-6">
+                    <label htmlFor="car">Текущий тягач: {trailer.car.brand} {trailer.car.model}, гос.номер {trailer.car.plate}</label>
                 </div> : <></>}
             </div>
 
             {cars && <div className="form-row">
-                <label>Выберите автомобиль</label>
+                <label>Выберите тягач</label>
                 <Autocomplete
                     options={cars}
                     disablePortal
@@ -168,15 +158,24 @@ function DriverForm() {
                     renderInput={(params) => <TextField {...params} label="Список тягачей" />} />
             </div>}
 
+
+            {message && (
+                <div className="form-group">
+                    <div className="alert alert-danger mt-2" role="alert">
+                        {message}
+                    </div>
+                </div>
+            )}
+
             <div className="row justify-content-md-center mt-3">
                 <div className="col-md-2">
-                    <Link to="/admin/drivers" className="btn btn-danger mr-1">
+                    <Link to="/admin/trailers" className="btn btn-danger mr-1">
                         Отмена
                     </Link>
                 </div>
 
                 <div className="col-md-3">
-                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => {handleSubmit(e)}}>
+                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
                         Сохранить
                     </button>
                 </div>
@@ -184,4 +183,4 @@ function DriverForm() {
         </div>);
 };
 
-export default DriverForm;
+export default TrailerForm;
