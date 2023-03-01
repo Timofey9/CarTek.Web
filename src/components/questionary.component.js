@@ -805,131 +805,132 @@ class Questionary extends Component {
                         <hr className="solid" />
                     </div>
 
-                    <h2>Полуприцеп {trailer.brand} {trailer.model} (гос.номер: {trailer.plate})</h2>
+                    {trailer && <div>                    <h2>Полуприцеп {trailer.brand} {trailer.model} (гос.номер: {trailer.plate})</h2>
 
-                    <div className="row">
-                        <h3>Световые приборы</h3>
-                        <div className="col-md-6">
-                            <StateRadioButtonGroup type={"Габариты"} id={"beamLight2"} isActive={this.state.beamLight2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "beamLight2")} />
+                        <div className="row">
+                            <h3>Световые приборы</h3>
+                            <div className="col-md-6">
+                                <StateRadioButtonGroup type={"Габариты"} id={"beamLight2"} isActive={this.state.beamLight2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "beamLight2")} />
+                            </div>
+
+                            <div className="col-md-6">
+                                <StateRadioButtonGroup type={"Поворотники"} id={"turn2"} isActive={this.state.turnSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "turnSignal2")} />
+                                <StateRadioButtonGroup type={"Стоп-сигналы"} id={"stop2"} isActive={this.state.stopSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "stopSignal2")} />
+                            </div>
+                            <hr className="solid" />
                         </div>
 
-                        <div className="col-md-6">
-                            <StateRadioButtonGroup type={"Поворотники"} id={"turn2"} isActive={this.state.turnSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "turnSignal2")} />
-                            <StateRadioButtonGroup type={"Стоп-сигналы"} id={"stop2"} isActive={this.state.stopSignal2} option1="Исправен" option2="Не исправен" onChange={(event) => this.commonChangedEvent(event, "stopSignal2")} />
-                        </div>
-                        <hr className="solid" />
-                    </div>
+                        <div className="row">
+                            <h3>Общее состояние</h3>
 
-                    <div className="row">
-                        <h3>Общее состояние</h3>
+                            <div className="col-md-6">
+                                <StateRadioButtonGroup type={"Внешнее состояние"} id={"trailercondition"} isActive={this.state.trailerCondition} option1="С повреждениями" option2="Без повреждений" onChange={this.trailerConditionChanged} />
+                            </div>
 
-                        <div className="col-md-6">
-                            <StateRadioButtonGroup type={"Внешнее состояние"} id={"trailercondition"} isActive={this.state.trailerCondition} option1="С повреждениями" option2="Без повреждений" onChange={this.trailerConditionChanged} />
+                            {trailerCondition === true ? <div className="col-md-6"><label htmlFor="comment">Комментарий</label><textarea rows="5" cols="40" type="text" id="comment" /></div> : <span></span>}
+
+                            <hr className="solid" />
                         </div>
 
-                        {trailerCondition === true ? <div className="col-md-6"><label htmlFor="comment">Комментарий</label><textarea rows="5" cols="40" type="text" id="comment" /></div> : <span></span>}
+                        <div className="row">
+                            <div className="col-md-6">
+                                <div className="form-group">
+                                    <h1 className="d-flex justify-content-center">Левая сторона</h1>
+                                    <div className="form-row">
+                                        <h5 className="d-flex justify-content-center">1 ось</h5>
+                                        <div className="col-md-12">
+                                            <StateRadioButtonGroup type={"Диски"} id={"trailerRimState1"} isActive={this.state.trailerRimState1} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState1")} />
+                                            <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState1"} isActive={this.state.trailerTireState1} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState1")} />
+                                            <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState1"} isActive={this.state.trailerPinsState1} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState1")} />
+                                            <div className="form-group">
+                                                <label htmlFor="pressure">Давление:</label>
+                                                <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure1" value={this.state.trailerPressure1} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure1")} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="form-row">
+                                        <h5 className="d-flex justify-content-center">2 ось</h5>
+                                        <div className="col-md-12">
+                                            <StateRadioButtonGroup type={"Диски"} id={"trailerRimState3"} isActive={this.state.trailerRimState3} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState3")} />
+                                            <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState3"} isActive={this.state.trailerTireState3} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState3")} />
+                                            <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState3"} isActive={this.state.trailerPinsState3} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState3")} />
+                                            <div className="form-group">
+                                                <label htmlFor="pressure">Давление:</label>
+                                                <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure3" value={this.state.trailerPressure3} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure3")} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {trailer.axelsCount > 2 ? <div className="form-row">
+                                        <h5 className="d-flex justify-content-center">3 ось</h5>
+                                        <div className="col-md-12">
+                                            <StateRadioButtonGroup type={"Диски"} id={"trailerRimState5"} isActive={this.state.trailerRimState5} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState5")} />
+                                            <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState5"} isActive={this.state.trailerTireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState5")} />
+                                            <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState5"} isActive={this.state.trailerPinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState5")} />
+                                            <div className="form-group">
+                                                <label htmlFor="pressure">Давление:</label>
+                                                <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure5" value={this.state.trailerPressure5} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure5")} />
+                                            </div>
+                                        </div>
+                                    </div> : <></>}
+                                </div>
+                            </div>
 
-                        <hr className="solid" />
-                    </div>
-
-                    <div className="row">
-                        <div className="col-md-6">
-                            <div className="form-group">
-                                <h1 className="d-flex justify-content-center">Левая сторона</h1>
+                            <div className="col-md-6">
+                                <h1 className="d-flex justify-content-center">Правая сторона</h1>
                                 <div className="form-row">
                                     <h5 className="d-flex justify-content-center">1 ось</h5>
                                     <div className="col-md-12">
-                                        <StateRadioButtonGroup type={"Диски"} id={"trailerRimState1"} isActive={this.state.trailerRimState1} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState1")} />
-                                        <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState1"} isActive={this.state.trailerTireState1} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState1")} />
-                                        <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState1"} isActive={this.state.trailerPinsState1} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState1")} />
+                                        <StateRadioButtonGroup type={"Диски"} id={"trailerRimState2"} isActive={this.state.trailerRimState2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState2")} />
+                                        <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState2"} isActive={this.state.trailerTireState2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState2")} />
+                                        <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState2"} isActive={this.state.trailerPinsState2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState2")} />
                                         <div className="form-group">
                                             <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure1" value={this.state.trailerPressure1} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure1")} />
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure2" value={this.state.trailerPressure2} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure2")} />
                                         </div>
                                     </div>
                                 </div>
                                 <div className="form-row">
                                     <h5 className="d-flex justify-content-center">2 ось</h5>
                                     <div className="col-md-12">
-                                        <StateRadioButtonGroup type={"Диски"} id={"trailerRimState3"} isActive={this.state.trailerRimState3} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState3")} />
-                                        <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState3"} isActive={this.state.trailerTireState3} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState3")} />
-                                        <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState3"} isActive={this.state.trailerPinsState3} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState3")} />
+                                        <StateRadioButtonGroup type={"Диски"} id={"trailerRimState4"} isActive={this.state.trailerRimState4} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState4")} />
+                                        <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState4"} isActive={this.state.trailerTireState4} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState4")} />
+                                        <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState4"} isActive={this.state.trailerPinsState4} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState4")} />
                                         <div className="form-group">
                                             <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure3" value={this.state.trailerPressure3} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure3")} />
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure4" value={this.state.trailerPressure4} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure4")} />
                                         </div>
                                     </div>
                                 </div>
                                 {trailer.axelsCount > 2 ? <div className="form-row">
                                     <h5 className="d-flex justify-content-center">3 ось</h5>
                                     <div className="col-md-12">
-                                        <StateRadioButtonGroup type={"Диски"} id={"trailerRimState5"} isActive={this.state.trailerRimState5} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState5")} />
-                                        <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState5"} isActive={this.state.trailerTireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState5")} />
-                                        <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState5"} isActive={this.state.trailerPinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState5")} />
+                                        <StateRadioButtonGroup type={"Диски"} id={"trailerRimState6"} isActive={this.state.trailerRimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState6")} />
+                                        <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState6"} isActive={this.state.trailerTireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState6")} />
+                                        <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState6"} isActive={this.state.trailerPinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState6")} />
                                         <div className="form-group">
                                             <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure5" value={this.state.trailerPressure5} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure5")} />
+                                            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure6" value={this.state.trailerPressure6} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure6")} />
                                         </div>
                                     </div>
                                 </div> : <></>}
                             </div>
+                            <hr className="solid" />
                         </div>
 
-                        <div className="col-md-6">
-                            <h1 className="d-flex justify-content-center">Правая сторона</h1>
-                            <div className="form-row">
-                                <h5 className="d-flex justify-content-center">1 ось</h5>
-                                <div className="col-md-12">
-                                    <StateRadioButtonGroup type={"Диски"} id={"trailerRimState2"} isActive={this.state.trailerRimState2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState2")} />
-                                    <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState2"} isActive={this.state.trailerTireState2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState2")} />
-                                    <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState2"} isActive={this.state.trailerPinsState2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState2")} />
-                                    <div className="form-group">
-                                        <label htmlFor="pressure">Давление:</label>
-                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure2" value={this.state.trailerPressure2} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure2")} />
-                                    </div>
-                                </div>
+                        <div className="row">
+                            <h3>Состояние крыльев</h3>
+
+                            <div className="col-md-6">
+                                <StateRadioButtonGroup type={"Крепления"} id={"trailerFendersOk"} isActive={this.state.trailerFendersOk} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerFendersOk")} />
                             </div>
-                            <div className="form-row">
-                                <h5 className="d-flex justify-content-center">2 ось</h5>
-                                <div className="col-md-12">
-                                    <StateRadioButtonGroup type={"Диски"} id={"trailerRimState4"} isActive={this.state.trailerRimState4} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState4")} />
-                                    <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState4"} isActive={this.state.trailerTireState4} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState4")} />
-                                    <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState4"} isActive={this.state.trailerPinsState4} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState4")} />
-                                    <div className="form-group">
-                                        <label htmlFor="pressure">Давление:</label>
-                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure4" value={this.state.trailerPressure4} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure4")} />
-                                    </div>
-                                </div>
+
+                            <div className="col-md-6">
+                                <StateRadioButtonGroup type={"Целостность"} id={"trailerFendersMountState1"} isActive={this.state.trailerFendersMountState} option1="Целые" option2="Повреждения" onChange={(event) => this.commonChangedEvent(event, "trailerFendersMountState")} />
                             </div>
-                            {trailer.axelsCount > 2 ? <div className="form-row">
-                                <h5 className="d-flex justify-content-center">3 ось</h5>
-                                <div className="col-md-12">
-                                    <StateRadioButtonGroup type={"Диски"} id={"trailerRimState6"} isActive={this.state.trailerRimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState6")} />
-                                    <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState6"} isActive={this.state.trailerTireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState6")} />
-                                    <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState6"} isActive={this.state.trailerPinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState6")} />
-                                    <div className="form-group">
-                                        <label htmlFor="pressure">Давление:</label>
-                                        <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure6" value={this.state.trailerPressure6} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure6")} />
-                                    </div>
-                                </div>
-                            </div> : <></>}
+
+                            <hr className="solid" />
                         </div>
-                        <hr className="solid" />                      
-                    </div>
-
-                    <div className="row">
-                        <h3>Состояние крыльев</h3>
-
-                        <div className="col-md-6">
-                            <StateRadioButtonGroup type={"Крепления"} id={"trailerFendersOk"} isActive={this.state.trailerFendersOk} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerFendersOk")} />
-                        </div>
-
-                        <div className="col-md-6">
-                            <StateRadioButtonGroup type={"Целостность"} id={"trailerFendersMountState1"} isActive={this.state.trailerFendersMountState} option1="Целые" option2="Повреждения" onChange={(event) => this.commonChangedEvent(event, "trailerFendersMountState")} />
-                        </div>
-
-                        <hr className="solid" />
-                    </div>
+                    </div>}
 
                     <div className="row mb-3">
                         <div className="form-row">
