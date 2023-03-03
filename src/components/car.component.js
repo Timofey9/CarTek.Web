@@ -45,7 +45,6 @@ function CarComponent() {
                 })
                 .then(({ data }) => {
                     const { totalNumber, list } = data;
-                    console.log(data);
 
                     !cancelled && setTotalNumber(totalNumber);
                     !cancelled && setQuestionaries(list);
@@ -141,10 +140,10 @@ function CarComponent() {
                 <div className="col-md-8">
                     <div className="row d-flex justify-content-center">
                         <div className="col-md-3">
-                            <label><b>Текущий водитель: </b></label>
+                            <label><b>Водители: </b></label>
                         </div>
                         <div className="col-md-6">
-                            <label>{car.driver ? car.driver.fullName : "Не определен"}</label>
+                            {car.drivers ? car.drivers.map(driver => { return <div key={driver.id}> <div>{driver.fullName}</div></div> }) : "Нет водителя"}
                         </div>
                     </div>
 

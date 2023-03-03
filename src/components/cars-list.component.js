@@ -46,13 +46,15 @@ const CarsList = () => {
             name: "Номер",
             sortBy: "plate",
             selector: (row, index) => <Link to={`/cars/car/${row.plate}`} className={"btn btn-default"}>{row.plate}</Link>,
-            sortable: true
+            sortable: true,
+            maxWidth: '1em'
         },
         {
             name: "Марка",
             sortBy: "brand",
             selector: (row, index) => row.brand,
-            sortable: false
+            sortable: false,
+            maxWidth: '1em'
         },
         {
             name: "Модель",
@@ -63,7 +65,8 @@ const CarsList = () => {
         {
             name: "Статус",
             selector: (row, index) => row.state === 0 ? "На базе" : "На линии", 
-            sortable: false
+            sortable: false,
+            maxWidth: '1em'
         },
         {
             name: "Полуприцеп",
