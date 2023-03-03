@@ -46,8 +46,7 @@ const CarsList = () => {
             name: "Номер",
             sortBy: "plate",
             selector: (row, index) => <Link to={`/cars/car/${row.plate}`} className={"btn btn-default"}>{row.plate}</Link>,
-            sortable: true,
-            maxWidth: '1em'
+            sortable: true
         },
         {
             name: "Марка",
@@ -60,7 +59,8 @@ const CarsList = () => {
             name: "Модель",
             sortBy: "model",
             selector: (row, index) => row.model,
-            sortable: false
+            sortable: false,
+            minWidth: '1em',
         },
         {
             name: "Статус",
@@ -76,7 +76,8 @@ const CarsList = () => {
         {
             name: "Водитель",
             selector: (row, index) => row.drivers ? row.drivers.map(driver => { return <div key={driver.id}> <div>{driver.fullName}</div></div> }) : "Нет водителя",
-            sortable: false
+            sortable: false,
+            minWidth: '3em'
         }
     ];
 
