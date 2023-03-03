@@ -62,12 +62,17 @@ const CarsList = () => {
         },
         {
             name: "Статус",
-            selector: (row, index) => row.status, 
+            selector: (row, index) => row.state === 0 ? "На базе" : "На линии", 
+            sortable: false
+        },
+        {
+            name: "Полуприцеп",
+            selector: (row, index) => row.trailer ? <div>{row.trailer.plate}</div> : "Нет полуприцепа",
             sortable: false
         },
         {
             name: "Водитель",
-            selector: (row, index) => row.driver ? row.driver.fullName  : "Нет водителя",
+            selector: (row, index) => row.drivers ? row.drivers.map(driver => { return <div key={driver.id}> <div>{driver.fullName}</div></div> }) : "Нет водителя",
             sortable: false
         }
     ];

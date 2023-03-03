@@ -15,23 +15,15 @@ class Profile extends Component {
       <div className="container">
         <header className="jumbotron">
           <h3>
-            <strong>{currentUser.username}</strong> Profile
+            <strong>Текущий пользователь: {currentUser.identity.lastName} {currentUser.identity.firstName} {currentUser.identity.middleName} - {currentUser.identity.login}</strong>
           </h3>
         </header>
+            <p>
+                <strong>Роль:</strong> {currentUser.identity.isAdmin ? "Администратор" : "Механик"}
+            </p>
         <p>
-          <strong>Token:</strong> {currentUser.token.substring(0, 20)} ...{" "}
-                {currentUser.token.substr(currentUser.token.length - 20)}
+          <strong>Телефон:</strong> {currentUser.identity.phone}
         </p>
-        <p>
-          <strong>Id:</strong> {currentUser.identity.id}
-        </p>
-        <p>
-          <strong>Email:</strong> {currentUser.identity.email}
-        </p>
-        <strong>Admin:</strong>
-        <ul>
-          {currentUser.identity.isAdmin.toString()}
-        </ul>
       </div>
     );
   }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import withRouter from "./withRouter";
-import { useLocation, useMatch, useParams } from 'react-router-dom'
+import { useNavigate, useMatch, useParams } from 'react-router-dom'
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
@@ -9,10 +9,13 @@ function AcceptanceComponent() {
     const [questionary, setQuestionary] = useState({});
     const [driver, setDriver] = useState({});
     const [driverPassword, setDriverPassword] = useState("");
+    const [message, setMessage] = useState("");
     const [car, setCar] = useState({});
    // const [uniqueId, setUniqueId] = useState({});
 
     let { uniqueId } = useParams();
+    const navigate = useNavigate();
+
 
     const acceptCar = () => {
         var request = {
@@ -21,17 +24,17 @@ function AcceptanceComponent() {
             questionaryId: uniqueId
         };
 
-        console.log(request);
-
         ApiService.acceptQuestionary(request)
             .then(({ data }) =>
-
             {
                 localStorage.removeItem("questionary");
-                console.log(data);
+                alert("Анкета принята");
+                navigate("/home");
             })
             .catch((error) => {
-                console.log(error);
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
             });
     };
 
@@ -58,7 +61,6 @@ function AcceptanceComponent() {
     useEffect(() => {
         ApiService.getQuestionary(uniqueId)
             .then(({ data }) => {
-                console.log(data);
                 setQuestionary(data);
                 setDriver(data.driver);
                 setCar(data.car);
@@ -142,6 +144,15 @@ function AcceptanceComponent() {
                     <div className="row d-flex justify-content-center mt-3">
                         <div className="col-md-3 d-flex justify-content-center"><input type="button" onClick={acceptCar} className="btn btn-success" value="Принять ТС"></input></div>
                     </div>
+
+                    {message && (
+                        <div className="row d-flex justify-content-center mt-3">
+                            <div className="alert alert-danger mt-2" role="alert">
+                                {message}
+                            </div>
+                        </div>
+                    )}
+
 
                     <div className="row d-flex justify-content-center mb-3">
                         <div className="col-md-8 d-flex justify-content-center">

@@ -102,7 +102,7 @@ function CarComponent() {
         },
         {
             name: "Тип",
-            selector: (row, index) => row.action == 'departure' ? "На выезд" : "На въезд",
+            selector: (row, index) => row.action,// == 'departure' ? "На выезд" : "На въезд",
             sortable: false,
             center: true,
         }
@@ -153,7 +153,7 @@ function CarComponent() {
                             <label><b>Статус: </b></label>
                         </div>
                         <div className="col-md-6">
-                            {car.state == 'Base' ? <label>На базе</label> : <label>На линии</label>}
+                            {car.state == 0 ? <label>На базе</label> : <label>На линии</label>}
                         </div>
                     </div>
 

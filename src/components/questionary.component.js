@@ -108,7 +108,9 @@ class Questionary extends Component {
             trailerFendersMountState: '',
 
             rack: '',
-            comment :"",
+            comment: "",
+            trailerComment: "",
+
             frontSuspension: '',
             backSuspension: '',
             hydroEq: '',
@@ -124,6 +126,8 @@ class Questionary extends Component {
         this.mileageChanged = this.mileageChanged.bind(this);
         this.commonPressureChangedEvent = this.commonPressureChangedEvent.bind(this);
         this.commentChanged = this.commentChanged.bind(this);
+        this.trailerCommentChanged = this.trailerCommentChanged.bind(this);
+
         this.constructAndCacheRequest = this.constructAndCacheRequest.bind(this);
         this.driverSelectionChanged = this.driverSelectionChanged.bind(this);
         this.validateForm = this.validateForm.bind(this);
@@ -219,6 +223,7 @@ class Questionary extends Component {
             }
             this.state.generalCondition = cachedQuestionary.carQuestionaryModel.generalCondition;
             this.state.trailerCondition = cachedQuestionary.trailerQuestionaryModel.trailerCondition;
+            this.state.trailerComment = cachedQuestionary.trailerQuestionaryModel.trailerComment;
             this.state.cabinCushion = cachedQuestionary.carQuestionaryModel.cabinCushion;
             this.state.cabinClean = cachedQuestionary.carQuestionaryModel.isCabinClean;
             this.state.platonInPlace = cachedQuestionary.carQuestionaryModel.platonInPlace;
@@ -300,6 +305,7 @@ class Questionary extends Component {
         var trailerQuestionaryModel = {
             transportId: this.state.trailer.id,
             generalCondition: this.state.trailerCondition,
+            trailerComment: this.state.trailerComment,
             lightsJsonObject:
             {
                 nearLight: this.state.nearLight2,
@@ -558,6 +564,11 @@ class Questionary extends Component {
         this.constructAndCacheRequest();
     }
 
+    trailerCommentChanged(event) {
+        this.setState({ trailerComment: event.target.value });
+        this.constructAndCacheRequest();
+    }
+
     driverSelectionChanged(event, newValue) {
         this.setState({ driver: newValue });
     }
@@ -591,6 +602,7 @@ class Questionary extends Component {
                     this.setState({
                         loading: false,
                         car: data,
+                        drivers: data.drivers,
                         trailer: data.trailer
                     })
                 })
@@ -600,16 +612,18 @@ class Questionary extends Component {
 
             this.setState({ loading: true });
 
-            ApiService.getDrivers()
-                .then(({ data }) => {
-                    this.setState({
-                        loading: false,
-                        drivers: data.list,
+            if (this.state.drivers.length === 0) {
+                ApiService.getDrivers()
+                    .then(({ data }) => {
+                        this.setState({
+                            loading: false,
+                            drivers: data.list,
+                        })
                     })
-                })
-                .catch((error) => {
-                    this.setState({ loading: false, error })
-                });
+                    .catch((error) => {
+                        this.setState({ loading: false, error })
+                    });
+            }
         }
     }
 
@@ -619,6 +633,8 @@ class Questionary extends Component {
         return (
             <div className="container">
                 <form>
+                    <h2>Осмотр {car.state === 0 ? <span>на выезд</span> : <span>на въезд</span>}</h2>
+
                     <h2>Тягач {car.brand} {car.model} (гос.номер: {car.plate})</h2>
                     <div className="row">
                         <h3>Световые приборы</h3>
@@ -827,7 +843,7 @@ class Questionary extends Component {
                                 <StateRadioButtonGroup type={"Внешнее состояние"} id={"trailercondition"} isActive={this.state.trailerCondition} option1="С повреждениями" option2="Без повреждений" onChange={this.trailerConditionChanged} />
                             </div>
 
-                            {trailerCondition === true ? <div className="col-md-6"><label htmlFor="comment">Комментарий</label><textarea rows="5" cols="40" type="text" id="comment" /></div> : <span></span>}
+                            {trailerCondition === true ? <div className="col-md-6"><label htmlFor="comment">Комментарий</label><textarea rows="5" cols="40" type="text" id="comment" value={this.state.trailerComment} onChange={this.trailerCommentChanged} /></div> : <span></span>}
 
                             <hr className="solid" />
                         </div>
@@ -930,7 +946,7 @@ class Questionary extends Component {
 
                             <hr className="solid" />
                         </div>
-                    </div>}
+                     </div>}
 
                     <div className="row mb-3">
                         <div className="form-row">
@@ -938,6 +954,8 @@ class Questionary extends Component {
                                 <label htmlFor="files">Прикрепить фотографии</label>
                                 <input type="file" id="files" accept=".jpg, .png" multiple onChange={this.selectFile}></input>
                             </div>
+
+                            { }
                             <div className="col-md-6">
                                 <label>Выберите водителя</label>
                                 <Autocomplete

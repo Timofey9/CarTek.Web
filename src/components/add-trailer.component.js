@@ -66,24 +66,29 @@ function TrailerForm() {
             carId: carId
         };
 
-        if (trailerPlate) {
-            ApiService.updateTrailer(trailer.id, newTrailer)
-                .then(({ data }) => {
-                    alert("Полуприцеп обновлен");
-                }).
-                catch((error) => {
-                    console.log(error);
-                });
+        if (!carId) {
+            setMessage("Необходимо выбрать тягач");
         } else {
-            ApiService.createTrailer(newTrailer)
-                .then(({ data }) => {
-                    alert("Полуприцеп создан");
-                }).
-                catch((error) => {
-                    if (error.response.data.message) {
-                        setMessage(error.response.data.message);
-                    }
-                });
+
+            if (trailerPlate) {
+                ApiService.updateTrailer(trailer.id, newTrailer)
+                    .then(({ data }) => {
+                        alert("Полуприцеп обновлен");
+                    }).
+                    catch((error) => {
+                        console.log(error);
+                    });
+            } else {
+                ApiService.createTrailer(newTrailer)
+                    .then(({ data }) => {
+                        alert("Полуприцеп создан");
+                    }).
+                    catch((error) => {
+                        if (error.response.data.message) {
+                            setMessage(error.response.data.message);
+                        }
+                    });
+                }
         }
     }
 
@@ -98,7 +103,7 @@ function TrailerForm() {
                     {error}
                 </div>
             </div>
-            <h1>Тягач</h1>
+            <h1>Полуприцеп</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
                     <label htmlFor="firstName">Гос. номер</label>

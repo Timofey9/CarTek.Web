@@ -45,7 +45,7 @@ const DriversList = () => {
         {
             name: "Имя",
             sortBy: "lastName",
-            selector: (row, index) => <Link to={`/admin/driver/${row.id}`} className="btn btn-default">{row.id}</Link>,
+            selector: (row, index) => <Link to={`/admin/driver/${row.id}`} className="btn btn-default">{row.fullName}</Link>,
             sortable: true
         },
         {

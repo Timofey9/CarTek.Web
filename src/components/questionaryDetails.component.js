@@ -75,7 +75,6 @@ function QuestionaryDetailsComponent() {
 
 
     if (questionary.carQuestionaryModel && questionary.trailerQuestionaryModel) {
-        console.log(questionary);
         return (
             <div>
                 <div className="row">
@@ -171,18 +170,18 @@ function QuestionaryDetailsComponent() {
                                     </div>
                                 </div>
                             </div>
-                            {/*{car.axelsCount > 2 ? <div className="form-row">*/}
-                            {/*    <h5 className="d-flex justify-content-center">3 ось</h5>*/}
-                            {/*    <div className="col-md-12">*/}
-                            {/*        <StateRadioButtonGroup type={"Диски"} id={"rimState5"} isActive={this.state.rimState5} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState5")} />*/}
-                            {/*        <StateRadioButtonGroup type={"Состояние резины"} id={"tireState5"} isActive={this.state.tireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState5")} />*/}
-                            {/*        <StateRadioButtonGroup type={"Шпильки"} id={"pinsState5"} isActive={this.state.pinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState5")} />*/}
-                            {/*        <div className="form-group">*/}
-                            {/*            <label htmlFor="pressure">Давление:</label>*/}
-                            {/*            <input name="pressure" type="number" step="0.1" min="0" max="15" id="pressure5" value={this.state.pressure5} onChange={(event) => this.commonPressureChangedEvent(event, "pressure5")} />*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-                            {/*</div> : <></>}*/}
+                            {car.axelsCount > 2 ? <div className="form-row">
+                                <h5 className="d-flex justify-content-center">3 ось</h5>
+                                <div className="col-md-12">
+                                    <StateRadioButtonGroup type={"Диски"} id={"rimState5"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.rimState} option1="В норме" option2="Изношен" />
+                                    <StateRadioButtonGroup type={"Состояние резины"} id={"tireState5"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.tireState} option1="В норме" option2="Изношена" />
+                                    <StateRadioButtonGroup type={"Шпильки"} id={"pinsState5"} isActive={carQuestionary.wheelsJsonObject.middleAxle.pinsState} option1="В норме" option2="Требуется замена" />
+                                    <div className="form-group">
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure5" value={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.pressure}  />
+                                    </div>
+                                </div>
+                            </div> : <></>}
                         </div>
                     </div>
 
@@ -212,18 +211,18 @@ function QuestionaryDetailsComponent() {
                                 </div>
                             </div>
                         </div>
-                        {/*{car.axelsCount > 2 ? <div className="form-row">*/}
-                        {/*    <h5 className="d-flex justify-content-center">3 ось</h5>*/}
-                        {/*    <div className="col-md-12">*/}
-                        {/*        <StateRadioButtonGroup type={"Диски"} id={"rimState6"} isActive={this.state.rimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState6")} />*/}
-                        {/*        <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6"} isActive={this.state.tireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState6")} />*/}
-                        {/*        <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6"} isActive={this.state.pinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState6")} />*/}
-                        {/*        <div className="form-group">*/}
-                        {/*            <label htmlFor="pressure">Давление:</label>*/}
-                        {/*            <input name="pressure" type="number" step="0.1" min="0" max="15" id="pressure6" value={this.state.pressure6} onChange={(event) => this.commonPressureChangedEvent(event, "pressure6")} />*/}
-                        {/*        </div>*/}
-                        {/*    </div>*/}
-                        {/*</div> : <></>}*/}
+                        {car.axelsCount > 2 ? <div className="form-row">
+                            <h5 className="d-flex justify-content-center">3 ось</h5>
+                            <div className="col-md-12">
+                                <StateRadioButtonGroup type={"Диски"} id={"rimState6"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.rimState} option1="В норме" option2="Изношен"  />
+                                <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.tireState} option1="В норме" option2="Изношена" />
+                                <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.pinsState} option1="В норме" option2="Требуется замена"  />
+                                <div className="form-group">
+                                    <label htmlFor="pressure">Давление:</label>
+                                    <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure6" value={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.pressure}/>
+                                </div>
+                            </div>
+                        </div> : <></>}
                     </div>
                     <hr className="solid" />
                 </div>
@@ -333,18 +332,18 @@ function QuestionaryDetailsComponent() {
                                     </div>
                                 </div>
                             </div>
-                            {/*{car.axelsCount > 2 ? <div className="form-row">*/}
-                            {/*    <h5 className="d-flex justify-content-center">3 ось</h5>*/}
-                            {/*    <div className="col-md-12">*/}
-                            {/*        <StateRadioButtonGroup type={"Диски"} id={"trailerRimState5"} isActive={this.state.trailerRimState5} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState5")} />*/}
-                            {/*        <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState5"} isActive={this.state.trailerTireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState5")} />*/}
-                            {/*        <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState5"} isActive={this.state.trailerPinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState5")} />*/}
-                            {/*        <div className="form-group">*/}
-                            {/*            <label htmlFor="pressure">Давление:</label>*/}
-                            {/*            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure5" value={this.state.trailerPressure5} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure5")} />*/}
-                            {/*        </div>*/}
-                            {/*    </div>*/}
-                            {/*</div> : <></>}*/}
+                            {car.axelsCount > 2 ? <div className="form-row">
+                                <h5 className="d-flex justify-content-center">3 ось</h5>
+                                <div className="col-md-12">
+                                    <StateRadioButtonGroup type={"Диски"} id={"trailerRimState5"} isActive={trailerQuestionary.wheelsJsonObject.middleAxle.leftWheel.rimState} option1="В норме" option2="Изношен" />
+                                    <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState5"} isActive={trailerQuestionary.wheelsJsonObject.middleAxle.leftWheel.tireState} option1="В норме" option2="Изношена" />
+                                    <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState5"} isActive={trailerQuestionary.wheelsJsonObject.middleAxle.leftWheel.pinsState} option1="В норме" option2="Требуется замена" />
+                                    <div className="form-group">
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure5" value={trailerQuestionary.wheelsJsonObject.middleAxle.leftWheel.pressure} />
+                                    </div>
+                                </div>
+                            </div> : <></>}
                         </div>
                     </div>
 
@@ -374,18 +373,18 @@ function QuestionaryDetailsComponent() {
                                 </div>
                             </div>
                         </div>
-                        {/*{car.axelsCount > 2 ? <div className="form-row">*/}
-                        {/*    <h5 className="d-flex justify-content-center">3 ось</h5>*/}
-                        {/*    <div className="col-md-12">*/}
-                        {/*        <StateRadioButtonGroup type={"Диски"} id={"trailerRimState6"} isActive={this.state.trailerRimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState6")} />*/}
-                        {/*        <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState6"} isActive={this.state.trailerTireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState6")} />*/}
-                        {/*        <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState6"} isActive={this.state.trailerPinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState6")} />*/}
-                        {/*        <div className="form-group">*/}
-                        {/*            <label htmlFor="pressure">Давление:</label>*/}
-                        {/*            <input name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure6" value={this.state.trailerPressure6} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure6")} />*/}
-                        {/*        </div>*/}
-                        {/*    </div>*/}
-                        {/*</div> : <></>}*/}
+                        {car.axelsCount > 2 ? <div className="form-row">
+                            <h5 className="d-flex justify-content-center">3 ось</h5>
+                            <div className="col-md-12">
+                                <StateRadioButtonGroup type={"Диски"} id={"trailerRimState6"} isActive={trailerQuestionary.wheelsJsonObject.middleAxle.rightWheel.rimState} option1="В норме" option2="Изношен" />
+                                <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState6"} isActive={trailerQuestionary.wheelsJsonObject.middleAxle.rightWheel.tireState} option1="В норме" option2="Изношена" />
+                                <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState6"} isActive={trailerQuestionary.wheelsJsonObject.middleAxle.rightWheel.pinsState} option1="В норме" option2="Требуется замена" />
+                                <div className="form-group">
+                                    <label htmlFor="pressure">Давление:</label>
+                                    <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="trailerPressure6" value={trailerQuestionary.wheelsJsonObject.middleAxle.rightWheel.pressure} />
+                                </div>
+                            </div>
+                        </div> : <></>}
                     </div>
                     <hr className="solid" />
                 </div>
