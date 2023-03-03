@@ -161,7 +161,7 @@ function CarComponent() {
                             <label><b>Полуприцеп: </b></label>
                         </div>
                         {car.trailer && <div className="col-md-6">
-                            <label>{car.trailer.brand} {car.trailer.model}, гос.номер: {car.trailer.plate}</label>
+                            <label>{car.trailer.brand} {car.trailer.model} гос.номер: {car.trailer.plate}</label>
                         </div> }
 
                     </div>
