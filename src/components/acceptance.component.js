@@ -8,9 +8,11 @@ function AcceptanceComponent() {
     let { cancelled } = false;
     const [questionary, setQuestionary] = useState({});
     const [driver, setDriver] = useState({});
+    const [user, setUser] = useState({});
     const [driverPassword, setDriverPassword] = useState("");
     const [message, setMessage] = useState("");
     const [car, setCar] = useState({});
+    const [loading, setLoading] = useState(true);
    // const [uniqueId, setUniqueId] = useState({});
 
     let { uniqueId } = useParams();
@@ -31,7 +33,7 @@ function AcceptanceComponent() {
                 alert("Анкета принята");
                 navigate("/home");
             })
-            .catch((error) => {
+            .catch((error) => {                
                 if (error.response.data.message) {
                     setMessage(error.response.data.message);
                 }
@@ -64,11 +66,12 @@ function AcceptanceComponent() {
                 setQuestionary(data);
                 setDriver(data.driver);
                 setCar(data.car);
+                setUser(data.user);
             })
             .catch((error) => {
 
             });
-
+        setLoading(false);
         return () => cancelled = true;
     }, []);
 
@@ -108,6 +111,10 @@ function AcceptanceComponent() {
         }
     };
 
+    if (loading) {
+        return <div><h1>ЗАГРУЗКА...</h1></div>
+    }
+
     return (
         <div>
             <div>
@@ -129,6 +136,13 @@ function AcceptanceComponent() {
 
             <div className="row  d-flex justify-content-center mb-3">
                 <div className="col-md-10">
+
+                    <div className="row d-flex justify-content-center mb-3">
+                        <div className="col-md-4">Осмотр произвел: </div>
+                        <div className="col-md-4">{user.fullName}</div>
+                    </div>
+
+
                     <div className="row d-flex justify-content-center mb-3">
                         <div className="col-md-8 d-flex justify-content-center">
                             <b>ТС передается в технически исправном состоянии, регистрационные номера ТС сверены и соответствуют указанным в документах, комплектация ТС сверена</b>
@@ -136,8 +150,8 @@ function AcceptanceComponent() {
                     </div>
 
                     <div className="row d-flex justify-content-center">
-                        <div className="col-md-3">{driver.lastName} {driver.firstName} {driver.middleName}</div>
-                        <div className="col-md-3"><input type="password" placeholder="Пароль" onChange={(e) => setDriverPassword(e.target.value)}></input></div>
+                        <div className="col-md-4">{driver.fullName}</div>
+                        <div className="col-md-4"><input type="password" placeholder="Пароль" onChange={(e) => setDriverPassword(e.target.value)}></input></div>
                     </div>
 
 

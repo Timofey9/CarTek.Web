@@ -3,17 +3,17 @@ import { Link } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
-const CarsList = () => {
+const QuestionariesList = () => {
     let cancelled = false;
-    const [loading, setLoading] = useState(false);
-    const [sortBy, setSortBy] = useState("name");
-    const [searchBy, setSearchBy] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [searchBy, setSearchBy] = useState("plate");
+    const [sortBy, setSortBy] = useState("date");
     const [searchString, setSearchString] = useState("");
     const [dir, setDir] = useState("asc");
-    const [totalNumber, setTotalNumber] = useState(15);
+    const [totalNumber, setTotalNumber] = useState(0);
     const [pageSize, setPageSize] = useState(15);
     const [pageNumber, setPageNumber] = useState(1);
-    const [cars, setCars] = useState([]);
+    const [questionaries, setQuestionaries] = useState([]);
     const [reload, setReload] = useState(0);
 
     const search = () => {
@@ -21,63 +21,64 @@ const CarsList = () => {
     };
 
     useEffect(() => {
-        !cancelled && setLoading(true);
+        setLoading(true);
 
-        ApiService.getCars({
+        ApiService.getAllQuestionaries({
             searchColumn: searchBy,
             search: searchString,
             sortColumn: sortBy,
             sortDirection: dir,
             pageSize: pageSize,
             pageNumber: pageNumber
-        })
-            .then(({ data }) => {
+        }).then(({ data }) => {
                 const { totalNumber, list } = data;
-                !cancelled && setTotalNumber(totalNumber);
-                !cancelled && setLoading(false);
-                !cancelled && setCars(list);
-            });
+                setTotalNumber(totalNumber);
+                setQuestionaries(list);
+        });
 
-        return () => cancelled = true
+        setLoading(false);
+        
     }, [sortBy, dir, pageSize, pageNumber, reload]);
 
     const columns = [
         {
-            name: "Номер",
-            sortBy: "plate",
-            selector: (row, index) => <Link to={`/cars/car/${row.plate}`} className={"btn btn-default"}>{row.plate}</Link>,
-            sortable: true
-        },
-        {
-            name: "Марка",
-            sortBy: "brand",
-            selector: (row, index) => row.brand,
+            name: "#",
+            selector: (row, index) => <Link to={`/questionary/details/${row.uniqueId}`} className={"btn btn-default"}>{index + 1}</Link>,
             sortable: false,
             maxWidth: '1em'
         },
         {
-            name: "Модель",
-            sortBy: "model",
-            selector: (row, index) => row.model,
-            sortable: false,
-            minWidth: '1em',
+            name: "Дата",
+            selector: (row, index) => new Date(row.lastUpdated).toLocaleString("pt-BR"),
+            sortable: true,
+            sortBy: "date",
+            center: true,
+            wrap: true
         },
         {
-            name: "Статус",
-            selector: (row, index) => row.state === 0 ? "На базе" : "На линии", 
+            name: "Тягач (гос.номер)",
+            selector: (row, index) => <Link to={`/cars/car/${row.car.plate}`} className={"btn btn-default"}>{row.car.plate}</Link>,
             sortable: false,
-            maxWidth: '1em'
+            center: true,
+            wrap: true
         },
         {
-            name: "Полуприцеп",
-            selector: (row, index) => row.trailer ? <div>{row.trailer.plate}</div> : "Нет полуприцепа",
-            sortable: false
+            name: "Механик",
+            selector: (row, index) => row.user.fullName,
+            sortable: false,
+            center: true,
         },
         {
             name: "Водитель",
-            selector: (row, index) => row.drivers ? row.drivers.map(driver => { return <div key={driver.id}> <div>{driver.fullName}</div></div> }) : "Нет водителя",
+            selector: (row, index) => row.driver ? row.driver.fullName : "Не определен",
             sortable: false,
-            minWidth: '3em'
+            center: true,
+        },
+        {
+            name: "Тип",
+            selector: (row, index) => row.action == 'departure' ? "На выезд" : "На въезд",
+            sortable: false,
+            center: true,
         }
     ];
 
@@ -85,7 +86,7 @@ const CarsList = () => {
         headCells: {
             style: {
                 fontSize: '14px',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
             },
         },
         cells: {
@@ -94,37 +95,27 @@ const CarsList = () => {
             },
         }
     };
+
+    if (loading) {
+        return <div><h1>ЗАГРУЗКА...</h1></div>
+    }
+
     return <>
         <form>
             <div className="row">
                 <div className="form-group col-md-7">
-                    <div className="row pl-3">
-                        <label htmlFor="staticEmail" className="col-md-3 mr-1">Поиск:</label>
-                        <select className="col-md-9" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
-                            <option value="plate">Номер</option>
-                            <option value="model">Модель</option>
-                        </select>
-                    </div>
                     <div className="row mt-3">
                         <div className="input-group mb-3 col-md-10 pl-1">
-                            <input type="text" className="form-control" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />
+                            <input placeholder="Поиск по гос.номеру" type="text" className="form-control" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />
                             <div className="input-group-append">
                                 <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="form-group col-md-5">
-                    <Link to="/admin/cars/add" type="submit" className="pull-right btn btn-success mb-2">Добавить тягач</Link>
-                </div>
             </div>
         </form>
-        {
-            cars.length === 0 && !loading ?
-                <section className="empty-view">
-                    <header>Не найдено машин</header>
-                </section>
-                :
+
                 <DataTable
                     columns={columns}
                     responsive
@@ -141,7 +132,7 @@ const CarsList = () => {
                         !cancelled && setSortBy(column.sortBy);
                         !cancelled && setDir(direction);
                     }}
-                    data={cars}
+                    data={questionaries}
                     pagination
                     onChangePage={(page, totalRows) => {
                         !cancelled && setPageNumber(page);
@@ -150,9 +141,8 @@ const CarsList = () => {
                         !cancelled && setPageSize(currentRowsPerPage);
                     }}
                     paginationPerPage={pageSize}
-                />
-        }
+                />        
     </>;
 };
 
-export default CarsList;
+export default QuestionariesList;

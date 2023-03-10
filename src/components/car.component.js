@@ -56,21 +56,6 @@ function CarComponent() {
         }
         return () => cancelled = true;
     }, [car, sortBy, dir, pageSize, pageNumber, reload]);
-
-    const getImages = (e, id) => {
-        console.log(id);
-        setLoading(true);
-        ApiService.getQuestionaryImages(id)
-            .then(({ data }) => {
-                console.log(data);
-                setImages(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                setLoading(false);
-            });
-        return () => cancelled = true;
-    }
     
     const columns = [
         {
@@ -101,7 +86,7 @@ function CarComponent() {
         },
         {
             name: "Тип",
-            selector: (row, index) => row.action,// == 'departure' ? "На выезд" : "На въезд",
+            selector: (row, index) => row.action == 'departure' ? "На выезд" : "На въезд",
             sortable: false,
             center: true,
         }

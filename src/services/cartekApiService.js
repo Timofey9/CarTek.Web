@@ -1,7 +1,7 @@
 import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
-const API_URL = "http://185.46.8.6:5000/api/";
+const API_URL = "https://localhost:32770/api/";
 
 class ApiService {
 
@@ -89,6 +89,11 @@ class ApiService {
         return this.get(`questionary/all/?${query}`);
     }
 
+    getAllQuestionaries(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`questionary/history/?${query}`);
+    }
+
     getUsers(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`user/all/?${query}`);
@@ -162,7 +167,7 @@ class ApiService {
 
     getAllDrivers(params) {
         const query = new URLSearchParams(params).toString();
-        return this.get(`drivers/getalldrivers/`);
+        return this.get(`drivers/getalldrivers/?${query}`);
     }
 
     getDriver(driverId) {

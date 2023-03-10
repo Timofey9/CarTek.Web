@@ -26,6 +26,9 @@ export default class BoardAdmin extends Component {
                 <div className="col-md-3 pb-3">
                     <Link to="/admin/trailers" className="w-100 btn btn-secondary">Прицепы</Link>
                 </div>
+                <div className="col-md-3 pb-3">
+                    <Link to="/admin/questionaries" className="w-100 btn btn-secondary">Осмотры</Link>
+                </div>
             </div>
         </div>
     );
