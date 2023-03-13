@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
@@ -8,13 +8,15 @@ const UsersList = () => {
     const [loading, setLoading] = useState(false);
     const [sortBy, setSortBy] = useState("name");
     const [searchBy, setSearchBy] = useState("name");
-    const [searchString, setSearchString] = useState("");
+    const [searchString, setSearchString] = useState("login");
     const [dir, setDir] = useState("asc");
     const [totalNumber, setTotalNumber] = useState(15);
     const [pageSize, setPageSize] = useState(15);
     const [pageNumber, setPageNumber] = useState(1);
     const [cars, setCars] = useState([]);
     const [reload, setReload] = useState(0);
+
+    const navigate = useNavigate();
 
     const search = () => {
         setReload(reload + 1);
@@ -139,6 +141,9 @@ const UsersList = () => {
                     }}
                     onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
                         !cancelled && setPageSize(currentRowsPerPage);
+                    }}
+                    onRowClicked={(row, event) => {
+                        navigate(`/admin/user/${row.login}`);
                     }}
                     paginationPerPage={pageSize}
                 />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import withRouter from "./withRouter";
-import { Link, useLocation, useMatch, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
@@ -16,11 +16,19 @@ function CarComponent() {
     const [pageSize, setPageSize] = useState(15);
     const [pageNumber, setPageNumber] = useState(1);
     const [reload, setReload] = useState(0);
+    const [user, setUser] = useState({});
 
     let { plate } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setLoading(true);
+
+        let localUser = JSON.parse(localStorage.getItem("user"));
+        if (localUser) {
+            setUser(localUser);
+        }
+
         ApiService.getCarByPlate(plate)
             .then(({ data }) => {
                 setCar(data);
@@ -56,7 +64,11 @@ function CarComponent() {
         }
         return () => cancelled = true;
     }, [car, sortBy, dir, pageSize, pageNumber, reload]);
-    
+
+    function clearStorage(event) {
+        localStorage.removeItem("questionary");
+    };
+
     const columns = [
         {
             name: "#",
@@ -81,6 +93,12 @@ function CarComponent() {
         {
             name: "Водитель",
             selector: (row, index) => row.driver ? row.driver.fullName : "Не определен",
+            sortable: false,
+            center: true,
+        },
+        {
+            name: "Подписано водителем",
+            selector: (row, index) => row.wasApproved ? "Да" : "Нет",
             sortable: false,
             center: true,
         },
@@ -117,7 +135,14 @@ function CarComponent() {
                     <h2>{car.brand} {car.model}, гос.номер: {car.plate}</h2>
                 </div>
                 <div className="col-md-4">
-                    <Link to={`/admin/cars/edit/${car.plate}`} className="btn btn-success pull-right">Редактировать</Link>
+                    <div className="row">
+                        <div className="col-md-6">
+                            {user.identity.isAdmin && <Link to={`/admin/cars/edit/${car.plate}`} className="btn btn-warning pull-right">Редактировать</Link>}
+                        </div>
+                        <div className="col-md-6">
+                            <Link id="goToQuestionary" to={`/questionary/car/${car.plate}`} onClick={(e) => clearStorage(e)} className="btn btn-success">Перейти к осмотру</Link>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -180,6 +205,9 @@ function CarComponent() {
                         }}
                         onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
                             !cancelled && setPageSize(currentRowsPerPage);
+                        }}
+                        onRowClicked={(row, event) => {
+                            row.wasApproved ? navigate(`/questionary/details/${row.uniqueId}`) : navigate(`/cars/acceptCar/${row.uniqueId}`);
                         }}
                         paginationPerPage={pageSize}
                     />

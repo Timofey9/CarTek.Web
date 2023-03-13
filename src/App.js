@@ -145,8 +145,8 @@ class App extends Component {
 
                 <div className="container mt-3">
                     <Routes>
-                        <Route exact path="/" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
-                        <Route exact path="/home" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />                        
+                        <Route exact path="/" element={<RequireAuth currentUser={currentUser}><Home/></RequireAuth>} />
+                        <Route exact path="/home" element={<RequireAuth currentUser={currentUser}><Home/></RequireAuth>} />                        
                         <Route exact path="/login" element={<Login />} />
                         <Route exact path="/profile" element={<RequireAuth currentUser={currentUser}><Profile /></RequireAuth>} />
                         <Route exact path="/user" element={<RequireAuth currentUser={currentUser}><BoardUser /></RequireAuth>} />

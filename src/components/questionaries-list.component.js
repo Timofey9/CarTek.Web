@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
@@ -9,7 +9,7 @@ const QuestionariesList = () => {
     const [searchBy, setSearchBy] = useState("plate");
     const [sortBy, setSortBy] = useState("date");
     const [searchString, setSearchString] = useState("");
-    const [dir, setDir] = useState("asc");
+    const [dir, setDir] = useState("desc");
     const [totalNumber, setTotalNumber] = useState(0);
     const [pageSize, setPageSize] = useState(15);
     const [pageNumber, setPageNumber] = useState(1);
@@ -19,6 +19,8 @@ const QuestionariesList = () => {
     const search = () => {
         setReload(reload + 1);
     };
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         setLoading(true);
@@ -75,6 +77,12 @@ const QuestionariesList = () => {
             center: true,
         },
         {
+            name: "Подписано водителем",
+            selector: (row, index) => row.wasApproved ? "Да" : "Нет",
+            sortable: false,
+            center: true,
+        },
+        {
             name: "Тип",
             selector: (row, index) => row.action == 'departure' ? "На выезд" : "На въезд",
             sortable: false,
@@ -115,7 +123,6 @@ const QuestionariesList = () => {
                 </div>
             </div>
         </form>
-
                 <DataTable
                     columns={columns}
                     responsive
@@ -139,6 +146,9 @@ const QuestionariesList = () => {
                     }}
                     onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
                         !cancelled && setPageSize(currentRowsPerPage);
+                    }}
+                    onRowClicked={(row, event) => {
+                        row.wasApproved ? navigate(`/questionary/details/${row.uniqueId}`) : navigate(`/cars/acceptCar/${row.uniqueId}`)
                     }}
                     paginationPerPage={pageSize}
                 />        

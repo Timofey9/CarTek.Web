@@ -1,13 +1,17 @@
 import React, { Fragment } from 'react';
+import "./radiobuttongroup.css"
 
-function StateRadioButtonGroup({ type, isActive, id, option1, option2, onChange }) {  
+function StateRadioButtonGroup({ type, isActive, id, validated, option1, option2, onChange }) {
     return <div className="row">
-        <div className="col-md-4 d-flex align-items-center">
-            <label><b>{type}</b></label>
-        </div>
 
-        <div className="col-md-8">
-            {onChange ? <div>
+        {type &&
+            <div className="col-md-5 d-flex align-items-center">
+                <div className="box"><b>{type}</b></div>
+            </div>
+        }
+
+        <div className="col-md-7">
+            {onChange ? <div className={(validated && (isActive === undefined || isActive === '') ? "not-valid-border" : "")}>
                 <div className="form-check">
                     <input className="form-check-input" type="radio" name={id} id={id + 1} value="true" checked={isActive === true} onChange={onChange} />
                     <label className="form-check-label" htmlFor={id + 1}>

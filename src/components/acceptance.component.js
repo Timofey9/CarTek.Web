@@ -134,14 +134,13 @@ function AcceptanceComponent() {
                 </div>
             </div>
 
-            <div className="row  d-flex justify-content-center mb-3">
+            <div className="row d-flex justify-content-center mb-3">
                 <div className="col-md-10">
 
                     <div className="row d-flex justify-content-center mb-3">
                         <div className="col-md-4">Осмотр произвел: </div>
                         <div className="col-md-4">{user.fullName}</div>
                     </div>
-
 
                     <div className="row d-flex justify-content-center mb-3">
                         <div className="col-md-8 d-flex justify-content-center">
@@ -167,15 +166,13 @@ function AcceptanceComponent() {
                         </div>
                     )}
 
-
                     <div className="row d-flex justify-content-center mb-3">
                         <div className="col-md-8 d-flex justify-content-center">
-                            <label>*Для приемки ТС водитель должен ввести свой уникальный ключ-пароль. Ввод пароль означает согласие с осмотром ТС и принятие ответственности за оборудование, перечисленное в списке</label>
+                            <label>*Для {questionary.type === "arrival" ? "передачи" : "приемки"} ТС водитель должен ввести свой уникальный ключ-пароль. Ввод пароль означает согласие с осмотром ТС и принятие ответственности за оборудование, перечисленное в списке</label>
                         </div>
                     </div>
                 </div>
-            </div>
-            
+            </div>            
     </div>);
 }
 

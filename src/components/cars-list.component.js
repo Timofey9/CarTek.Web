@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
 const CarsList = () => {
     let cancelled = false;
+    const navigate = useNavigate();
+
     const [loading, setLoading] = useState(false);
     const [sortBy, setSortBy] = useState("name");
-    const [searchBy, setSearchBy] = useState("");
+    const [searchBy, setSearchBy] = useState("plate");
     const [searchString, setSearchString] = useState("");
     const [dir, setDir] = useState("asc");
     const [totalNumber, setTotalNumber] = useState(15);
@@ -15,6 +17,8 @@ const CarsList = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const [cars, setCars] = useState([]);
     const [reload, setReload] = useState(0);
+    const [user, setUser] = useState({});
+
 
     const search = () => {
         setReload(reload + 1);
@@ -22,6 +26,11 @@ const CarsList = () => {
 
     useEffect(() => {
         !cancelled && setLoading(true);
+
+        let localUser = JSON.parse(localStorage.getItem("user"));
+        if (localUser) {
+            setUser(localUser);
+        }
 
         ApiService.getCars({
             searchColumn: searchBy,
@@ -115,7 +124,7 @@ const CarsList = () => {
                     </div>
                 </div>
                 <div className="form-group col-md-5">
-                    <Link to="/admin/cars/add" type="submit" className="pull-right btn btn-success mb-2">Добавить тягач</Link>
+                    {user.identity && user.identity.isAdmin && <Link to="/admin/cars/add" type="submit" className="pull-right btn btn-success mb-2">Добавить тягач</Link>}
                 </div>
             </div>
         </form>
@@ -145,6 +154,9 @@ const CarsList = () => {
                     pagination
                     onChangePage={(page, totalRows) => {
                         !cancelled && setPageNumber(page);
+                    }}
+                    onRowClicked={(row, event) => {
+                        navigate(`/cars/car/${row.plate}`);
                     }}
                     onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
                         !cancelled && setPageSize(currentRowsPerPage);

@@ -1,0 +1,8 @@
+.not-valid-border{
+    border: solid 2px red;
+    border-radius: 3px;
+}
+
+.box {
+    overflow-wrap: break-word;
+}
