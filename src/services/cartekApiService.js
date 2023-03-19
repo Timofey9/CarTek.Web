@@ -1,7 +1,7 @@
 import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
-const API_URL = "http://185.46.8.6:5000/api/";
+const API_URL = "https://localhost:32768/api/";
 
 class ApiService {
 
@@ -68,6 +68,12 @@ class ApiService {
         var res = this.get(`questionary/${uniqueId}`);
         return res;
     }
+
+    deleteQuestionary(uniqueId) {
+        var res = this.delete(`questionary/${uniqueId}`);
+        return res;
+    }
+
 
     getQuestionaryUnit(uniqueId) {
         var res = this.get(`questionary/getunit/${uniqueId}`);

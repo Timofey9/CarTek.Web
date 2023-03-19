@@ -179,7 +179,6 @@ function CarComponent() {
             </div>
 
 
-
             <div className="row">
                 <div className="col-md-12">
                     <DataTable
@@ -207,7 +206,7 @@ function CarComponent() {
                             !cancelled && setPageSize(currentRowsPerPage);
                         }}
                         onRowClicked={(row, event) => {
-                            row.wasApproved ? navigate(`/questionary/details/${row.uniqueId}`) : navigate(`/cars/acceptCar/${row.uniqueId}`);
+                            navigate(`/questionary/details/${row.uniqueId}`);
                         }}
                         paginationPerPage={pageSize}
                     />

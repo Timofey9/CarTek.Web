@@ -5,6 +5,7 @@ import StateRadioButtonGroup from "./radiobuttongroup";
 import "./questionary.component.css";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import _ from "lodash";
 import { Link } from "react-router-dom";
 
 class Questionary extends Component {
@@ -168,11 +169,6 @@ class Questionary extends Component {
             this.state.turnSignal1 = cachedQuestionary.carQuestionaryModel.lightsJsonObject.turnSignal;
             this.state.stopSignal1 = cachedQuestionary.carQuestionaryModel.lightsJsonObject.stopSignal;
 
-            //габариты
-            this.state.beamLight2 = cachedQuestionary.trailerQuestionaryModel.lightsJsonObject.beamLight;
-            this.state.turnSignal2 = cachedQuestionary.trailerQuestionaryModel.lightsJsonObject.turnSignal;
-            this.state.stopSignal2 = cachedQuestionary.trailerQuestionaryModel.lightsJsonObject.stopSignal;
-
             this.state.pressure1 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.pressure;
             this.state.rimState1 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.rimState;
             this.state.pinsState1 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.pinsState;
@@ -225,42 +221,55 @@ class Questionary extends Component {
                 this.state.tireState6_2 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel2.tireState;
             }
 
-            this.state.trailerPressure1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.pressure;
-            this.state.trailerRimState1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.rimState;
-            this.state.trailerPinsState1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.pinsState;
-            this.state.trailerTireState1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.tireState;
+            if (!_.isEmpty(this.state.trailer)) {
+                //габариты
+                this.state.beamLight2 = cachedQuestionary.trailerQuestionaryModel.lightsJsonObject.beamLight;
+                this.state.turnSignal2 = cachedQuestionary.trailerQuestionaryModel.lightsJsonObject.turnSignal;
+                this.state.stopSignal2 = cachedQuestionary.trailerQuestionaryModel.lightsJsonObject.stopSignal;
 
-            this.state.trailerPressure2 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.rightWheel.pressure;
-            this.state.trailerRimState2 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.rightWheel.rimState;
-            this.state.trailerPinsState2 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.rightWheel.pinsState;
-            this.state.trailerTireState2 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.rightWheel.tireState;
+                this.state.trailerPressure1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.pressure;
+                this.state.trailerRimState1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.rimState;
+                this.state.trailerPinsState1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.pinsState;
+                this.state.trailerTireState1 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.leftWheel.tireState;
 
-            this.state.trailerPressure3 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.leftWheel.pressure;
-            this.state.trailerRimState3 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.leftWheel.rimState;
-            this.state.trailerPinsState3 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.leftWheel.pinsState;
-            this.state.trailerTireState3 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.leftWheel.tireState;
+                this.state.trailerPressure2 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.rightWheel.pressure;
+                this.state.trailerRimState2 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.rightWheel.rimState;
+                this.state.trailerPinsState2 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.rightWheel.pinsState;
+                this.state.trailerTireState2 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.frontAxle.rightWheel.tireState;
 
-            this.state.trailerPressure4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.pressure;
-            this.state.trailerRimState4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.rimState;
-            this.state.trailerPinsState4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.pinsState;
-            this.state.trailerTireState4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.tireState;
+                this.state.trailerPressure3 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.leftWheel.pressure;
+                this.state.trailerRimState3 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.leftWheel.rimState;
+                this.state.trailerPinsState3 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.leftWheel.pinsState;
+                this.state.trailerTireState3 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.leftWheel.tireState;
 
-            if (cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle) {
+                this.state.trailerPressure4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.pressure;
+                this.state.trailerRimState4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.rimState;
+                this.state.trailerPinsState4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.pinsState;
+                this.state.trailerTireState4 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.backAxle.rightWheel.tireState;
 
-                //Обработать количество осей
-                this.state.trailerPressure5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pressure;
-                this.state.trailerRimState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.rimState;
-                this.state.trailerPinsState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pinsState;
-                this.state.trailerTireState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.tireState;
+                if (cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle) {
 
-                this.state.trailerPressure6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pressure;
-                this.state.trailerRimState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.rimState;
-                this.state.trailerPinsState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pinsState;
-                this.state.trailerTireState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.tireState;
+                    //Обработать количество осей
+                    this.state.trailerPressure5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pressure;
+                    this.state.trailerRimState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.rimState;
+                    this.state.trailerPinsState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.pinsState;
+                    this.state.trailerTireState5 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.leftWheel.tireState;
+
+                    this.state.trailerPressure6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pressure;
+                    this.state.trailerRimState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.rimState;
+                    this.state.trailerPinsState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.pinsState;
+                    this.state.trailerTireState6 = cachedQuestionary.trailerQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel.tireState;
+                }
+                this.state.trailerCondition = cachedQuestionary.trailerQuestionaryModel.trailerCondition;
+                this.state.trailerComment = cachedQuestionary.trailerQuestionaryModel.trailerComment;
+
+                this.state.trailerFendersOk = cachedQuestionary.trailerQuestionaryModel.fendersOk;
+                this.state.trailerFendersMountState = cachedQuestionary.trailerQuestionaryModel.fendersMountState;
             }
+
+
             this.state.generalCondition = cachedQuestionary.carQuestionaryModel.generalCondition;
-            this.state.trailerCondition = cachedQuestionary.trailerQuestionaryModel.trailerCondition;
-            this.state.trailerComment = cachedQuestionary.trailerQuestionaryModel.trailerComment;
+
             this.state.cabinCushion = cachedQuestionary.carQuestionaryModel.cabinCushion;
             this.state.cabinClean = cachedQuestionary.carQuestionaryModel.isCabinClean;
             this.state.platonInPlace = cachedQuestionary.carQuestionaryModel.platonInPlace;
@@ -268,8 +277,6 @@ class Questionary extends Component {
             this.state.fendersOk1 = cachedQuestionary.carQuestionaryModel.fendersOk;
             this.state.fendersMountState1 = cachedQuestionary.carQuestionaryModel.fendersMountState;
 
-            this.state.trailerFendersOk = cachedQuestionary.trailerQuestionaryModel.fendersOk;
-            this.state.trailerFendersMountState = cachedQuestionary.trailerQuestionaryModel.fendersMountState;
 
             this.state.rack = cachedQuestionary.carQuestionaryModel.rack;
             this.state.comment = cachedQuestionary.comment;
@@ -360,51 +367,6 @@ class Questionary extends Component {
             }
         };
 
-        var trailerQuestionaryModel = {
-            transportId: this.state.trailer.id,
-            generalCondition: this.state.trailerCondition,
-            trailerComment: this.state.trailerComment,
-            lightsJsonObject:
-            {
-                beamLight: this.state.beamLight2,
-                stopSignal: this.state.stopSignal2,
-                turnSignal: this.state.turnSignal2,
-            },
-            wheelsJsonObject: {
-                frontAxle: {
-                    leftWheel: {
-                        pressure: this.state.trailerPressure1,
-                        rimState: this.state.trailerRimState1,
-                        pinsState: this.state.trailerPinsState1,
-                        tireState: this.state.trailerTireState1
-                    },
-                    rightWheel: {
-                        pressure: this.state.trailerPressure2,
-                        rimState: this.state.trailerRimState2,
-                        pinsState: this.state.trailerPinsState2,
-                        tireState: this.state.trailerTireState2
-                    }
-                },
-                backAxle: {
-                    leftWheel: {
-                        pressure: this.state.trailerPressure3,
-                        rimState: this.state.trailerRimState3,
-                        pinsState: this.state.trailerPinsState3,
-                        tireState: this.state.trailerTireState3
-                    },
-                    rightWheel: {
-                        pressure: this.state.trailerPressure4,
-                        rimState: this.state.trailerRimState4,
-                        pinsState: this.state.trailerPinsState4,
-                        tireState: this.state.trailerTireState4
-                    }
-                }
-            },
-            trailerCondition: this.state.trailerCondition,
-            fendersOk: this.state.trailerFendersOk,
-            fendersMountState: this.state.trailerFendersMountState,
-        };
-
         var carQuestionaryObject = {
             transportId: this.state.car.id,
             generalCondition: this.state.generalCondition,
@@ -478,20 +440,70 @@ class Questionary extends Component {
             carQuestionaryObject.wheelsJsonObject.middleAxle = carMiddleAxle;
         }
 
-        if (this.state.trailer.axelsCount > 2) {
-            trailerQuestionaryModel.wheelsJsonObject.middleAxle = trailerMiddleAxle;
-        }
-
         var requestObject = {
             uniqueId: uniqueId,
             submitted: submitted,
             approvedByDriver: this.state.approvedByDriver,
             carQuestionaryModel: carQuestionaryObject,
-            trailerQuestionaryModel: trailerQuestionaryModel,
             comment: this.state.comment,
             createdBy: this.state.userLogin,
             car: this.state.car
         };
+
+        if (!_.isEmpty(this.state.trailer)) {
+            var trailerQuestionaryModel = {
+                transportId: this.state.trailer.id,
+                generalCondition: this.state.trailerCondition,
+                trailerComment: this.state.trailerComment,
+                lightsJsonObject:
+                {
+                    beamLight: this.state.beamLight2,
+                    stopSignal: this.state.stopSignal2,
+                    turnSignal: this.state.turnSignal2,
+                },
+                wheelsJsonObject: {
+                    frontAxle: {
+                        leftWheel: {
+                            pressure: this.state.trailerPressure1,
+                            rimState: this.state.trailerRimState1,
+                            pinsState: this.state.trailerPinsState1,
+                            tireState: this.state.trailerTireState1
+                        },
+                        rightWheel: {
+                            pressure: this.state.trailerPressure2,
+                            rimState: this.state.trailerRimState2,
+                            pinsState: this.state.trailerPinsState2,
+                            tireState: this.state.trailerTireState2
+                        }
+                    },
+                    backAxle: {
+                        leftWheel: {
+                            pressure: this.state.trailerPressure3,
+                            rimState: this.state.trailerRimState3,
+                            pinsState: this.state.trailerPinsState3,
+                            tireState: this.state.trailerTireState3
+                        },
+                        rightWheel: {
+                            pressure: this.state.trailerPressure4,
+                            rimState: this.state.trailerRimState4,
+                            pinsState: this.state.trailerPinsState4,
+                            tireState: this.state.trailerTireState4
+                        }
+                    }
+                },
+                trailerCondition: this.state.trailerCondition,
+                fendersOk: this.state.trailerFendersOk,
+                fendersMountState: this.state.trailerFendersMountState,
+            };
+
+            if (this.state.trailer.axelsCount > 2) {
+                trailerQuestionaryModel.wheelsJsonObject.middleAxle = trailerMiddleAxle;
+            }
+
+            requestObject.trailerQuestionaryModel = trailerQuestionaryModel;
+
+        }
+
 
         localStorage.setItem("questionary", JSON.stringify(requestObject));
 
@@ -526,18 +538,7 @@ class Questionary extends Component {
         if (this.state.stopSignal1 === '') {
             isValid = false;
         }
-        //////////////////////////////
-        if (this.state.beamLight2 === '') {
-            isValid = false;
-        }
 
-        if (this.state.turnSignal2 === '') {
-            isValid = false;
-        }
-
-        if (this.state.stopSignal2 === '') {
-            isValid = false;
-        }
         ///////////////////////////////
         if (this.state.pressure1 === "") {
             isValid = false;
@@ -709,112 +710,141 @@ class Questionary extends Component {
         }
         ////////////////////////////////////////
 
-        if (this.state.trailerPressure1 === "") {
-            isValid = false;
-        }
+        if (!_.isEmpty(this.state.trailer)) {
 
-        if (this.state.trailerRimState1 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerPinsState1 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerTireState1 === '') {
-            isValid = false;
-        }
-        /////////////////////////////////////
-        if (this.state.trailerPressure2 === "") {
-            isValid = false;
-        }
-
-        if (this.state.trailerRimState2 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerPinsState2 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerTireState2 === '') {
-            isValid = false;
-        }
-        /////////////////////////////////////
-        if (this.state.trailerPressure3 === "") {
-            isValid = false;
-        }
-
-        if (this.state.trailerRimState3 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerPinsState3 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerTireState3 === '') {
-            isValid = false;
-        }
-        /////////////////////////////////////
-        if (this.state.trailerPressure4 === "") {
-            isValid = false;
-        }
-
-        if (this.state.trailerRimState4 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerPinsState4 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerTireState4 === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailer.axelsCount > 2) {
-
-            /////////////////////////////////////
-            if (this.state.trailerPressure5 === "") {
+            //////////////////////////////
+            if (this.state.beamLight2 === '') {
                 isValid = false;
             }
 
-            if (this.state.trailerRimState5 === '') {
+            if (this.state.turnSignal2 === '') {
                 isValid = false;
             }
 
-            if (this.state.trailerPinsState5 === '') {
+            if (this.state.stopSignal2 === '') {
                 isValid = false;
             }
 
-            if (this.state.trailerTireState5 === '') {
+            if (this.state.trailerPressure1 === "") {
+                isValid = false;
+            }
+
+            if (this.state.trailerRimState1 === '') {
+                isValid = false;
+            }
+
+            if (this.state.trailerPinsState1 === '') {
+                isValid = false;
+            }
+
+            if (this.state.trailerTireState1 === '') {
                 isValid = false;
             }
             /////////////////////////////////////
-            if (this.state.trailerPressure6 === "") {
+            if (this.state.trailerPressure2 === "") {
                 isValid = false;
             }
 
-            if (this.state.trailerRimState6 === '') {
+            if (this.state.trailerRimState2 === '') {
                 isValid = false;
             }
 
-            if (this.state.trailerPinsState6 === '') {
+            if (this.state.trailerPinsState2 === '') {
                 isValid = false;
             }
 
-            if (this.state.trailerTireState6 === '') {
+            if (this.state.trailerTireState2 === '') {
+                isValid = false;
+            }
+            /////////////////////////////////////
+            if (this.state.trailerPressure3 === "") {
+                isValid = false;
+            }
+
+            if (this.state.trailerRimState3 === '') {
+                isValid = false;
+            }
+
+            if (this.state.trailerPinsState3 === '') {
+                isValid = false;
+            }
+
+            if (this.state.trailerTireState3 === '') {
+                isValid = false;
+            }
+            /////////////////////////////////////
+            if (this.state.trailerPressure4 === "") {
+                isValid = false;
+            }
+
+            if (this.state.trailerRimState4 === '') {
+                isValid = false;
+            }
+
+            if (this.state.trailerPinsState4 === '') {
+                isValid = false;
+            }
+
+            if (this.state.trailerTireState4 === '') {
+                isValid = false;
+            }
+
+            if (this.state.trailer.axelsCount > 2) {
+
+                /////////////////////////////////////
+                if (this.state.trailerPressure5 === "") {
+                    isValid = false;
+                }
+
+                if (this.state.trailerRimState5 === '') {
+                    isValid = false;
+                }
+
+                if (this.state.trailerPinsState5 === '') {
+                    isValid = false;
+                }
+
+                if (this.state.trailerTireState5 === '') {
+                    isValid = false;
+                }
+                /////////////////////////////////////
+                if (this.state.trailerPressure6 === "") {
+                    isValid = false;
+                }
+
+                if (this.state.trailerRimState6 === '') {
+                    isValid = false;
+                }
+
+                if (this.state.trailerPinsState6 === '') {
+                    isValid = false;
+                }
+
+                if (this.state.trailerTireState6 === '') {
+                    isValid = false;
+                }
+            }
+
+            if (this.state.trailerCondition === '') {
+                isValid = false;
+            }
+
+
+            if (this.state.trailerFendersOk === '') {
+                isValid = false;
+            }
+
+            if (this.state.trailerFendersMountState === '') {
                 isValid = false;
             }
         }
 
+
+        if (this.state.hydroEq === '') {
+            isValid = false;
+        }
 
         if (this.state.generalCondition === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerCondition === '') {
             isValid = false;
         }
 
@@ -842,14 +872,6 @@ class Questionary extends Component {
             isValid = false;
         }
 
-        if (this.state.trailerFendersOk === '') {
-            isValid = false;
-        }
-
-        if (this.state.trailerFendersMountState === '') {
-            isValid = false;
-        }
-
         if (this.state.rack === '') {
             isValid = false;
         }
@@ -862,11 +884,8 @@ class Questionary extends Component {
             isValid = false;
         }
 
-        if (this.state.hydroEq === '') {
-            isValid = false;
-        }
 
-        if (this.state.mileage === 0) {
+        if (this.state.mileage === 0 || this.state.mileage === '' ){
             isValid = false;
         }
 
@@ -902,7 +921,10 @@ class Questionary extends Component {
     }
 
     selectFile = (e) => {
+        this.state.formData.delete("Images");
+
         for (const file of e.target.files) {
+            console.log(file);
             this.state.formData.append("Images", file);
         }
         this.constructAndCacheRequest();
@@ -987,9 +1009,9 @@ class Questionary extends Component {
         return (
             <div className="container">
                 <form>
-                    <h2>Осмотр {car.state === 0 ? <span>на выезд</span> : <span>на въезд</span>}</h2>
+                    <h2>Осмотр</h2>
 
-                    <h2>Тягач {car.brand} {car.model} (гос.номер: {car.plate})</h2>
+                    <h2>Тягач {car.brand} {car.model} (гос.номер: {car.plate}) {trailer && <>, прицеп: {trailer.plate} </>}</h2>
                     <div className="row">
                         <h3>Световые приборы</h3>
                         <div className="col-md-6">
@@ -1011,7 +1033,7 @@ class Questionary extends Component {
                         <div className="col-md-6">
                             <div className="col-md-6">
                                 <label htmlFor="mileage">Пробег</label>
-                                <input type="text" className={this.state.validated && this.state.mileage === 0 ? "not-valid-input-border" : ""} id="mileage" value={this.state.mileage} onChange={this.mileageChanged} />
+                                <input type="text" className={this.state.validated && this.state.mileage === 0 || this.state.mileage === '' ? "not-valid-input-border" : ""} id="mileage" value={this.state.mileage} onChange={this.mileageChanged} />
                             </div> 
 
                             <StateRadioButtonGroup type={"Внешнее состояние"} validated={this.state.validated} id={"condition"} isActive={this.state.generalCondition} option1="С повреждениями" option2="Без повреждений" onChange={this.conditionChanged} />
@@ -1051,56 +1073,41 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState1"} isActive={this.state.rimState1} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState1")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState1"} isActive={this.state.tireState1} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState1")} />
                                         <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"pinsState1"} isActive={this.state.pinsState1} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState1")} />
-                                        <div className="form-group">
-                                            <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" className={this.state.validated && this.state.pressure1 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure1" value={this.state.pressure1} onChange={(event) => this.commonPressureChangedEvent(event, "pressure1")} />
-                                        </div>
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure1"} isActive={this.state.pressure1} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure1")} />
                                     </div>
                                 </div>
                                 <div className="row">
                                     <h5 className="d-flex justify-content-center">2 ось</h5>
                                     <div className="col-md-6">
-                                        <h6>Внешний</h6>
+                                        <h6>Внешнее</h6>
                                         <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState3"} isActive={this.state.rimState3} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState3")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState3"} isActive={this.state.tireState3} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState3")} />
                                         <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"pinsState3"} isActive={this.state.pinsState3} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState3")} />
-                                        <div className="form-group">
-                                            <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" className={this.state.validated && this.state.pressure3 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure3" value={this.state.pressure3} onChange={(event) => this.commonPressureChangedEvent(event, "pressure3")} />
-                                        </div>
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure3"} isActive={this.state.pressure3} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure3")} />
                                     </div>
                                     <div className="col-md-6">
-                                        <h6>Внутренний</h6>
+                                        <h6>Внутреннее</h6>
                                         <StateRadioButtonGroup validated={this.state.validated} id={"rimState3_2"} isActive={this.state.rimState3_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState3_2")} />
                                         <StateRadioButtonGroup validated={this.state.validated} id={"tireState3_2"} isActive={this.state.tireState3_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState3_2")} />
                                         <StateRadioButtonGroup validated={this.state.validated} id={"pinsState3_2"} isActive={this.state.pinsState3_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState3_2")} />
-                                        <div className="form-group">
-                                            <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" className={this.state.validated && this.state.pressure3_2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure3_2" value={this.state.pressure3_2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure3_2")} />
-                                        </div>
+                                        <StateRadioButtonGroup validated={this.state.validated} id={"pressure3_2"} isActive={this.state.pressure3_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pressure3_2")} />
                                     </div>
                                 </div>
                                 {car.axelsCount > 2 ? <div className="row">
                                     <h5 className="d-flex justify-content-center">3 ось</h5>
                                     <div className="col-md-6">
-                                        <h6>Внешний</h6>
+                                        <h6>Внешнее</h6>
                                         <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState5"} isActive={this.state.rimState5} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState5")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState5"} isActive={this.state.tireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState5")} />
                                         <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"pinsState5"} isActive={this.state.pinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState5")} />
-                                        <div className="form-group">
-                                            <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" className={this.state.validated && this.state.pressure5 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure5" value={this.state.pressure5} onChange={(event) => this.commonPressureChangedEvent(event, "pressure5")} />
-                                        </div>
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure5"} isActive={this.state.pressure5} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure5")} />
                                     </div>
                                     <div className="col-md-6">
-                                        <h6>Внутренний</h6>
+                                        <h6>Внутреннее</h6>
                                         <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState5_2"} isActive={this.state.rimState5_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState5_2")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState5_2"} isActive={this.state.tireState5_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState5_2")} />
                                         <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"pinsState5_2"} isActive={this.state.pinsState5_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState5_2")} />
-                                        <div className="form-group">
-                                            <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" className={this.state.validated && this.state.pressure5_2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure5_2" value={this.state.pressure5_2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure5_2")} />
-                                        </div>
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure5_2"} isActive={this.state.pressure5_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure5_2")} />
                                     </div>
                                 </div> : <></>}
                             </div>
@@ -1114,59 +1121,43 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState2"} isActive={this.state.rimState2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState2")} />
                                     <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState2"} isActive={this.state.tireState2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState2")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState2"} validated={this.state.validated} isActive={this.state.pinsState2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState2")} />
-                                    <div className="form-group">
-                                        <label htmlFor="pressure">Давление:</label>
-                                        <input name="pressure" className={this.state.validated && this.state.pressure2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure2" value={this.state.pressure2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure2")} />
-                                    </div>
+                                    <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure2"} isActive={this.state.pressure2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure2")} />
                                 </div>
                             </div>
                             <div className="row">
                                 <h5 className="d-flex justify-content-center">2 ось</h5>
                                 <div className="col-md-6">
-                                    <h6>Внешний</h6>
+                                    <h6>Внешнее</h6>
                                     <StateRadioButtonGroup type={"Диски"} id={"rimState4"} validated={this.state.validated} isActive={this.state.rimState4} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState4")} />
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState4"} validated={this.state.validated} isActive={this.state.tireState4} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState4")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState4"} validated={this.state.validated} isActive={this.state.pinsState4} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState4")} />
-                                    <div className="form-group">
-                                        <label htmlFor="pressure">Давление:</label>
-                                        <input name="pressure" className={this.state.validated && this.state.pressure4 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure4" value={this.state.pressure4} onChange={(event) => this.commonPressureChangedEvent(event, "pressure4")} />
-                                    </div>
+                                    <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure4"} isActive={this.state.pressure4} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure4")} />
                                 </div>
                                 <div className="col-md-6">
-                                    <h6>Внутренний</h6>
+                                    <h6>Внутреннее</h6>
                                     <StateRadioButtonGroup type={"Диски"} id={"rimState4_2"} validated={this.state.validated} isActive={this.state.rimState4_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState4_2")} />
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState4_2"} validated={this.state.validated} isActive={this.state.tireState4_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState4_2")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState4_2"} validated={this.state.validated} isActive={this.state.pinsState4_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState4_2")} />
-                                    <div className="form-group">
-                                        <label htmlFor="pressure">Давление:</label>
-                                        <input name="pressure" className={this.state.validated && this.state.pressure4_2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure4_2" value={this.state.pressure4_2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure4_2")} />
-                                    </div>
+                                    <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure4_2"} isActive={this.state.pressure4_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure4_2")} />
                                 </div>
                             </div>
                             {car.axelsCount > 2 ?
                                 <div className="row">
                                 <h5 className="d-flex justify-content-center">3 ось</h5>
                                     <div className="col-md-6">
-                                        <h6>Внешний</h6>
+                                        <h6>Внешнее</h6>
 
                                         <StateRadioButtonGroup type={"Диски"} id={"rimState6"} validated={this.state.validated} isActive={this.state.rimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState6")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6"} validated={this.state.validated} isActive={this.state.tireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState6")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6"} validated={this.state.validated} isActive={this.state.pinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState6")} />
-                                    <div className="form-group">
-                                        <label htmlFor="pressure">Давление:</label>
-                                        <input name="pressure" className={this.state.validated && this.state.pressure6 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure6" value={this.state.pressure6} onChange={(event) => this.commonPressureChangedEvent(event, "pressure6")} />
-                                    </div>
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure6"} isActive={this.state.pressure6} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure6")} />
                                 </div>
                                     <div className="col-md-6">
-                                        <h6>Внутренний</h6>
-
-                                    <StateRadioButtonGroup type={"Диски"} id={"rimState6_2"} validated={this.state.validated} isActive={this.state.rimState6_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState6_2")} />
-                                    <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6_2"} validated={this.state.validated} isActive={this.state.tireState6_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState6_2")} />
-                                    <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6_2"} validated={this.state.validated} isActive={this.state.pinsState6_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState6_2")} />
-                                    <div className="form-group">
-                                        <label htmlFor="pressure">Давление:</label>
-                                        <input name="pressure" className={this.state.validated && this.state.pressure6_2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure6_2" value={this.state.pressure6_2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure6_2")} />
-                                    </div>
+                                        <h6>Внутреннее</h6>
+                                        <StateRadioButtonGroup type={"Диски"} id={"rimState6_2"} validated={this.state.validated} isActive={this.state.rimState6_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState6_2")} />
+                                        <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6_2"} validated={this.state.validated} isActive={this.state.tireState6_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState6_2")} />
+                                        <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6_2"} validated={this.state.validated} isActive={this.state.pinsState6_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState6_2")} />
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure6_2"} isActive={this.state.pressure6_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure6_2")} />
                                 </div>
                             </div> : <></> }
                         </div>
@@ -1259,10 +1250,7 @@ class Questionary extends Component {
                                                 <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"trailerRimState1"} isActive={this.state.trailerRimState1} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState1")} />
                                                 <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"trailerTireState1"} isActive={this.state.trailerTireState1} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState1")} />
                                                 <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"trailerPinsState1"} isActive={this.state.trailerPinsState1} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState1")} />
-                                            <div className="form-group">
-                                                <label htmlFor="pressure">Давление:</label>
-                                                <input name="pressure" className={this.state.validated && this.state.trailerPressure1 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="trailerPressure1" value={this.state.trailerPressure1} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure1")} />
-                                            </div>
+                                                <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"trailerPressure1"} isActive={this.state.trailerPressure1} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerPressure1")} />
                                         </div>
                                     </div>
                                     <div className="form-row">
@@ -1271,10 +1259,7 @@ class Questionary extends Component {
                                                 <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"trailerRimState3"} isActive={this.state.trailerRimState3} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState3")} />
                                                 <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"trailerTireState3"} isActive={this.state.trailerTireState3} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState3")} />
                                                 <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"trailerPinsState3"} isActive={this.state.trailerPinsState3} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState3")} />
-                                            <div className="form-group">
-                                                <label htmlFor="pressure">Давление:</label>
-                                                <input name="pressure" className={this.state.validated && this.state.trailerPressure3 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="trailerPressure3" value={this.state.trailerPressure3} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure3")} />
-                                            </div>
+                                                <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"trailerPressure3"} isActive={this.state.trailerPressure3} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerPressure3")} />                                             
                                         </div>
                                     </div>
                                     {trailer.axelsCount > 2 ? <div className="form-row">
@@ -1283,10 +1268,7 @@ class Questionary extends Component {
                                                 <StateRadioButtonGroup type={"Диски"} id={"trailerRimState5"} validated={this.state.validated} isActive={this.state.trailerRimState5} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState5")} />
                                                 <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState5"} validated={this.state.validated} isActive={this.state.trailerTireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState5")} />
                                                 <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState5"} validated={this.state.validated} isActive={this.state.trailerPinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState5")} />
-                                            <div className="form-group">
-                                                <label htmlFor="pressure">Давление:</label>
-                                                <input name="pressure" className={this.state.validated && this.state.trailerPressure5 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="trailerPressure5" value={this.state.trailerPressure5} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure5")} />
-                                            </div>
+                                                <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"trailerPressure5"} isActive={this.state.trailerPressure5} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerPressure5")} />                                                                                       
                                         </div>
                                     </div> : <></>}
                                 </div>
@@ -1300,10 +1282,7 @@ class Questionary extends Component {
                                             <StateRadioButtonGroup type={"Диски"} id={"trailerRimState2"} validated={this.state.validated} isActive={this.state.trailerRimState2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState2")} />
                                             <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState2"} validated={this.state.validated} isActive={this.state.trailerTireState2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState2")} />
                                             <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState2"} validated={this.state.validated} isActive={this.state.trailerPinsState2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState2")} />
-                                        <div className="form-group">
-                                            <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" className={this.state.validated && this.state.trailerPressure2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="trailerPressure2" value={this.state.trailerPressure2} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure2")} />
-                                        </div>
+                                            <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"trailerPressure2"} isActive={this.state.trailerPressure2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerPressure2")} />                                                                                       
                                     </div>
                                 </div>
                                 <div className="form-row">
@@ -1312,11 +1291,8 @@ class Questionary extends Component {
                                             <StateRadioButtonGroup type={"Диски"} id={"trailerRimState4"} validated={this.state.validated} isActive={this.state.trailerRimState4} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState4")} />
                                             <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState4"} validated={this.state.validated} isActive={this.state.trailerTireState4} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState4")} />
                                             <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState4"} validated={this.state.validated} isActive={this.state.trailerPinsState4} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState4")} />
-                                        <div className="form-group">
-                                            <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" className={this.state.validated && this.state.trailerPressure4 < 1 ? "not-valid-input-border" : ""}type="number" step="0.1" min="0" max="15" id="trailerPressure4" value={this.state.trailerPressure4} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure4")} />
+                                            <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"trailerPressure4"} isActive={this.state.trailerPressure4} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerPressure4")} />                                                                                       
                                         </div>
-                                    </div>
                                 </div>
                                 {trailer.axelsCount > 2 ? <div className="form-row">
                                     <h5 className="d-flex justify-content-center">3 ось</h5>
@@ -1324,10 +1300,7 @@ class Questionary extends Component {
                                             <StateRadioButtonGroup type={"Диски"} id={"trailerRimState6"} validated={this.state.validated} isActive={this.state.trailerRimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "trailerRimState6")} />
                                             <StateRadioButtonGroup type={"Состояние резины"} id={"trailerTireState6"} validated={this.state.validated} isActive={this.state.trailerTireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "trailerTireState6")} />
                                             <StateRadioButtonGroup type={"Шпильки"} id={"trailerPinsState6"} validated={this.state.validated} isActive={this.state.trailerPinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "trailerPinsState6")} />
-                                        <div className="form-group">
-                                            <label htmlFor="pressure">Давление:</label>
-                                            <input name="pressure" className={this.state.validated && this.state.trailerPressure6 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="trailerPressure6" value={this.state.trailerPressure6} onChange={(event) => this.commonPressureChangedEvent(event, "trailerPressure6")} />
-                                        </div>
+                                            <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"trailerPressure6"} isActive={this.state.trailerPressure6} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "trailerPressure6")} />                                                                                       
                                     </div>
                                 </div> : <></>}
                             </div>
@@ -1353,7 +1326,7 @@ class Questionary extends Component {
                         <div className="form-row">
                             <div className="col-md-6">
                                 <label htmlFor="files">Прикрепить фотографии</label>
-                                <input type="file" id="files" accept=".jpg, .png" multiple onChange={this.selectFile}></input>
+                                <input type="file" id="files" accept=".jpg, .png, .jpeg" multiple onChange={this.selectFile}></input>
                             </div>
 
                             { }

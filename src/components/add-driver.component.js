@@ -78,7 +78,6 @@ function DriverForm() {
         } else {
             ApiService.createDriver(newDriver)
                 .then(({ data }) => {
-                    console.log(data);
                     alert("Водитель создан");
                 }).
                 catch((error) => {

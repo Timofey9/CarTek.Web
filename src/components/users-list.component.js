@@ -48,7 +48,7 @@ const UsersList = () => {
             name: "Логин",
             sortBy: "login",
             selector: (row, index) =>
-                <Link to={`/admin/user/${row.login}`} className={"btn btn-default"}>{row.login}</Link>,
+                <Link to={`/admin/user/${row.login}`} className={"btn btn-light"}>{row.login}</Link>,
             sortable: true
         },
         {
@@ -102,7 +102,7 @@ const UsersList = () => {
                         <div className="input-group mb-3 col-md-10 pl-1">
                             <input type="text" className="form-control" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />
                             <div className="input-group-append">
-                                <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
+                                <button className="btn btn-light" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
                             </div>
                         </div>
                     </div>

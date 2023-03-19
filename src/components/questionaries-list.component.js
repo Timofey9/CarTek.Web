@@ -42,10 +42,23 @@ const QuestionariesList = () => {
         
     }, [sortBy, dir, pageSize, pageNumber, reload]);
 
+
+    function deleteQuestionary(event, uniqueId) {
+        ApiService.deleteQuestionary(uniqueId)
+            .then(({ data }) => {
+                alert("Осмотр удален");
+                setReload(reload + 1);
+                navigate(`/admin/questionaries`);
+            })
+            .catch((error) => {
+                alert("Ошибка удаления анкеты");
+            });
+    }
+
     const columns = [
         {
             name: "#",
-            selector: (row, index) => <Link to={`/questionary/details/${row.uniqueId}`} className={"btn btn-default"}>{index + 1}</Link>,
+            selector: (row, index) => <Link to={`/questionary/details/${row.uniqueId}`} className={"btn btn-light"}>{index + 1}</Link>,
             sortable: false,
             maxWidth: '1em'
         },
@@ -59,7 +72,7 @@ const QuestionariesList = () => {
         },
         {
             name: "Тягач (гос.номер)",
-            selector: (row, index) => <Link to={`/cars/car/${row.car.plate}`} className={"btn btn-default"}>{row.car.plate}</Link>,
+            selector: (row, index) => <Link to={`/cars/car/${row.car.plate}`} className={"btn btn-light"}>{row.car.plate}</Link>,
             sortable: false,
             center: true,
             wrap: true
@@ -85,6 +98,11 @@ const QuestionariesList = () => {
         {
             name: "Тип",
             selector: (row, index) => row.action == 'departure' ? "На выезд" : "На въезд",
+            sortable: false,
+            center: true,
+        },
+        {
+            selector: (row, index) => <button onClick={(e) => deleteQuestionary(e, row.uniqueId)} className="btn btn-danger">Удалить</button>,
             sortable: false,
             center: true,
         }
@@ -116,7 +134,7 @@ const QuestionariesList = () => {
                         <div className="input-group mb-3 col-md-10 pl-1">
                             <input placeholder="Поиск по гос.номеру" type="text" className="form-control" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />
                             <div className="input-group-append">
-                                <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
+                                <button className="btn btn-light" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
                             </div>
                         </div>
                     </div>
@@ -148,7 +166,7 @@ const QuestionariesList = () => {
                         !cancelled && setPageSize(currentRowsPerPage);
                     }}
                     onRowClicked={(row, event) => {
-                        row.wasApproved ? navigate(`/questionary/details/${row.uniqueId}`) : navigate(`/cars/acceptCar/${row.uniqueId}`)
+                        navigate(`/questionary/details/${row.uniqueId}`)
                     }}
                     paginationPerPage={pageSize}
                 />        
