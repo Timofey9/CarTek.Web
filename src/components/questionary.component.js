@@ -987,8 +987,7 @@ class Questionary extends Component {
                 });
 
             this.setState({ loading: true });
-
-            if (this.state.drivers.length === 0) {
+            if (this.state.drivers.length === 0 || this.state.drivers == null) {
                 ApiService.getDrivers()
                     .then(({ data }) => {
                         this.setState({

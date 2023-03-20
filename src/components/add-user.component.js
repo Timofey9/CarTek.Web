@@ -269,7 +269,7 @@ class UserForm extends Component {
                     </div>
                 </div>
             </div>
-            <div className="row justify-content-md-center">
+            <div className="row justify-content-md-center mb-5">
                 <Link to="/admin/users" className="btn btn-danger col-md-2 mr-1">
                     Отмена
                 </Link>

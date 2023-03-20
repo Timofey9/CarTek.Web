@@ -10,8 +10,8 @@ function CarComponent() {
     const [images, setImages] = useState([]);
     const [questionaries, setQuestionaries] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [sortBy, setSortBy] = useState("approvedAt");
-    const [dir, setDir] = useState("asc");
+    const [sortBy, setSortBy] = useState("date");
+    const [dir, setDir] = useState("desc");
     const [totalNumber, setTotalNumber] = useState(15);
     const [pageSize, setPageSize] = useState(15);
     const [pageNumber, setPageNumber] = useState(1);
