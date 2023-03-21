@@ -6,7 +6,6 @@ import "./questionary.component.css";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import _ from "lodash";
-import { Link } from "react-router-dom";
 
 class Questionary extends Component {
 
@@ -307,7 +306,7 @@ class Questionary extends Component {
                     alert("Анкета сохранена");
                     this.props.navigate(`/cars/acceptCar/${response.data.uniqueId}`);
                 }, error => {
-                    if (error.code == 'ERR_NETWORK') {
+                    if (error.code === 'ERR_NETWORK') {
                         this.setState({ errorMessage: "Ошибка сети" });
                     }
                     else
@@ -433,7 +432,6 @@ class Questionary extends Component {
             rack: this.state.rack,
             frontSuspension: this.state.frontSuspension,
             backSuspension: this.state.backSuspension,
-            generalCondition: this.state.generalCondition
         };
 
         if (this.state.car.axelsCount > 2) {
@@ -889,7 +887,7 @@ class Questionary extends Component {
             isValid = false;
         }
 
-        if (this.state.driver.id == undefined) {
+        if (this.state.driver.id === undefined) {
             isValid = false;
         }
 
@@ -901,7 +899,7 @@ class Questionary extends Component {
 
 
     commonChangedEvent(event, parameterName) {
-        if (event.target.value == 'true') {
+        if (event.target.value === 'true') {
             this.setState({[parameterName]: true });
         } else {
             this.setState({[parameterName]: false });
@@ -950,7 +948,7 @@ class Questionary extends Component {
     }
 
     conditionChanged(event){
-        if (event.target.value == "true") {
+        if (event.target.value === "true") {
             this.setState({ generalCondition: true });
         } else {
             this.setState({ generalCondition: false });
@@ -959,7 +957,7 @@ class Questionary extends Component {
     }
 
     trailerConditionChanged(event) {
-        if (event.target.value == "true") {
+        if (event.target.value === "true") {
             this.setState({ trailerCondition: true });
         } else {
             this.setState({ trailerCondition: false });
@@ -1003,12 +1001,12 @@ class Questionary extends Component {
     }
 
     render() {
-        const { generalCondition, car, trailer, drivers, trailerCondition, errorMessage } = this.state;
+        const { generalCondition, car, trailer, drivers, trailerCondition } = this.state;
 
         return (
             <div className="container">
                 <form>
-                    <h2>Осмотр</h2>
+                    <h2>Осмотр {car.state === 0 ? <span>на выезд</span> : <span>на въезд</span>}</h2>
 
                     <h2>Тягач {car.brand} {car.model} (гос.номер: {car.plate}) {trailer && <>, прицеп: {trailer.plate} </>}</h2>
                     <div className="row">
@@ -1072,7 +1070,10 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState1"} isActive={this.state.rimState1} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState1")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState1"} isActive={this.state.tireState1} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState1")} />
                                         <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"pinsState1"} isActive={this.state.pinsState1} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState1")} />
-                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure1"} isActive={this.state.pressure1} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure1")} />
+                                        {car.state === 0 ? <div className="form-group">
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" className={this.state.validated && this.state.pressure1 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure1" value={this.state.pressure1} onChange={(event) => this.commonPressureChangedEvent(event, "pressure1")} />
+                                        </div> : <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure1"} isActive={this.state.pressure1} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure1")} />}
                                     </div>
                                 </div>
                                 <div className="row">
@@ -1082,14 +1083,26 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState3"} isActive={this.state.rimState3} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState3")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState3"} isActive={this.state.tireState3} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState3")} />
                                         <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"pinsState3"} isActive={this.state.pinsState3} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState3")} />
-                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure3"} isActive={this.state.pressure3} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure3")} />
+                                        {car.state === 0 ?
+                                            <div className="form-group">
+                                                <label htmlFor="pressure">Давление:</label>
+                                                <input name="pressure" className={this.state.validated && this.state.pressure3 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure3" value={this.state.pressure3} onChange={(event) => this.commonPressureChangedEvent(event, "pressure3")} />
+                                            </div> :
+
+                                            <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure3"} isActive={this.state.pressure3} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure3")} />}
                                     </div>
                                     <div className="col-md-6">
                                         <h6>Внутреннее</h6>
                                         <StateRadioButtonGroup validated={this.state.validated} id={"rimState3_2"} isActive={this.state.rimState3_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState3_2")} />
                                         <StateRadioButtonGroup validated={this.state.validated} id={"tireState3_2"} isActive={this.state.tireState3_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState3_2")} />
                                         <StateRadioButtonGroup validated={this.state.validated} id={"pinsState3_2"} isActive={this.state.pinsState3_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState3_2")} />
-                                        <StateRadioButtonGroup validated={this.state.validated} id={"pressure3_2"} isActive={this.state.pressure3_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pressure3_2")} />
+                                                                              
+                                        {car.state === 0 ? 
+                                            <div className="form-group">
+                                                <label htmlFor="pressure">Давление:</label>
+                                                <input name="pressure" className={this.state.validated && this.state.pressure3_2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure3_2" value={this.state.pressure3_2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure3_2")} />
+                                            </div> :
+                                        <StateRadioButtonGroup validated={this.state.validated} id={"pressure3_2"} isActive={this.state.pressure3_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure3_2")} />}
                                     </div>
                                 </div>
                                 {car.axelsCount > 2 ? <div className="row">
@@ -1099,14 +1112,25 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState5"} isActive={this.state.rimState5} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState5")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState5"} isActive={this.state.tireState5} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState5")} />
                                         <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"pinsState5"} isActive={this.state.pinsState5} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState5")} />
-                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure5"} isActive={this.state.pressure5} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure5")} />
+                                        {car.state === 0 ?
+                                            <div className="form-group">
+                                                <label htmlFor="pressure">Давление:</label>
+                                                <input name="pressure" className={this.state.validated && this.state.pressure5 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure5" value={this.state.pressure5} onChange={(event) => this.commonPressureChangedEvent(event, "pressure5")} />
+                                            </div> :
+                                            <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure5"} isActive={this.state.pressure5} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure5")} /> }
                                     </div>
                                     <div className="col-md-6">
                                         <h6>Внутреннее</h6>
                                         <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState5_2"} isActive={this.state.rimState5_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState5_2")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState5_2"} isActive={this.state.tireState5_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState5_2")} />
                                         <StateRadioButtonGroup type={"Шпильки"} validated={this.state.validated} id={"pinsState5_2"} isActive={this.state.pinsState5_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState5_2")} />
-                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure5_2"} isActive={this.state.pressure5_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure5_2")} />
+
+                                        {car.state === 0 ?
+                                        <div className="form-group">
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" className={this.state.validated && this.state.pressure5_2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure5_2" value={this.state.pressure5_2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure5_2")} />
+                                        </div> :
+                                            <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure5_2"} isActive={this.state.pressure5_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure5_2")} />}
                                     </div>
                                 </div> : <></>}
                             </div>
@@ -1120,7 +1144,12 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Диски"} validated={this.state.validated} id={"rimState2"} isActive={this.state.rimState2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState2")} />
                                     <StateRadioButtonGroup type={"Состояние резины"} validated={this.state.validated} id={"tireState2"} isActive={this.state.tireState2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState2")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState2"} validated={this.state.validated} isActive={this.state.pinsState2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState2")} />
-                                    <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure2"} isActive={this.state.pressure2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure2")} />
+                                    {car.state === 0 ?
+                                        <div className="form-group">
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" className={this.state.validated && this.state.pressure2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure2" value={this.state.pressure2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure2")} />
+                                        </div> :
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure2"} isActive={this.state.pressure2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure2")} />}
                                 </div>
                             </div>
                             <div className="row">
@@ -1130,14 +1159,24 @@ class Questionary extends Component {
                                     <StateRadioButtonGroup type={"Диски"} id={"rimState4"} validated={this.state.validated} isActive={this.state.rimState4} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState4")} />
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState4"} validated={this.state.validated} isActive={this.state.tireState4} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState4")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState4"} validated={this.state.validated} isActive={this.state.pinsState4} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState4")} />
-                                    <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure4"} isActive={this.state.pressure4} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure4")} />
+                                    {car.state === 0 ?
+                                        <div className="form-group">
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" className={this.state.validated && this.state.pressure4 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure4" value={this.state.pressure4} onChange={(event) => this.commonPressureChangedEvent(event, "pressure4")} />
+                                        </div> :
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure4"} isActive={this.state.pressure4} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure4")} />}
                                 </div>
                                 <div className="col-md-6">
                                     <h6>Внутреннее</h6>
                                     <StateRadioButtonGroup type={"Диски"} id={"rimState4_2"} validated={this.state.validated} isActive={this.state.rimState4_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState4_2")} />
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState4_2"} validated={this.state.validated} isActive={this.state.tireState4_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState4_2")} />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState4_2"} validated={this.state.validated} isActive={this.state.pinsState4_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState4_2")} />
-                                    <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure4_2"} isActive={this.state.pressure4_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure4_2")} />
+                                    {car.state === 0 ?
+                                        <div className="form-group">
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input name="pressure" className={this.state.validated && this.state.pressure4_2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure4_2" value={this.state.pressure4_2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure4_2")} />
+                                        </div> :
+                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure4_2"} isActive={this.state.pressure4_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure4_2")} />}
                                 </div>
                             </div>
                             {car.axelsCount > 2 ?
@@ -1149,14 +1188,24 @@ class Questionary extends Component {
                                         <StateRadioButtonGroup type={"Диски"} id={"rimState6"} validated={this.state.validated} isActive={this.state.rimState6} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState6")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6"} validated={this.state.validated} isActive={this.state.tireState6} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState6")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6"} validated={this.state.validated} isActive={this.state.pinsState6} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState6")} />
-                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure6"} isActive={this.state.pressure6} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure6")} />
+                                        {car.state === 0 ?
+                                            <div className="form-group">
+                                                <label htmlFor="pressure">Давление:</label>
+                                                <input name="pressure" className={this.state.validated && this.state.pressure6 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure6" value={this.state.pressure6} onChange={(event) => this.commonPressureChangedEvent(event, "pressure6")} />
+                                            </div> :
+                                            <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure6"} isActive={this.state.pressure6} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure6")} />}
                                 </div>
                                     <div className="col-md-6">
                                         <h6>Внутреннее</h6>
                                         <StateRadioButtonGroup type={"Диски"} id={"rimState6_2"} validated={this.state.validated} isActive={this.state.rimState6_2} option1="В норме" option2="Изношен" onChange={(event) => this.commonChangedEvent(event, "rimState6_2")} />
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6_2"} validated={this.state.validated} isActive={this.state.tireState6_2} option1="В норме" option2="Изношена" onChange={(event) => this.commonChangedEvent(event, "tireState6_2")} />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6_2"} validated={this.state.validated} isActive={this.state.pinsState6_2} option1="В норме" option2="Требуется замена" onChange={(event) => this.commonChangedEvent(event, "pinsState6_2")} />
-                                        <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure6_2"} isActive={this.state.pressure6_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure6_2")} />
+                                        {car.state === 0 ?
+                                            <div className="form-group">
+                                                <label htmlFor="pressure">Давление:</label>
+                                                <input name="pressure" className={this.state.validated && this.state.pressure6_2 < 1 ? "not-valid-input-border" : ""} type="number" step="0.1" min="0" max="15" id="pressure6_2" value={this.state.pressure6_2} onChange={(event) => this.commonPressureChangedEvent(event, "pressure6_2")} />
+                                            </div> :
+                                            <StateRadioButtonGroup type={"Давление"} validated={this.state.validated} id={"pressure6_2"} isActive={this.state.pressure6_2} option1="В норме" option2="Не в норме" onChange={(event) => this.commonChangedEvent(event, "pressure6_2")} />}
                                 </div>
                             </div> : <></> }
                         </div>

@@ -91,7 +91,7 @@ function QuestionaryDetailsComponent() {
             <div>
                 <div className="row">
                     <div className="col-md-10">
-                        <h2>Результаты осмотра тягача {car.brand} {car.model}, гос.номер: {car.plate}{trailer && <>, прицеп: {trailer.plate} </>} от {new Date(questionary.lastUpdated).toLocaleString("pt-BR")}</h2>
+                        <h2>Результаты осмотра тягача {car.brand} {car.model}, гос.номер: {car.plate}{trailer && <>,прицеп: {trailer.plate} </>} {questionary.action == "departure" ? <span>на выезд</span> : <span>на въезд</span>} от {new Date(questionary.lastUpdated).toLocaleString("pt-BR")}</h2>
                     </div>
                     <div className="col-md-2">
                         {!questionary.wasApproved && <Link to={`/cars/acceptCar/${questionary.uniqueId}`} className="btn btn-warning pull-right mb-3">Передать водителю</Link>}
@@ -171,7 +171,13 @@ function QuestionaryDetailsComponent() {
                                     <StateRadioButtonGroup type={"Диски"} id={"rimState1"} isActive={carQuestionary.wheelsJsonObject.frontAxle.leftWheel.rimState} option1="В норме" option2="Изношен" />
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState1"} isActive={carQuestionary.wheelsJsonObject.frontAxle.leftWheel.tireState} option1="В норме" option2="Изношена" />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState1"} isActive={carQuestionary.wheelsJsonObject.frontAxle.leftWheel.pinsState} option1="В норме" option2="Требуется замена" />
-                                    <StateRadioButtonGroup type={"Давление"} id={"pressure1"} isActive={carQuestionary.wheelsJsonObject.frontAxle.leftWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />
+
+                                    {questionary.action == 'departure' ? <div>
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input disabled name="pressure" type="number" id="pressure1" value={carQuestionary.wheelsJsonObject.frontAxle.leftWheel.pressure} />
+                                    </div> : <StateRadioButtonGroup type={"Давление"} id={"pressure1"} isActive={carQuestionary.wheelsJsonObject.frontAxle.leftWheel.pressure == 'true'} option1="В норме" option2="Не в норме" />}
+
+
                                 </div>
                             </div>
                             <div className="row">
@@ -182,7 +188,12 @@ function QuestionaryDetailsComponent() {
                                     <StateRadioButtonGroup type={"Диски"} id={"rimState3"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel.rimState} option1="В норме" option2="Изношен" />
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState3"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel.tireState} option1="В норме" option2="Изношена" />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState3"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel.pinsState} option1="В норме" option2="Требуется замена" />
-                                    <StateRadioButtonGroup type={"Шпильки"} id={"pressure3"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />
+
+                                    {questionary.action == 'departure' ? <div>
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure3" value={carQuestionary.wheelsJsonObject.backAxle.leftWheel.pressure} />
+                                    </div> : 
+                                        <StateRadioButtonGroup type={"Давление"} id={"pressure3"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel.pressure == 'true'} option1="В норме" option2="Не в норме" />}
                                 </div>
                                     {carQuestionary.wheelsJsonObject.backAxle.leftWheel2 &&
 
@@ -191,7 +202,11 @@ function QuestionaryDetailsComponent() {
                                         <StateRadioButtonGroup type={"Диски"} id={"rimState3_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel2.rimState} option1="В норме" option2="Изношен" />
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState3_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel2.tireState} option1="В норме" option2="Изношена" />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState3_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel2.pinsState} option1="В норме" option2="Требуется замена" />
-                                        <StateRadioButtonGroup type={"Давление"} id={"pressure3_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel2.pressure === 'true'} option1="В норме" option2="Не в норме" />   
+                                        {questionary.action == 'departure' ? <div>
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure3_2" value={carQuestionary.wheelsJsonObject.backAxle.leftWheel2.pressure} />
+                                        </div> :
+                                            <StateRadioButtonGroup type={"Давление"} id={"pressure3_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.leftWheel2.pressure == 'true'} option1="В норме" option2="Не в норме" />}
                                     </div>}
                             </div>
                             {car.axelsCount > 2 ? <div className="row">
@@ -201,7 +216,11 @@ function QuestionaryDetailsComponent() {
                                     <StateRadioButtonGroup type={"Диски"} id={"rimState5"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.rimState} option1="В норме" option2="Изношен" />
                                     <StateRadioButtonGroup type={"Состояние резины"} id={"tireState5"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.tireState} option1="В норме" option2="Изношена" />
                                     <StateRadioButtonGroup type={"Шпильки"} id={"pinsState5"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.pinsState} option1="В норме" option2="Требуется замена" />
-                                    <StateRadioButtonGroup type={"Давление"} id={"pressure5"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />   
+                                    {questionary.action == 'departure' ? <div className="form-group">
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure5" value={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.pressure} />
+                                    </div> :
+                                        <StateRadioButtonGroup type={"Давление"} id={"pressure5"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel.pressure == 'true'} option1="В норме" option2="Не в норме" />}
                                 </div>
                                 {carQuestionary.wheelsJsonObject.middleAxle.leftWheel2 &&
                                     <div className="col-md-6">
@@ -209,7 +228,11 @@ function QuestionaryDetailsComponent() {
                                         <StateRadioButtonGroup type={"Диски"} id={"rimState5_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel2.rimState} option1="В норме" option2="Изношен" />
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState5_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel2.tireState} option1="В норме" option2="Изношена" />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState5_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel2.pinsState} option1="В норме" option2="Требуется замена" />
-                                        <StateRadioButtonGroup type={"Давление"} id={"pressure3_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel2.pressure === 'true'} option1="В норме" option2="Не в норме" />   
+                                        {questionary.action == 'departure' ? <div className="form-group">
+                                            <label htmlFor="pressure">Давление:</label>
+                                            <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure5_2" value={carQuestionary.wheelsJsonObject.middleAxle.leftWheel2.pressure} />
+                                        </div> :
+                                            <StateRadioButtonGroup type={"Давление"} id={"pressure5_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.leftWheel2.pressure == 'true'} option1="В норме" option2="Не в норме" />} 
                                 </div>}           
                             </div> : <></>}
                         </div>
@@ -223,7 +246,11 @@ function QuestionaryDetailsComponent() {
                                 <StateRadioButtonGroup type={"Диски"} id={"rimState2"} isActive={carQuestionary.wheelsJsonObject.frontAxle.rightWheel.rimState} option1="В норме" option2="Изношен" />
                                 <StateRadioButtonGroup type={"Состояние резины"} id={"tireState2"} isActive={carQuestionary.wheelsJsonObject.frontAxle.rightWheel.tireState} option1="В норме" option2="Изношена" />
                                 <StateRadioButtonGroup type={"Шпильки"} id={"pinsState2"} isActive={carQuestionary.wheelsJsonObject.frontAxle.rightWheel.pinsState} option1="В норме" option2="Требуется замена" />
-                                <StateRadioButtonGroup type={"Давление"} id={"pressure2"} isActive={carQuestionary.wheelsJsonObject.frontAxle.rightWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />   
+                                {questionary.action == 'departure' ? <div>
+                                    <label htmlFor="pressure">Давление:</label>
+                                    <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure2" value={carQuestionary.wheelsJsonObject.frontAxle.rightWheel.pressure} />
+                                </div> :
+                                <StateRadioButtonGroup type={"Давление"} id={"pressure2"} isActive={carQuestionary.wheelsJsonObject.frontAxle.rightWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />}   
                             </div>
                         </div>
                         <div className="row">
@@ -233,7 +260,11 @@ function QuestionaryDetailsComponent() {
                                 <StateRadioButtonGroup type={"Диски"} id={"rimState4"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel.rimState} option1="В норме" option2="Изношен" />
                                 <StateRadioButtonGroup type={"Состояние резины"} id={"tireState4"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel.tireState} option1="В норме" option2="Изношена" />
                                 <StateRadioButtonGroup type={"Шпильки"} id={"pinsState4"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel.pinsState} option1="В норме" option2="Требуется замена" />
-                                <StateRadioButtonGroup type={"Давление"} id={"pressure4"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />   
+                                {questionary.action == 'departure' ? <div>
+                                    <label htmlFor="pressure">Давление:</label>
+                                    <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure4" value={carQuestionary.wheelsJsonObject.backAxle.rightWheel.pressure} />
+                                </div> :
+                                <StateRadioButtonGroup type={"Давление"} id={"pressure4"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />}   
                             </div>
 
                                 {carQuestionary.wheelsJsonObject.backAxle.rightWheel2 &&
@@ -242,7 +273,11 @@ function QuestionaryDetailsComponent() {
                                         <StateRadioButtonGroup type={"Диски"} id={"rimState4_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel2.rimState} option1="В норме" option2="Изношен" />
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState4_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel2.tireState} option1="В норме" option2="Изношена" />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState4_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel2.pinsState} option1="В норме" option2="Требуется замена" />
-                                        <StateRadioButtonGroup type={"Давление"} id={"pressure4_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel2.pressure === 'true'} option1="В норме" option2="Не в норме" />   
+                                    {questionary.action == 'departure' ? <div>
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure4_2" value={carQuestionary.wheelsJsonObject.backAxle.rightWheel2.pressure} />
+                                    </div> :
+                                        <StateRadioButtonGroup type={"Давление"} id={"pressure4_2"} isActive={carQuestionary.wheelsJsonObject.backAxle.rightWheel2.pressure === 'true'} option1="В норме" option2="Не в норме" />}   
                                 </div>}
                         </div>
                         {car.axelsCount > 2 ? <div className="row">
@@ -252,7 +287,11 @@ function QuestionaryDetailsComponent() {
                                 <StateRadioButtonGroup type={"Диски"} id={"rimState6"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.rimState} option1="В норме" option2="Изношен"  />
                                 <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.tireState} option1="В норме" option2="Изношена" />
                                 <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.pinsState} option1="В норме" option2="Требуется замена" />
-                                <StateRadioButtonGroup type={"Давление"} id={"pressure6"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />   
+                                {questionary.action == 'departure' ? <div className="form-group">
+                                    <label htmlFor="pressure">Давление:</label>
+                                    <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure6" value={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.pressure} />
+                                </div> : 
+                                <StateRadioButtonGroup type={"Давление"} id={"pressure6"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel.pressure === 'true'} option1="В норме" option2="Не в норме" />}   
                             </div>
                                 {carQuestionary.wheelsJsonObject.middleAxle.rightWheel2 &&
                                     <div className="col-md-6">
@@ -260,7 +299,11 @@ function QuestionaryDetailsComponent() {
                                         <StateRadioButtonGroup type={"Диски"} id={"rimState6_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel2.rimState} option1="В норме" option2="Изношен" />
                                         <StateRadioButtonGroup type={"Состояние резины"} id={"tireState6_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel2.tireState} option1="В норме" option2="Изношена" />
                                         <StateRadioButtonGroup type={"Шпильки"} id={"pinsState6_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel2.pinsState} option1="В норме" option2="Требуется замена" />
-                                        <StateRadioButtonGroup type={"Давление"} id={"pressure6_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel2.pressure === 'true'} option1="В норме" option2="Не в норме" />   
+                                    {questionary.action == 'departure' ? <div className="form-group">
+                                        <label htmlFor="pressure">Давление:</label>
+                                        <input disabled name="pressure" type="number" step="0.1" min="0" max="15" id="pressure6_2" value={carQuestionary.wheelsJsonObject.middleAxle.rightWheel2.pressure} />
+                                    </div> :
+                                        <StateRadioButtonGroup type={"Давление"} id={"pressure6_2"} isActive={carQuestionary.wheelsJsonObject.middleAxle.rightWheel2.pressure === 'true'} option1="В норме" option2="Не в норме" />}
                                     </div>}   
                         </div> : <></>}
                     </div>
