@@ -1006,7 +1006,7 @@ class Questionary extends Component {
                 <form>
                     <h2>Осмотр {car.state === 0 ? <span>на выезд</span> : <span>на въезд</span>}</h2>
 
-                    <h2>Тягач {car.brand} {car.model} (гос.номер: {car.plate}) {trailer && <>, прицеп: {trailer.plate} </>}</h2>
+                    <h2>Тягач {car.brand} {car.model} (гос.номер: {car.plate}) {trailer && <>, прицеп: {trailer.plate}</>}</h2>
                     <div className="row">
                         <h3>Световые приборы</h3>
                         <div className="col-md-6">

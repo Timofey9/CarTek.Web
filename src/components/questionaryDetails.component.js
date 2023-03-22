@@ -91,7 +91,17 @@ function QuestionaryDetailsComponent() {
             <div>
                 <div className="row">
                     <div className="col-md-10">
-                        <h2>Результаты осмотра тягача {car.brand} {car.model}, гос.номер: {car.plate}{trailer && <>,прицеп: {trailer.plate} </>} {questionary.action == "departure" ? <span>на выезд</span> : <span>на въезд</span>} от {new Date(questionary.lastUpdated).toLocaleString("pt-BR")}</h2>
+                        <h2>Результаты осмотра {questionary.action === "departure" ? "на выезд" : "на въезд"} тягача {car.brand} {car.model}, гос.номер: {car.plate}</h2>
+                        <div className="row">
+                            <div className="col-md-1">
+                                {trailer && <div><b>Прицеп:</b></div>}
+                                <div><b>Дата:</b></div>
+                            </div>
+                            <div className="col-md-4">
+                                {trailer && <div>{trailer.plate}</div>}
+                                <div>{new Date(questionary.lastUpdated).toLocaleString("pt-BR")}</div>
+                            </div>
+                        </div>
                     </div>
                     <div className="col-md-2">
                         {!questionary.wasApproved && <Link to={`/cars/acceptCar/${questionary.uniqueId}`} className="btn btn-warning pull-right mb-3">Передать водителю</Link>}
@@ -100,14 +110,13 @@ function QuestionaryDetailsComponent() {
                     </div>
                 </div>
                 {images.length > 0 &&
-                <div className="row">
+                <div className="row mt-3">
                     <div className="col-md-12">
-                        <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={200}>
+                        <ImageList sx={{ width: 500, height: 250 }} cols={3} rowHeight={200}>
                             {imagesList}
                         </ImageList>
                     </div>
-                </div>
-}
+                </div>}
 
                 <div className="row">
                     <h3>Световые приборы</h3>
@@ -126,7 +135,6 @@ function QuestionaryDetailsComponent() {
 
                 <div className="row">
                     <h3>Общее состояние</h3>
-
                     <div className="col-md-6">
                         <div className="col-md-6">
                             <label htmlFor="mileage">Пробег</label>
