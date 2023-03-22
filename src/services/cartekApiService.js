@@ -2,7 +2,7 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32772/api/";
+//const API_URL = "https://localhost:32776/api/";
 
 class ApiService {
 
@@ -63,6 +63,11 @@ class ApiService {
     sendQuestionary(data) {
         var res = this.post(`questionary`, data, { 'Content-Type': 'multipart/form-data' });
         return res;
+    }
+
+    async sendQuestionaryAsync(data) {
+        var res = await this.post(`questionary`, data, { 'Content-Type': 'multipart/form-data' });
+        return await res;
     }
 
     getQuestionary(uniqueId) {

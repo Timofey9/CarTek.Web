@@ -220,7 +220,7 @@ class Questionary extends Component {
                 this.state.tireState6_2 = cachedQuestionary.carQuestionaryModel.wheelsJsonObject.middleAxle.rightWheel2.tireState;
             }
 
-            if (!_.isEmpty(this.state.trailer)) {
+            if (!_.isEmpty(cachedQuestionary.trailerQuestionaryModel)) {
                 //габариты
                 this.state.beamLight2 = cachedQuestionary.trailerQuestionaryModel.lightsJsonObject.beamLight;
                 this.state.turnSignal2 = cachedQuestionary.trailerQuestionaryModel.lightsJsonObject.turnSignal;
@@ -300,14 +300,13 @@ class Questionary extends Component {
             var isFormValid = this.validateForm();
 
             if (isFormValid) {
-                ApiService.sendQuestionary(this.state.formData).then(response => {
-                    this.setState({ createdQuestionary: response.data });
+                ApiService.sendQuestionaryAsync(this.state.formData).then(response => {
                     this.constructAndCacheRequest(true, response.data.uniqueId);
                     alert("Анкета сохранена");
                     this.props.navigate(`/cars/acceptCar/${response.data.uniqueId}`);
                 }, error => {
-                    if (error.code === 'ERR_NETWORK') {
-                        this.setState({ errorMessage: "Ошибка сети" });
+                    if (error.response.data.message) {
+                        this.setState({ errorMessage: error.response.data.message });
                     }
                     else
                         this.setState({ errorMessage: "Анкета не сохранена" });
@@ -922,7 +921,6 @@ class Questionary extends Component {
         this.state.formData.delete("Images");
 
         for (const file of e.target.files) {
-            console.log(file);
             this.state.formData.append("Images", file);
         }
         this.constructAndCacheRequest();
