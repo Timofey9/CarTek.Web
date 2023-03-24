@@ -22,7 +22,6 @@ class UserForm extends Component {
                 .catch((error) => {
                     this.setState({ loading: false, error })
                 });
-
         }
     }
 
@@ -31,7 +30,7 @@ class UserForm extends Component {
 
         this.state = {
             loading: false,
-            error: null,
+            error: "",
             login: "",
             firstName: "",
             middleName:"",
@@ -44,6 +43,7 @@ class UserForm extends Component {
 
         this.handleSubmit = (event) => {
             event.preventDefault();
+            if (this.validate()) {
                 const newUser = {
                     firstName: this.state.firstName,
                     middleName: this.state.middleName,
@@ -53,11 +53,9 @@ class UserForm extends Component {
                     isAdmin: this.state.isAdmin,
                     password: this.state.password
                 };
-
-            const { login } = this.props.params;
-
-            if (login) {
-                this.updateProfile(login, newUser);
+                const { login } = this.props.params;
+                if (login) {
+                    this.updateProfile(login, newUser);
                 }
                 else {
 
@@ -69,12 +67,27 @@ class UserForm extends Component {
                                 ...data,
                                 loading: false
                             });
+                            alert("Пользователь создан");
                         })
                         .catch((error) => {
-                            this.setState({ loading: false, error });
+                            this.setState({ error: error.response.data })
+                            this.setState({ loading: false });
                         })
-                }            
+                }
+            }
         };
+
+        this.validate = () => {
+            if (this.state.login.trim() === '' ||
+                this.state.password.trim() === '' ||
+                this.state.firstName.trim() === '' ||
+                this.state.lastName.trim() === '')
+            {
+                this.setState({ error: "Поля логин, пароль, имя и фамилия являются обязательными" })
+                return false;
+            }
+            return true;
+        }
 
         this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
         this.handleMiddleNameChange = this.handleMiddleNameChange.bind(this);
@@ -94,8 +107,10 @@ class UserForm extends Component {
                     ...data,
                     loading: false
                 });
+                alert("Пользователь обновлен")
             })
             .catch((error) => {
+                this.setState({ error: error.response.data })
                 this.setState({ loading: false });
             })
     }
@@ -129,17 +144,7 @@ class UserForm extends Component {
     }
 
     handlePhoneNumberChange(event) {
-        let phone = event.target.value.trim().replace(/[^0-9]/g, "");
-
-        if (phone && phone[0] !== "+") {
-            phone = "+" + phone;
-        }
-
-        if (phone && phone[1] !== "7") {
-            phone = phone[0] + "7" + phone.substr(1);
-        }
-
-        this.setState({ phone: phone });
+        this.setState({ phone: event.target.value });
     }
 
     render() {
@@ -151,11 +156,6 @@ class UserForm extends Component {
         }
 
         return <>
-            <div className="row justify-content-md-center">
-                <div className="col-md-auto">
-                    {error}
-                </div>
-            </div>
             <h1>Пользователь</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
@@ -230,13 +230,10 @@ class UserForm extends Component {
                             onChange={this.handlePhoneNumberChange}
                             value={phone}
                         />
-                        <div className={this.state.phone ? "has-error" : "d-none"}>
-                            <span className="help-block">Неверный формат номера</span>
-                        </div>
                     </div>
                 </div>
             </div>
-            <div className="form-row pb-4">
+            <div className="form-row pb-2">
                 <div className="col-md-2">
                     <label htmlFor="notifications">Администратор</label>
                     <div className="form-check">
@@ -269,16 +266,25 @@ class UserForm extends Component {
                     </div>
                 </div>
             </div>
-            <div className="row justify-content-md-center mb-5">
-                <Link to="/admin/users" className="btn btn-danger col-md-2 mr-1">
-                    Отмена
-                </Link>
-                <div className="col-md-3">
-                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { this.handleSubmit(e) }}>
+
+            <div className="row justify-content-md-center mb-2">
+                <div className="col-md-6">
+                    <Link to="/admin/users" className="btn btn-danger mx-4">
+                        Отмена
+                    </Link>
+
+                    <button type="submit" form="profile-form" className="btn btn-success ml-2" onClick={(e) => { this.handleSubmit(e) }}>
                         Сохранить
                     </button>
                 </div>
             </div>
+            {this.state.error && (
+                <div className="row d-flex justify-content-center mt-3">
+                    <div className="alert alert-danger mt-2" role="alert">
+                        {this.state.error}
+                    </div>
+                </div>
+            )}
         </>
     }
 }

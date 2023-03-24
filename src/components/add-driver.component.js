@@ -13,7 +13,7 @@ function DriverForm() {
     const [lastName, setLastName] = useState("");
     const [password, setPassword] = useState("");
     const [carId, setCarId] = useState(0);
-    const [phone, setPhone] = useState(0);
+    const [phone, setPhone] = useState();
     const [selectedItem, setSelectedItem] = useState(0);
     const [error, setError] = useState("");
 
@@ -58,32 +58,44 @@ function DriverForm() {
     function handleSubmit(event) {
         event.preventDefault();
 
-        const newDriver = {
-            firstName: firstName,
-            middleName: middleName,
-            lastName: lastName,
-            password: password,
-            phone: phone,
-            carId: carId
-        };
+        if (validate()) {
+            const newDriver = {
+                firstName: firstName,
+                middleName: middleName,
+                lastName: lastName,
+                password: password,
+                phone: phone,
+                carId: carId
+            };
 
-        if (driverId) {
-            ApiService.updateDriver(driverId, newDriver)
-                .then(({ data }) => {
-                    alert("Водитель обновлен");
-                }).
-                catch((error) => {
-                    console.log(error);
-                });
-        } else {
-            ApiService.createDriver(newDriver)
-                .then(({ data }) => {
-                    alert("Водитель создан");
-                }).
-                catch((error) => {
-                    console.log(error);
-                });
+            if (driverId) {
+                ApiService.updateDriver(driverId, newDriver)
+                    .then(({ data }) => {
+                        alert("Водитель обновлен");
+                    }).
+                    catch((error) => {
+                        console.log(error);
+                    });
+            } else {
+                ApiService.createDriver(newDriver)
+                    .then(({ data }) => {
+                        alert("Водитель создан");
+                    }).
+                    catch((error) => {
+                        console.log(error);
+                    });
+            }
         }
+    }
+
+    function validate(){
+        if (password.trim() === '' ||
+            firstName.trim() === '' ||
+            lastName.trim() === '') {
+            setError("Поля имя, фамилия и пароль являются обязательными");
+            return false;
+        }
+        return true;
     }
 
     if (loading) {
@@ -93,11 +105,6 @@ function DriverForm() {
 
     return (
         <div>
-          <div className="row justify-content-md-center">
-                <div className="col-md-auto">
-                    {error}
-                </div>
-            </div>
             <h1>Водитель</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
@@ -166,6 +173,14 @@ function DriverForm() {
                     getOptionLabel={(option) => `${option.brand} ${option.model} - ${option.plate}`}
                     renderInput={(params) => <TextField {...params} label="Список тягачей" />} />
             </div>}
+
+            {error && 
+                <div className="row d-flex justify-content-center mt-3">
+                    <div className="alert alert-danger mt-2" role="alert">
+                        {error}
+                    </div>
+                </div>
+            }
 
             <div className="row justify-content-md-center mt-3">
                 <div className="col-md-2">

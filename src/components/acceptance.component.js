@@ -13,7 +13,8 @@ function AcceptanceComponent() {
     const [message, setMessage] = useState("");
     const [car, setCar] = useState({});
     const [loading, setLoading] = useState(true);
-   // const [uniqueId, setUniqueId] = useState({});
+    const [acceptanceComment, setAcceptanceComment] = useState("");
+    const [fullComplectation, setFullComplectation] = useState(false);
 
     let { uniqueId } = useParams();
     const navigate = useNavigate();
@@ -23,7 +24,8 @@ function AcceptanceComponent() {
         var request = {
             driverId: driver.id,
             driverPass: driverPassword,
-            questionaryId: uniqueId
+            questionaryId: uniqueId,
+            acceptanceComment: acceptanceComment
         };
 
         ApiService.acceptQuestionary(request)
@@ -138,6 +140,28 @@ function AcceptanceComponent() {
                 <div className="col-md-10">
 
                     <div className="row d-flex justify-content-center mb-3">
+                        <div className="col-md-10 d-flex justify-content-center">
+                            <div className="row">
+                                <label htmlFor="complect">
+                                    <input type="checkbox" id="complect" value={fullComplectation} onChange={(e) => setFullComplectation(e.target.checked)} />
+                                    Комплектация не полная
+                                </label>
+                            </div>
+                        </div>
+                        {fullComplectation && 
+                            <div className="col-md-10 d-flex justify-content-center mt-3">
+                                <div className="row d-flex justify-content-center">
+                                    <div className="col-md-12 mb-2 d-flex justify-content-center">
+                                        <label>Введите комменатрий по комплектации:</label>
+                                    </div>
+                                    <div className="col-md-12 d-flex justify-content-center">
+                                        <textarea id="acceptanceComment" rows="5" cols="90" onChange={(e) => setAcceptanceComment(e.event.target.value)}></textarea>
+                                    </div>
+                                </div>
+                            </div>}
+                    </div>
+
+                    <div className="row d-flex justify-content-center mb-3">
                         <div className="col-md-4">Осмотр произвел: </div>
                         <div className="col-md-4">{user.fullName}</div>
                     </div>
@@ -153,7 +177,6 @@ function AcceptanceComponent() {
                         <div className="col-md-4"><input type="password" placeholder="Пароль" onChange={(e) => setDriverPassword(e.target.value)}></input></div>
                     </div>
 
-
                     <div className="row d-flex justify-content-center mt-3">
                         <div className="col-md-3 d-flex justify-content-center"><input type="button" onClick={acceptCar} className="btn btn-success" value="Принять ТС"></input></div>
                     </div>
@@ -168,7 +191,7 @@ function AcceptanceComponent() {
 
                     <div className="row d-flex justify-content-center mb-3">
                         <div className="col-md-8 d-flex justify-content-center">
-                            <label>*Для {questionary.type === "arrival" ? "передачи" : "приемки"} ТС водитель должен ввести свой уникальный ключ-пароль. Ввод пароль означает согласие с осмотром ТС и принятие ответственности за оборудование, перечисленное в списке</label>
+                            <label>*Для {questionary.action === "arrival" ? "сдачи" : "приемки"} ТС водитель должен ввести свой уникальный ключ-пароль. Ввод пароля означает согласие с осмотром ТС и принятие ответственности за оборудование, перечисленное в списке</label>
                         </div>
                     </div>
                 </div>

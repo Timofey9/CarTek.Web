@@ -8,7 +8,7 @@ const UsersList = () => {
     const [loading, setLoading] = useState(false);
     const [sortBy, setSortBy] = useState("name");
     const [searchBy, setSearchBy] = useState("name");
-    const [searchString, setSearchString] = useState("login");
+    const [searchString, setSearchString] = useState("");
     const [dir, setDir] = useState("asc");
     const [totalNumber, setTotalNumber] = useState(15);
     const [pageSize, setPageSize] = useState(15);
@@ -47,8 +47,7 @@ const UsersList = () => {
         {
             name: "Логин",
             sortBy: "login",
-            selector: (row, index) =>
-                <Link to={`/admin/user/${row.login}`} className={"btn btn-light"}>{row.login}</Link>,
+            selector: (row, index) => row.login,
             sortable: true
         },
         {
