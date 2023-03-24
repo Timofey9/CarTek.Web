@@ -19,7 +19,6 @@ function AcceptanceComponent() {
     let { uniqueId } = useParams();
     const navigate = useNavigate();
 
-
     const acceptCar = () => {
         var request = {
             driverId: driver.id,
@@ -27,7 +26,6 @@ function AcceptanceComponent() {
             questionaryId: uniqueId,
             acceptanceComment: acceptanceComment
         };
-
         ApiService.acceptQuestionary(request)
             .then(({ data }) =>
             {
@@ -155,7 +153,7 @@ function AcceptanceComponent() {
                                         <label>Введите комменатрий по комплектации:</label>
                                     </div>
                                     <div className="col-md-12 d-flex justify-content-center">
-                                        <textarea id="acceptanceComment" rows="5" cols="90" onChange={(e) => setAcceptanceComment(e.event.target.value)}></textarea>
+                                        <textarea id="acceptanceComment" rows="5" cols="90" onChange={(e) => setAcceptanceComment(e.target.value)}></textarea>
                                     </div>
                                 </div>
                             </div>}
