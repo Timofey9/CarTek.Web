@@ -144,7 +144,7 @@ function QuestionaryDetailsComponent() {
                             <input type="text" id="mileage" value={carQuestionary.mileage} disabled />
                         </div>
 
-                        <StateRadioButtonGroup type={"Внешнее состояние"} id={"condition"} isActive={true} option1="С повреждениями" option2="Без повреждений" />
+                        <StateRadioButtonGroup type={"Внешнее состояние"} id={"condition"} isActive={carQuestionary.generalCondition} option1="С повреждениями" option2="Без повреждений" />
                     </div>
 
                     <div className="col-md-6"><label htmlFor="comment">Комментарий</label>

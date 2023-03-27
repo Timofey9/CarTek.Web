@@ -962,22 +962,22 @@ class Questionary extends Component {
             isValid = false;
         }
 
-        if (this.state.generalCondition && this.state.comment === '') {
+        if (this.state.generalCondition && this.state.comment.trim() === '') {
             isValid = false;
         }
 
-        if (this.state.trailerCondition && this.state.trailerComment === '') {
+        if (this.state.trailerCondition && this.state.trailerComment.trim() === '') {
             isValid = false;
         }
 
         this.checkCarFields();
         this.checkTrailerFields();
 
-        if (this.state.showTrailerTechnicalComment && this.state.trailerTechnicalComment === '') {
+        if (this.state.showTrailerTechnicalComment && this.state.trailerTechnicalComment.trim() === '') {
             isValid = false;
         }
 
-        if (this.state.showCarTechnicalComment && this.state.carTechnicalComment === '') {
+        if (this.state.showCarTechnicalComment && this.state.carTechnicalComment.trim() === '') {
             isValid = false;
         }
 
@@ -1142,7 +1142,8 @@ class Questionary extends Component {
                             <StateRadioButtonGroup type={"Внешнее состояние"} validated={this.state.validated} id={"condition"} isActive={this.state.generalCondition} option1="С повреждениями" option2="Без повреждений" onChange={this.conditionChanged} />
                         </div>
 
-                        {generalCondition === true ? <div className="col-md-6"><label htmlFor="comment">Опишите повреждения</label><textarea className={this.state.validated && this.state.comment == '' ? "not-valid-input-border" : ""} rows="5" cols="40" type="text" id="comment" value={this.state.comment} onChange={this.commentChanged}/></div> : <span></span>}
+                        {generalCondition === true ? <div className="col-md-6"><label htmlFor="comment">Опишите повреждения</label>
+                            <textarea className={this.state.validated && this.state.comment.trim() == '' ? "not-valid-input-border" : ""} rows="5" cols="40" type="text" id="comment" value={this.state.comment} onChange={this.commentChanged}/></div> : <span></span>}
                     </div>
 
                     <div className="row">
@@ -1322,7 +1323,7 @@ class Questionary extends Component {
                                     <label htmlFor="carTechnicalComment">Опишите неисправности:</label>
                                 </div>
                                 <div className="col-md-8 d-flex justify-content-center">
-                                    <textarea className={this.state.validated && this.state.carTechnicalComment === '' ? "not-valid-input-border" : ""} rows="5" cols="50" type="text" id="carTechnicalComment" value={this.state.carTechnicalComment} onChange={this.carTechnicalCommentChanged} />
+                                    <textarea className={this.state.validated && this.state.carTechnicalComment.trim() === '' ? "not-valid-input-border" : ""} rows="5" cols="50" type="text" id="carTechnicalComment" value={this.state.carTechnicalComment} onChange={this.carTechnicalCommentChanged} />
                                 </div>
                             </div>}
                         <hr className="solid" />
@@ -1402,7 +1403,7 @@ class Questionary extends Component {
                                 {trailerCondition === true ?
                                     <div className="col-md-6">
                                         <label htmlFor="comment">Комментарий</label>
-                                        <textarea rows="5" cols="40" type="text" id="comment" value={this.state.trailerComment} onChange={this.trailerCommentChanged} />
+                                        <textarea className={this.state.validated && this.state.trailerComment.trim() == '' ? "not-valid-input-border" : ""} rows="5" cols="40" type="text" id="comment" value={this.state.trailerComment} onChange={this.trailerCommentChanged} />
                                     </div> : <span></span>}
 
                             <hr className="solid" />
@@ -1507,7 +1508,7 @@ class Questionary extends Component {
                                             <label htmlFor="trailerTechnicalComment">Опишите неисправности:</label>
                                         </div>
                                         <div className="col-md-8 d-flex justify-content-center">
-                                            <textarea className={this.state.validated && this.state.trailerTechnicalComment === '' ? "not-valid-input-border" : ""} rows="5" cols="50" type="text" id="trailerTechnicalComment" value={this.state.trailerTechnicalComment} onChange={this.trailerTechnicalCommentChanged} />
+                                            <textarea className={this.state.validated && this.state.trailerTechnicalComment.trim() === '' ? "not-valid-input-border" : ""} rows="5" cols="50" type="text" id="trailerTechnicalComment" value={this.state.trailerTechnicalComment} onChange={this.trailerTechnicalCommentChanged} />
                                         </div>
                                     </div>}
                             <hr className="solid" />
