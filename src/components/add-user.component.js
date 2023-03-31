@@ -51,35 +51,41 @@ class UserForm extends Component {
                     login: this.state.login,
                     phone: this.state.phone,
                     isAdmin: this.state.isAdmin,
-                    password: this.state.password
                 };
                 const { login } = this.props.params;
                 if (login) {
+                    if (this.state.password !== '') {
+                        newUser.password = this.state.password;
+                    }
+
                     this.updateProfile(login, newUser);
                 }
                 else {
 
-                    this.setState({ loading: true });
-
-                    ApiService.createUser({ ...newUser, email: this.state.email, login: this.state.login, password: this.state.password })
-                        .then(({ data }) => {
-                            this.setState({
-                                ...data,
-                                loading: false
-                            });
-                            alert("Пользователь создан");
-                        })
-                        .catch((error) => {
-                            this.setState({ error: error.response.data })
-                            this.setState({ loading: false });
-                        })
+                    if (this.state.password.trim() === '') {
+                        this.setState({ error: "Поля логин, пароль, имя и фамилия являются обязательными" })
+                    } else {
+                        newUser.password = this.state.password;
+                        this.setState({ loading: true });
+                        ApiService.createUser({ ...newUser, email: this.state.email, login: this.state.login, password: this.state.password })
+                            .then(({ data }) => {
+                                this.setState({
+                                    ...data,
+                                    loading: false
+                                });
+                                alert("Пользователь создан");
+                            })
+                            .catch((error) => {
+                                this.setState({ error: error.response.data })
+                                this.setState({ loading: false });
+                            })
+                    }
                 }
             }
         };
 
         this.validate = () => {
             if (this.state.login.trim() === '' ||
-                this.state.password.trim() === '' ||
                 this.state.firstName.trim() === '' ||
                 this.state.lastName.trim() === '')
             {

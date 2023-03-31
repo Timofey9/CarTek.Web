@@ -2,7 +2,7 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32772/api/";
+//const API_URL = "https://localhost:32768/api/";
 
 class ApiService {
 
@@ -121,10 +121,10 @@ class ApiService {
 
     updateUser = (login, params) => {
         const data = JSON.stringify(Object.keys(params).map(key => {
-            return {
-                op: "add",
-                path: `/${key}`,
-                value: params[key]
+                return {
+                    op: "add",
+                    path: `/${key}`,
+                    value: params[key]                
             }
         }));
 
