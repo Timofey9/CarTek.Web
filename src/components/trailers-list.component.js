@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
@@ -16,6 +16,7 @@ const TrailersList = () => {
     const [trailers, setTrailers] = useState([]);
     const [reload, setReload] = useState(0);
 
+    const navigate = useNavigate();
     const search = () => {
         setReload(reload + 1);
     };
@@ -45,7 +46,7 @@ const TrailersList = () => {
         {
             name: "Номер",
             sortBy: "plate",
-            selector: (row, index) => <Link to={`/admin/trailer/${row.plate}`} className={"btn btn-light"}>{row.plate}</Link>,
+            selector: (row, index) => <Link to={`/admin/trailer/${row.plate}`} className={"btn btn-default"}>{row.plate}</Link>,
             sortable: true
         },
         {
@@ -134,6 +135,9 @@ const TrailersList = () => {
                     }}
                     onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
                         !cancelled && setPageSize(currentRowsPerPage);
+                    }}
+                    onRowClicked={(row, event) => {
+                        navigate(`/admin/trailer/${row.plate}`);
                     }}
                     paginationPerPage={pageSize}
                 />

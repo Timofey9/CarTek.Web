@@ -2,7 +2,7 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32768/api/";
+//const API_URL = "https://localhost:32770/api/";
 
 class ApiService {
 
@@ -114,6 +114,15 @@ class ApiService {
     createUser = (data) => {
         return this.post("user/registeruser", data);
     };
+
+    deleteUser = (login) => {
+        return this.delete(`user/deleteuser/${login}`);
+    };
+
+    deleteDriver = (id) => {
+        return this.delete(`drivers/deletedriver/${id}`);
+    };
+
 
     getAdminUser = (login) => {
         return this.get(`user/${login}`);
@@ -229,6 +238,12 @@ class ApiService {
 
     deleteCar(carId) {
         return this.delete(`cars/deletecar/${carId}`);
+    }
+
+
+    deleteTrailer(trailerId) {
+        console.log(trailerId);
+        return this.delete(`cars/deletetrailer/${trailerId}`);
     }
 
     login(username, password) {

@@ -1082,7 +1082,6 @@ class Questionary extends Component {
                     this.setState({
                         loading: false,
                         car: data,
-                        drivers: data.drivers,
                         trailer: data.trailer
                     })
                 })
@@ -1091,7 +1090,7 @@ class Questionary extends Component {
                 });
 
             this.setState({ loading: true });
-            if (this.state.drivers.length === 0 || this.state.drivers == null) {
+
                 ApiService.getDrivers()
                     .then(({ data }) => {
                         this.setState({
@@ -1102,7 +1101,7 @@ class Questionary extends Component {
                     .catch((error) => {
                         this.setState({ loading: false, error })
                     });
-            }
+            
         }
     }
 

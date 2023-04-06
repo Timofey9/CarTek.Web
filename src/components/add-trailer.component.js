@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -8,7 +8,7 @@ import { setMessage } from '../actions/message';
 function TrailerForm() {
     const [cars, setCars] = useState([]);
     const [carId, setCarId] = useState(0);
-    const [trailer, setTrailer] = useState([]);
+    const [trailer, setTrailer] = useState({});
     const [loading, setLoading] = useState(true);
     const [plate, setPlate] = useState("");
     const [brand, setBrand] = useState("");
@@ -16,8 +16,9 @@ function TrailerForm() {
     const [axelsCount, setAxelsCount] = useState(2);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const [notificationShown, setNotificationShown] = useState(false);
 
-
+    const navigate = useNavigate();
     let { trailerPlate } = useParams();
 
     useEffect(() => {
@@ -48,11 +49,19 @@ function TrailerForm() {
                     setAxelsCount(data.axelsCount);
                 }).
                 catch((error) => {
-                    console.log(error);
+                    setMessage(error.response.data);
                 });
         }
         setLoading(false);
     }, []);
+
+    function validate() {
+        if (!plate) {
+            setMessage("Необходимо ввести гос.номер и выбрать тягач");
+            return false;
+        }
+        return true;
+    }
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -66,29 +75,51 @@ function TrailerForm() {
             carId: carId
         };
 
-        if (!carId) {
+        if (!validate()) {
             setMessage("Необходимо выбрать тягач");
         } else {
-
             if (trailerPlate) {
                 ApiService.updateTrailer(trailer.id, newTrailer)
                     .then(({ data }) => {
                         alert("Полуприцеп обновлен");
+                        navigate("/admin/trailers/");
                     }).
                     catch((error) => {
-                        console.log(error);
+                        setMessage(error.response);
                     });
             } else {
                 ApiService.createTrailer(newTrailer)
                     .then(({ data }) => {
                         alert("Полуприцеп создан");
+                        navigate("/admin/trailers/");
                     }).
                     catch((error) => {
-                        if (error.response.data.message) {
-                            setMessage(error.response.data.message);
+                        if (error.response.data) {
+                            setMessage(error.response.data);
                         }
                     });
                 }
+        }
+    }
+
+    function deleteTrailer(event) {
+        event.preventDefault();
+
+        if (!notificationShown) {
+            setMessage("Чтобы продолжить нажмите \"Удалить\" еще раз");
+            setNotificationShown(true);
+        } else {
+            var id = trailer.id;
+            ApiService.deleteTrailer(id)
+                .then(({ data }) => {
+                    setLoading(false);
+                    alert("Прицеп удален");
+                    navigate("/admin/trailers/");
+                })
+                .catch((error) => {
+                    setMessage(error.response.data);
+                    setLoading(false);
+                })
         }
     }
 
@@ -98,11 +129,6 @@ function TrailerForm() {
 
     return (
         <div>
-            <div className="row justify-content-md-center">
-                <div className="col-md-auto">
-                    {error}
-                </div>
-            </div>
             <h1>Полуприцеп</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
@@ -172,17 +198,27 @@ function TrailerForm() {
                 </div>
             )}
 
-            <div className="row justify-content-md-center mt-3">
-                <div className="col-md-2">
-                    <Link to="/admin/trailers" className="btn btn-danger mr-1">
-                        Отмена
-                    </Link>
-                </div>
-
-                <div className="col-md-3">
-                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
-                        Сохранить
-                    </button>
+            <div className="row mb-2">
+                <div className="col-md-3"></div>
+                <div className="col-md-9">
+                    <div className="row">
+                        {trailer &&
+                            <div className="col-md-2">
+                                <button className="btn btn-danger mx-2" onClick={(e) => { deleteTrailer(e) }}>
+                                    Удалить
+                                </button>
+                            </div>}
+                        <div className="col-md-2">
+                            <Link to="/admin/trailers" className="btn btn-warning mx-2">
+                                Отмена
+                            </Link>
+                        </div>
+                        <div className="col-md-2">
+                            <button type="submit" form="profile-form" className="btn btn-success mx-2" onClick={(e) => { handleSubmit(e) }}>
+                                Сохранить
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>);

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { setMessage } from '../actions/message';
 
 function CarForm() {
     const [driver, setDriver] = useState({});
@@ -17,19 +16,20 @@ function CarForm() {
     const [axelsCount, setAxelsCount] = useState(2);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const [notificationShown, setNotificationShown] = useState(false);
 
+    const navigate = useNavigate();
 
     let { carPlate } = useParams();
 
     useEffect(() => {
         setLoading(true);
-
         ApiService.getAllTrailers()
             .then(({ data }) => {
                 setTrailers(data);
             }).
             catch((error) => {
-                console.log(error);
+                setMessage(error.response.data.message);
             });
 
         setLoading(false);
@@ -50,11 +50,34 @@ function CarForm() {
                     setDriver(data.driver);
                 }).
                 catch((error) => {
-                    console.log(error);
+                    if (error.response.data.message) {
+                        setMessage(error.response.data.message);
+                    }
                 });
         }
         setLoading(false);
     }, []);
+
+    function deleteCar(event) {
+        event.preventDefault();
+
+        if (!notificationShown) {
+            setMessage("Удаление атвомобиля приведет к удалению всех связанных с ним осмотров! Чтобы продолжить нажмите \"Удалить\" еще раз");
+            setNotificationShown(true);
+        } else {
+            ApiService.deleteCar(car.id)
+                .then(({ data }) => {
+                    setLoading(false);
+                    alert("Тягач удален");
+                    navigate("/admin/cars/");
+                })
+                .catch((error) => {
+                    setMessage(error.response.data);
+                    setLoading(false);
+                })
+        }
+    }
+
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -74,12 +97,15 @@ function CarForm() {
                     alert("Тягач обновлен");
                 }).
                 catch((error) => {
-                    console.log(error);
+                    if (error.response.data.message) {
+                        setMessage(error.response.data.message);
+                    }
                 });
         } else {
             ApiService.createCar(newCar)
                 .then(({ data }) => {
                     alert("Тягач создан");
+                    navigate("/admin/cars/");
                 }).
                 catch((error) => {
                     if (error.response.data.message) {
@@ -169,17 +195,28 @@ function CarForm() {
                 </div>
             )}
 
-            <div className="row justify-content-md-center mt-3">
-                <div className="col-md-2">
-                    <Link to="/admin/cars" className="btn btn-danger mr-1">
-                        Отмена
-                    </Link>
-                </div>
 
-                <div className="col-md-3">
-                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
-                        Сохранить
-                    </button>
+            <div className="row mt-5">
+                <div className="col-md-3"></div>
+                <div className="col-md-6">
+                    <div className="row">
+                        {car &&
+                            <div className="col-md-2">
+                                <button className="btn btn-danger" onClick={(e) => { deleteCar(e) }}>
+                                    Удалить
+                                </button>
+                            </div>}
+                        <div className="col-md-2">
+                            <Link to="/admin/cars" className="btn btn-warning mr-1">
+                                Отмена
+                            </Link>
+                        </div>
+                        <div className="col-md-2">
+                            <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
+                                Сохранить
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {Link, useParams } from 'react-router-dom';
+import {Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -16,6 +16,9 @@ function DriverForm() {
     const [phone, setPhone] = useState();
     const [selectedItem, setSelectedItem] = useState(0);
     const [error, setError] = useState("");
+    const [notificationShown, setNotificationShown] = useState(false);
+
+    const navigate = useNavigate();
 
     let { driverId } = useParams();
 
@@ -27,7 +30,7 @@ function DriverForm() {
                 setCars(data);
             }).
             catch((error) => {
-                console.log(error);
+                setError(error.response.data);
             });
 
         setLoading(false);
@@ -49,7 +52,7 @@ function DriverForm() {
                     setPhone(data.phone);
                 }).
                 catch((error) => {
-                    console.log(error);
+                    setError(error.response.data);
                 });
         }
         setLoading(false);
@@ -74,17 +77,38 @@ function DriverForm() {
                         alert("Водитель обновлен");
                     }).
                     catch((error) => {
-                        console.log(error);
+                        setError(error.response.data);
                     });
             } else {
                 ApiService.createDriver(newDriver)
                     .then(({ data }) => {
                         alert("Водитель создан");
+                        navigate("/admin/drivers/");
                     }).
                     catch((error) => {
-                        console.log(error);
+                        setError(error.response.data);
                     });
             }
+        }
+    }
+
+    function deleteDriver(event) {
+        event.preventDefault();
+
+        if (!notificationShown) {
+            setError("Удаление пользователя приведет к удалению всех созданных им осмотров.\nЧтобы продолжить нажмите \"Удалить\" еще раз");
+            setNotificationShown(true);
+        } else {
+            ApiService.deleteDriver(driverId)
+                .then(({ data }) => {
+                    setLoading(false);
+                    alert("Водитель удален");
+                    navigate("/admin/drivers/");
+                })
+                .catch((error) => {
+                    setError(error.response.data);
+                    setLoading(false);
+                })
         }
     }
 
@@ -101,7 +125,6 @@ function DriverForm() {
     if (loading) {
         return <div><h1>ЗАГРУЗКА...</h1></div>
     }
-
 
     return (
         <div>
@@ -182,17 +205,27 @@ function DriverForm() {
                 </div>
             }
 
-            <div className="row justify-content-md-center mt-3">
-                <div className="col-md-2">
-                    <Link to="/admin/drivers" className="btn btn-danger mr-1">
-                        Отмена
-                    </Link>
-                </div>
-
-                <div className="col-md-3">
-                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => {handleSubmit(e)}}>
-                        Сохранить
-                    </button>
+            <div className="row mb-2">
+                <div className="col-md-3"></div>
+                <div className="col-md-6">
+                    <div className="row">
+                        {driverId &&
+                            <div className="col-md-2">
+                                <button className="btn btn-danger" onClick={(e) => { deleteDriver(e) }}>
+                                    Удалить
+                                </button>
+                            </div>}
+                        <div className="col-md-2">
+                            <Link to="/admin/drivers" className="btn btn-warning mr-1">
+                                Отмена
+                            </Link>
+                        </div>
+                        <div className="col-md-2">
+                            <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
+                                Сохранить
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>);

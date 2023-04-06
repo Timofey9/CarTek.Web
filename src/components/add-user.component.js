@@ -8,10 +8,12 @@ class UserForm extends Component {
         active: "Active",
         inactive: "Inactive"
     };
+
     componentDidMount() {
         const { login } = this.props.params;
         if (login) {
             this.setState({ loading: true });
+            this.setState({ userExists: true });
             ApiService.getAdminUser(login)
                 .then(({ data }) => {
                     this.setState({
@@ -39,6 +41,8 @@ class UserForm extends Component {
             isAdmin: false,
             password: "",
             email: "",
+            notificationShown: false,
+            userExists: false
         };
 
         this.handleSubmit = (event) => {
@@ -74,6 +78,7 @@ class UserForm extends Component {
                                     loading: false
                                 });
                                 alert("Пользователь создан");
+                                this.props.navigate(`/admin/users/`);
                             })
                             .catch((error) => {
                                 this.setState({ error: error.response.data })
@@ -95,6 +100,28 @@ class UserForm extends Component {
             return true;
         }
 
+        this.deleteUser = (event) => {
+            event.preventDefault();
+            if (!this.state.notificationShown) {
+                this.setState({ error: "Удаление пользователя приведет к удалению всех созданных им осмотров.\nЧтобы продолжить нажмите \"Удалить\" еще раз" });
+                this.setState({ notificationShown: true });
+            } else {
+                ApiService.deleteUser(this.state.login)
+                    .then(({ data }) => {
+                        this.setState({
+                            ...data,
+                            loading: false
+                        });
+                        alert("Пользователь удален");
+                        this.props.navigate(`/admin/users/`);
+                    })
+                    .catch((error) => {
+                        this.setState({ error: error.response.data })
+                        this.setState({ loading: false });
+                    })
+            }
+        }
+
         this.handleFirstNameChange = this.handleFirstNameChange.bind(this);
         this.handleMiddleNameChange = this.handleMiddleNameChange.bind(this);
         this.handleLastNameChange = this.handleLastNameChange.bind(this);
@@ -104,6 +131,7 @@ class UserForm extends Component {
         this.handleLoginChange = this.handleLoginChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
     }
+
 
     updateProfile(login, newUser) {
         this.setState({ loading: true });
@@ -272,18 +300,6 @@ class UserForm extends Component {
                     </div>
                 </div>
             </div>
-
-            <div className="row justify-content-md-center mb-2">
-                <div className="col-md-6">
-                    <Link to="/admin/users" className="btn btn-danger mx-4">
-                        Отмена
-                    </Link>
-
-                    <button type="submit" form="profile-form" className="btn btn-success ml-2" onClick={(e) => { this.handleSubmit(e) }}>
-                        Сохранить
-                    </button>
-                </div>
-            </div>
             {this.state.error && (
                 <div className="row d-flex justify-content-center mt-3">
                     <div className="alert alert-danger mt-2" role="alert">
@@ -291,6 +307,29 @@ class UserForm extends Component {
                     </div>
                 </div>
             )}
+            <div className="row mb-2">
+                <div className="col-md-3"></div>
+                <div className="col-md-6">
+                    <div className="row">
+                        {this.state.userExists &&
+                            <div className="col-md-2">
+                                <button className="btn btn-danger" onClick={(e) => { this.deleteUser(e) }}>
+                                    Удалить
+                                </button>
+                            </div>}
+                        <div className="col-md-2">
+                            <Link to="/admin/users" className="btn btn-warning">
+                                Отмена
+                            </Link>
+                        </div>
+                        <div className="col-md-2">
+                            <button type="submit" form="profile-form" className="btn btn-success ml-2" onClick={(e) => { this.handleSubmit(e) }}>
+                                Сохранить
+                            </button>
+                        </div>   
+                    </div>
+                </div>             
+            </div>
         </>
     }
 }
