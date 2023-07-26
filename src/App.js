@@ -23,6 +23,11 @@ import AcceptanceComponent from "./components/acceptance.component";
 import QuestionaryDetailsComponent from "./components/questionaryDetails.component";
 import CarForm from "./components/add-car.component";
 import TrailerForm from "./components/add-trailer.component";
+import OrdersList from "./components/orders/orders-list.component";
+import OrderForm from "./components/orders/add-order.component";
+import CarsWork from "./components/orders/task-distribution.component";
+import MyTasksList from "./components/driver-dashboard/my-tasks.component";
+import DriverDashboard from "./components/driver-dashboard/driver-dashboard.component";
 
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
@@ -80,7 +85,7 @@ class App extends Component {
     }
 
     render() {
-        const { currentUser, showModeratorBoard, showAdminBoard } = this.state;
+        const { currentUser, showAdminBoard } = this.state;
 
         return (
             <BrowserRouter location={history.location} navigator={history}>
@@ -151,6 +156,9 @@ class App extends Component {
                         <Route exact path="/profile" element={<RequireAuth currentUser={currentUser}><Profile /></RequireAuth>} />
                         <Route exact path="/user" element={<RequireAuth currentUser={currentUser}><BoardUser /></RequireAuth>} />
                         <Route exact path="/cars" element={<RequireAuth currentUser={currentUser}><CarsList /></RequireAuth>} />
+                        <Route path="/driver-dashboard" element={<RequireAuth currentUser={currentUser}><DriverDashboard /></RequireAuth>} />
+                        <Route exact path="/driver-dashboard/mytasks" element={<RequireAuth currentUser={currentUser}><MyTasksList /></RequireAuth>} />
+
                         <Route exact path="/cars/car/:plate" element={<RequireAuth currentUser={currentUser}><CarComponent /></RequireAuth>} />
 
                         <Route exact path="/admin/questionaries" element={<RequireAuth currentUser={currentUser}><QuestionariesList /></RequireAuth>} />
@@ -170,6 +178,9 @@ class App extends Component {
                         <Route exact path="/admin/drivers" element={<RequireAuth currentUser={currentUser}><DriversList /></RequireAuth>} />
                         <Route exact path="/admin/driver" element={<RequireAuth currentUser={currentUser}><DriverForm /></RequireAuth>} />
                         <Route exact path="/admin/driver/:driverId" element={<RequireAuth currentUser={currentUser}><DriverForm /></RequireAuth>} />
+                        <Route exact path="/admin/orders" element={<RequireAuth currentUser={currentUser}><OrdersList /></RequireAuth>} />
+                        <Route exact path="/admin/workload" element={<RequireAuth currentUser={currentUser}><CarsWork /></RequireAuth>} />
+                        <Route exact path="/admin/orders/create" element={<RequireAuth currentUser={currentUser}><OrderForm /></RequireAuth>} />
                     </Routes>
                 </div>
 

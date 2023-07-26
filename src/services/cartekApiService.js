@@ -1,8 +1,8 @@
 import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
-const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32770/api/";
+//const API_URL = "http://185.46.8.6:5000/api/";
+const API_URL = "https://localhost:32768/api/";
 
 class ApiService {
 
@@ -23,7 +23,26 @@ class ApiService {
             headers: { 'Content-Type': 'application/json' }
         });
 
+        this._axiosXlsx = axios.create({
+            baseURL: API_URL,
+            responseType: 'blob',
+            headers: { 'Access-Control-Allow-Origin': '*' }
+        });
+
         this._axios.interceptors.request.use(this.createSetAuthInterceptor);
+
+        this._axiosXlsx.interceptors.request.use(this.createSetAuthInterceptor);
+
+        this._axiosXlsx.interceptors.response.use(
+            response => response,
+            error => {
+                const { status } = error.response;
+                if (status === 401) {
+                    EventBus.dispatch("logout", {});
+                }
+                return Promise.reject(error);
+            }
+        );
 
         this._axios.interceptors.response.use(
             response => response,
@@ -38,13 +57,6 @@ class ApiService {
     }
 
     post(url, data, headers = {}) {
-        const config = {
-            method: 'post',
-            url,
-            data,
-            headers
-        };
-
         return this._axios.post(url, data, { headers });
     }
 
@@ -58,6 +70,40 @@ class ApiService {
 
     delete(url) {
         return this._axios.delete(url);
+    }
+
+    testGetFile(params) {
+        const query = new URLSearchParams(params).toString();
+        var res = this._axiosXlsx.get(`order/getxls/?${query}`);
+        return res;
+    }
+
+    getDriverTasks(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`drivers/getdrivertasks/?${query}`);
+    }
+
+    getOrdersBetweenDates(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`order/getordersbetweendates/?${query}`);
+    }
+
+    getAllActiveOrders(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`order/getallactiveorders/?${query}`);
+    }
+
+    getMaterials() {
+        var res = this.get(`order/getmaterials`);
+        return res;
+    }
+
+    createOrder(data) {
+        return this.post("order/create", data);
+    }
+
+    createDriverTask(data) {
+        return this.post("order/createtask", data);
     }
 
     sendQuestionary(data) {
@@ -200,6 +246,11 @@ class ApiService {
         return this.get(`cars/getcars/?${query}`);
     }
 
+    getCarsWithTasks(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`cars/getcarswithtasks/?${query}`);
+    }
+
     getAllCars() {
         return this.get(`cars/getallcars/`);
     }
@@ -246,8 +297,8 @@ class ApiService {
         return this.delete(`cars/deletetrailer/${trailerId}`);
     }
 
-    login(username, password) {
-        return this.post("auth/login", { login: username, password: password })
+    login(username, password, isDriver) {
+        return this.post("auth/login", { login: username, password: password, isDriver: isDriver })
             .then((response) => {
                 if (response.data.token) {
                     localStorage.setItem("user", JSON.stringify(response.data));

@@ -45,8 +45,8 @@ export const register = (username, email, password) => (dispatch) => {
   );
 };
 
-export const login = (username, password) => (dispatch) => {
-    return ApiService.login(username, password).then(
+export const login = (username, password, isDriver) => (dispatch) => {
+    return ApiService.login(username, password, isDriver).then(
       (data) => {
       dispatch({
         type: LOGIN_SUCCESS,

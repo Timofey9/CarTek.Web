@@ -14,5 +14,6 @@
   <ItemGroup>
     <Folder Include="src\components\form\" />
     <Folder Include="src\common\" />
+    <Folder Include="src\components\driver-dashboard\" />
   </ItemGroup>
 </Project>
