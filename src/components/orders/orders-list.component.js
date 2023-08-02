@@ -137,7 +137,11 @@ const OrdersList = () => {
         },    
         {
             name: "Дата начала",
-            selector: (row, index) => new Date(row.startDate).toLocaleString("pt-BR"),
+            selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            }),
             center: true,
         },        
         {
@@ -175,7 +179,11 @@ const OrdersList = () => {
         },
         {
             name: "Дата",
-            selector: (row, index) => new Date(row.startDate).toLocaleString("pt-BR"),
+            selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            }),
             center: true,
         }
     ];

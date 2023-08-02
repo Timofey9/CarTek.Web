@@ -1,3 +1,4 @@
+/// <reference path="../orders/add-drivertask.component.js" />
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import ApiService from "../../services/cartekApiService";
@@ -65,7 +66,11 @@ const MyTasksList = () => {
         },
         {
             name: "Дата",
-            selector: (row, index) => `${new Date(row.startDate).getDate()}.${new Date(row.startDate).getMonth() + 1}.${new Date(row.startDate).getFullYear()}`,
+            selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            }),
             center: true,
         },
         {
@@ -139,6 +144,9 @@ const MyTasksList = () => {
             }}
             onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
                 !cancelled && setPageSize(currentRowsPerPage);
+            }}
+            onRowClicked={(row, event) => {
+                navigate(`/driver-dashboard/task/${row.id}`);
             }}
             paginationPerPage={pageSize}
         />

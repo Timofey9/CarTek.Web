@@ -83,6 +83,16 @@ class ApiService {
         return this.get(`drivers/getdrivertasks/?${query}`);
     }
 
+    getDriverTaskById(id) {
+        return this.get(`drivers/getdrivertask/${id}`);
+    }
+
+    async EditDriverTaskAsync(data) {
+        var res = await this.post(`drivers/updatedrivertask`, data, { 'Content-Type': 'multipart/form-data' });
+        return await res;
+    }
+
+
     getOrdersBetweenDates(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`order/getordersbetweendates/?${query}`);

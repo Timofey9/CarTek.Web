@@ -28,6 +28,7 @@ import OrderForm from "./components/orders/add-order.component";
 import CarsWork from "./components/orders/task-distribution.component";
 import MyTasksList from "./components/driver-dashboard/my-tasks.component";
 import DriverDashboard from "./components/driver-dashboard/driver-dashboard.component";
+import DriverEditTask from "./components/driver-dashboard/driver-edittask.component";
 
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
@@ -47,6 +48,7 @@ class App extends Component {
         this.state = {
             showModeratorBoard: false,
             showAdminBoard: false,
+            showDriver: false,
             currentUser: undefined,
         };
 
@@ -63,6 +65,7 @@ class App extends Component {
                 currentUser: user,
                 showModeratorBoard: user.identity.isAdmin,
                 showAdminBoard: user.identity.isAdmin,
+                showDriver: user.isDriver
             });
         }
 
@@ -81,19 +84,24 @@ class App extends Component {
             showModeratorBoard: false,
             showAdminBoard: false,
             currentUser: undefined,
+            showDriver: false
         });
     }
 
     render() {
-        const { currentUser, showAdminBoard } = this.state;
+        const { currentUser, showAdminBoard, showDriver } = this.state;
 
         return (
             <BrowserRouter location={history.location} navigator={history}>
 
                 <nav className="navbar navbar-expand-lg navbar-light main-nav">
-                    <Link to={"/"} className="navbar-brand">
-                        <img src="/logo.png" height="40" alt="logo" />
-                    </Link>
+                    {showDriver ? (
+                        <Link to={"/driver-dashboard"} className="navbar-brand">
+                            <img src="/logo.png" height="40" alt="logo" />
+                        </Link>) :
+                        (<Link to={"/"} className="navbar-brand">
+                            <img src="/logo.png" height="40" alt="logo" />
+                        </Link>)}
 
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
@@ -102,17 +110,20 @@ class App extends Component {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav mr-auto">
 
-                            <li className="nav-item">
-                                <Link to={"/home"} className="nav-link">
-                                    Осмотр
-                                </Link>
-                            </li>
+                            {!showDriver && (
+                                <>
+                                    <li className="nav-item">
+                                        <Link to={"/home"} className="nav-link">
+                                            Осмотр
+                                        </Link>
+                                    </li>
 
-                            <li className="nav-item">
-                                <Link to={"/cars"} className="nav-link">
-                                    Машины
-                                </Link>
-                            </li>
+                                    <li className="nav-item">
+                                        <Link to={"/cars"} className="nav-link">
+                                            Машины
+                                        </Link>
+                                    </li>
+                                </>)}
 
                             {showAdminBoard && (
                                 <li className="nav-item">
@@ -150,14 +161,15 @@ class App extends Component {
 
                 <div className="container mt-3">
                     <Routes>
-                        <Route exact path="/" element={<RequireAuth currentUser={currentUser}><Home/></RequireAuth>} />
-                        <Route exact path="/home" element={<RequireAuth currentUser={currentUser}><Home/></RequireAuth>} />                        
+                        <Route exact path="/" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
+                        <Route exact path="/home" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
                         <Route exact path="/login" element={<Login />} />
                         <Route exact path="/profile" element={<RequireAuth currentUser={currentUser}><Profile /></RequireAuth>} />
                         <Route exact path="/user" element={<RequireAuth currentUser={currentUser}><BoardUser /></RequireAuth>} />
                         <Route exact path="/cars" element={<RequireAuth currentUser={currentUser}><CarsList /></RequireAuth>} />
-                        <Route path="/driver-dashboard" element={<RequireAuth currentUser={currentUser}><DriverDashboard /></RequireAuth>} />
+                        <Route exact path="/driver-dashboard" element={<RequireAuth currentUser={currentUser}><DriverDashboard /></RequireAuth>} />
                         <Route exact path="/driver-dashboard/mytasks" element={<RequireAuth currentUser={currentUser}><MyTasksList /></RequireAuth>} />
+                        <Route exact path="/driver-dashboard/task/:driverTaskId" element={<RequireAuth currentUser={currentUser}><DriverEditTask /></RequireAuth>} />
 
                         <Route exact path="/cars/car/:plate" element={<RequireAuth currentUser={currentUser}><CarComponent /></RequireAuth>} />
 
@@ -170,7 +182,7 @@ class App extends Component {
                         <Route exact path="/admin/cars/edit/:carPlate" element={<RequireAuth currentUser={currentUser}><CarForm /></RequireAuth>} />
                         <Route exact path="/cars/acceptCar/:uniqueId" element={<RequireAuth currentUser={currentUser}><AcceptanceComponent /></RequireAuth>} />
                         <Route exact path="/questionary/car/:plate" element={<RequireAuth currentUser={currentUser}><Questionary /></RequireAuth>} />
-                        <Route exact path="/questionary/details/:uniqueId" element={<RequireAuth currentUser={currentUser}><QuestionaryDetailsComponent/></RequireAuth>} />
+                        <Route exact path="/questionary/details/:uniqueId" element={<RequireAuth currentUser={currentUser}><QuestionaryDetailsComponent /></RequireAuth>} />
                         <Route exact path="/admin" element={<RequireAuth currentUser={currentUser}><BoardAdmin /></RequireAuth>} />
                         <Route exact path="/admin/user/" element={<RequireAuth currentUser={currentUser}><UserForm /></RequireAuth>} />
                         <Route exact path="/admin/user/:login" element={<RequireAuth currentUser={currentUser}><UserForm /></RequireAuth>} />

@@ -62,27 +62,27 @@ const CarsWork = () => {
     const getTaskStatus = (statusInt) => {
         switch (statusInt) {
             case 0:
-                return ('Назначена');
+                return "Назначена";
             case 1:
-                return ('Принята водителем');
+                return "Принята";
             case 2:
-                return ('Погрузка');
+                return "Загрузка";
             case 3:
-                return ('Погружен');
+                return "Загружен";
             case 4:
-                return ('В пути');
+                return "В пути";
             case 5:
-                return ('Разгрузка');
+                return "Разгрузка";
             case 6:
-                return ('Разгружен');
+                return "Разгружен";
             case 7:
-                return ('Оригинал отправлен');
+                return "Документы загружены";
             case 8:
-                return ('Оригинал получен');
+                return "Оригиналы получены";
             case 9:
-                return ('Завершено');
+                return "Завершена";
             default:
-                return(`Неизвестный статус: ${statusInt}.`);
+                return "Неизвестный статус";
         }
     }
     const navigate = useNavigate();

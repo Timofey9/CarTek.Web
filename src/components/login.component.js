@@ -58,11 +58,9 @@ class Login extends Component {
         const { dispatch, history } = this.props;
 
         if (this.state.username && this.state.password) {
-
             dispatch(login(this.state.username, this.state.password, this.state.isDriver))
                 .then(() => {
                     window.location.reload(true);
-                    history.push("/profile");
                 })
                 .catch(() => {
                     this.setState({
@@ -82,10 +80,14 @@ class Login extends Component {
     }
 
     render() {
-        const { isLoggedIn, message } = this.props;
-
+        const { isLoggedIn, message, isDriver } = this.props;
+        console.log(this.props);
         if (isLoggedIn) {
-            return <Navigate to="/profile" />;
+            if (isDriver) {
+                return <Navigate to="/driver-dashboard" />;
+            } else {
+                return <Navigate to="/profile" />;
+            }
         }
 
         return (
@@ -144,9 +146,11 @@ class Login extends Component {
 function mapStateToProps(state) {
     const { isLoggedIn } = state.auth;
     const { message } = state.message;
+    const isDriver = state.auth.isDriver
     return {
         isLoggedIn,
-        message
+        message,
+        isDriver
     };
 }
 
