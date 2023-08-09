@@ -60,42 +60,6 @@ function DriverTaskForm({orderId, handleClose}) {
         setLoading(false);
     }, []);
 
-    //useEffect(() => {
-    //    setLoading(true);
-
-    //    if (carPlate) {
-    //        ApiService.getOrderById(orderId)
-    //            .then(({ data }) => {
-    //                setOrder(data);
-    //            }).
-    //            catch((error) => {
-    //                if (error.response.data.message) {
-    //                    setMessage(error.response.data.message);
-    //                }
-    //            });
-    //    }
-    //    setLoading(false);
-    //}, []);
-
-    //function deleteOrder(event) {
-    //    event.preventDefault();
-    //    if (!notificationShown) {
-    //        setMessage("Удаление атвомобиля приведет к удалению всех связанных с ним осмотров! Чтобы продолжить нажмите \"Удалить\" еще раз");
-    //        setNotificationShown(true);
-    //    } else {
-    //        ApiService.deleteCar(car.id)
-    //            .then(({ data }) => {
-    //                setLoading(false);
-    //                alert("Тягач удален");
-    //                navigate("/admin/cars/");
-    //            })
-    //            .catch((error) => {
-    //                setMessage(error.response.data);
-    //                setLoading(false);
-    //            })
-    //    }
-    //}
-
     function handleSubmit(event) {
         event.preventDefault();
         setMessage("");

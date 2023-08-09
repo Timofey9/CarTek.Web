@@ -5,8 +5,11 @@ import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
+import StepContent from '@mui/material/StepContent';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+
 
 //редактирование со стороны водителя: 1) поменять статус; 2) добавить комментарий; 3) загрузить фото. Все выполняется одним запросом
 
@@ -20,6 +23,7 @@ const DriverEditTask = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [note, setNote] = useState("");
     const [formData, setFormData] = useState(new FormData());
+    const [notes, setNotes] = useState([]);
 
     const statuses = ['Назначена', 'Принята', 'Загрузка', 'Загружен', 'В пути', 'Разгрузка', 'Разгружен', 'Документы загружены', 'Оригиналы получены', 'Завершена'];
 
@@ -66,33 +70,6 @@ const DriverEditTask = () => {
             });
     };
 
-    const statusToString = (status) => {
-        switch (status) {
-            case 0:
-                return "Назначена";
-            case 1:
-                return "Принята";
-            case 2:
-                return "Загрузка";
-            case 3:
-                return "Загружен";
-            case 4:
-                return "В пути";
-            case 5:
-                return "Разгрузка";
-            case 6:
-                return "Разгружен";
-            case 7:
-                return "Документы загружены";
-            case 8:
-                return "Оригиналы получены";
-            case 9:
-                return "Завершена";
-            default:
-                return "Неизвестный статус";
-        }
-    }
-
     const statusToButtonTxt = (status) => {
         switch (status) {
             case 0:
@@ -123,10 +100,11 @@ const DriverEditTask = () => {
         if (driverTaskId) {
             ApiService.getDriverTaskById(driverTaskId)
                 .then(({ data }) => {
-                    console.log(data);
                     setDriverTask(data);
                     setOrder(data.order);
-                    setActiveStep(data.status)
+                    setActiveStep(data.status);
+                    setNotes(data.notes);
+                    console.log(data.notes);
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -183,8 +161,20 @@ const DriverEditTask = () => {
                                     const stepProps = {};
                                     const labelProps = {};
                                     return (
-                                        <Step key={label} {...stepProps}>
+                                        <Step key={label} {...stepProps} expanded={true}>
                                             <StepLabel {...labelProps}>{label}</StepLabel>
+
+                                            <StepContent>
+                                                {notes.filter((n) => n.status === index).map((note, noteindex) => {
+                                                    return (
+                                                        <div>
+                                                            <div>{new Date(note.dateCreated).toLocaleString('ru-Ru')}</div>
+                                                            <Typography>{note.text}</Typography>
+                                                            <a target="_blank" href="https://storage.yandexcloud.net/cartek/cartek/test">test</a>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </StepContent>
                                         </Step>
                                     );
                                 })}

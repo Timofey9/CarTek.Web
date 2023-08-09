@@ -108,6 +108,26 @@ class ApiService {
         return res;
     }
 
+    getClients() {
+        var res = this.get(`order/getclients`);
+        return res;
+    }
+
+    createClient(data) {
+        var res = this.post(`order/createclient`, data);
+        return res;
+    }
+
+    createAddress(data) {
+        var res = this.post(`order/createaddress`, data);
+        return res;
+    }
+
+    getAddresses() {
+        var res = this.get(`order/getaddresses`);
+        return res;
+    }
+
     createOrder(data) {
         return this.post("order/create", data);
     }
