@@ -78,6 +78,12 @@ class ApiService {
         return res;
     }
 
+    downloadTN(params) {
+        const query = new URLSearchParams(params).toString();
+        var res = this._axiosXlsx.get(`order/gettn/?${query}`);
+        return res;
+    }
+
     getDriverTasks(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`drivers/getdrivertasks/?${query}`);
@@ -92,6 +98,11 @@ class ApiService {
         return await res;
     }
 
+
+    async AdminEditDriverTaskAsync(data) {
+        var res = await this.post(`order/updatedrivertask`, data);
+        return await res;
+    }
 
     getOrdersBetweenDates(params) {
         const query = new URLSearchParams(params).toString();
@@ -149,6 +160,11 @@ class ApiService {
     getQuestionary(uniqueId) {
         var res = this.get(`questionary/${uniqueId}`);
         return res;
+    }
+
+    getNotifications(data) {
+        const query = new URLSearchParams(data).toString();
+        return this.get(`notification/getnotifications/?${query}`);
     }
 
     deleteQuestionary(uniqueId) {
@@ -262,9 +278,8 @@ class ApiService {
         return this.get(`drivers/getdrivers/?${query}`);
     }
 
-    getAllDrivers(params) {
-        const query = new URLSearchParams(params).toString();
-        return this.get(`drivers/getalldrivers/?${query}`);
+    getAllDrivers() {
+        return this.get(`drivers/getalldrivers`);
     }
 
     getDriver(driverId) {

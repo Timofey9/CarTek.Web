@@ -29,6 +29,8 @@ import CarsWork from "./components/orders/task-distribution.component";
 import MyTasksList from "./components/driver-dashboard/my-tasks.component";
 import DriverDashboard from "./components/driver-dashboard/driver-dashboard.component";
 import DriverEditTask from "./components/driver-dashboard/driver-edittask.component";
+import AdminEditTask from "./components/orders/admin-edittask.component";
+import NotificationsList from "./components/driver-dashboard/notification-list.component";
 
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
@@ -167,9 +169,10 @@ class App extends Component {
                         <Route exact path="/profile" element={<RequireAuth currentUser={currentUser}><Profile /></RequireAuth>} />
                         <Route exact path="/user" element={<RequireAuth currentUser={currentUser}><BoardUser /></RequireAuth>} />
                         <Route exact path="/cars" element={<RequireAuth currentUser={currentUser}><CarsList /></RequireAuth>} />
-                        <Route exact path="/driver-dashboard" element={<RequireAuth currentUser={currentUser}><DriverDashboard /></RequireAuth>} />
-                        <Route exact path="/driver-dashboard/mytasks" element={<RequireAuth currentUser={currentUser}><MyTasksList /></RequireAuth>} />
-                        <Route exact path="/driver-dashboard/task/:driverTaskId" element={<RequireAuth currentUser={currentUser}><DriverEditTask /></RequireAuth>} />
+                        <Route exact path="/driver-dashboard" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><DriverDashboard /></RequireAuth>} />
+                        <Route exact path="/driver-dashboard/mytasks" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><MyTasksList /></RequireAuth>} />
+                        <Route exact path="/driver/notifications" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><NotificationsList /></RequireAuth>} />
+                        <Route exact path="/driver-dashboard/task/:driverTaskId" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><DriverEditTask /></RequireAuth>} />
 
                         <Route exact path="/cars/car/:plate" element={<RequireAuth currentUser={currentUser}><CarComponent /></RequireAuth>} />
 
@@ -193,6 +196,7 @@ class App extends Component {
                         <Route exact path="/admin/orders" element={<RequireAuth currentUser={currentUser}><OrdersList /></RequireAuth>} />
                         <Route exact path="/admin/workload" element={<RequireAuth currentUser={currentUser}><CarsWork /></RequireAuth>} />
                         <Route exact path="/admin/orders/create" element={<RequireAuth currentUser={currentUser}><OrderForm /></RequireAuth>} />
+                        <Route exact path="/admin/drivertask/:driverTaskId" element={<RequireAuth currentUser={currentUser}><AdminEditTask /></RequireAuth>} />
                     </Routes>
                 </div>
 
@@ -203,9 +207,16 @@ class App extends Component {
 }
 
 
-function RequireAuth({ currentUser, children }) {
-    let user = localStorage.getItem("user");
+function RequireAuth({ currentUser, isDriverComponent, children }) {
+
+    let user = JSON.parse(localStorage.getItem("user"));
     let isAuthenticated = user !== null;
+
+    
+    if (isAuthenticated && isDriverComponent === undefined && user.isDriver) {
+        return <Navigate to="/driver-dashboard" />;
+    }
+
     return isAuthenticated ? children : <Navigate to="/login" />;
 }
 

@@ -31,9 +31,9 @@ function DriverTaskForm({orderId, handleClose}) {
 
     useEffect(() => {
         setLoading(true);
-        ApiService.getDrivers()
+        ApiService.getAllDrivers()
             .then(({ data }) => {
-                setDrivers(data.list);
+                setDrivers(data);
             }).
             catch((error) => {
                 if (error.response.data.message) {

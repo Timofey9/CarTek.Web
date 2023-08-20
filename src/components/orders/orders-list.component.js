@@ -57,6 +57,17 @@ const OrdersList = () => {
             });
     };
 
+
+    const downloadTN = (id) => {
+        ApiService.downloadTN({
+            driverTaskId: id
+        }).then(response => {
+            let url = window.URL
+                .createObjectURL(new Blob([response.data]));
+            saveAs(url, "TN.xlsx");    
+            });
+    };
+
     const ExpandedComponent = ({ data }) => <pre>
         <DataTable
             columns={columnsDriverTask}
@@ -68,6 +79,9 @@ const OrdersList = () => {
             progressPending={loading}
             customStyles={subCustomStyles}
             data={data.driverTasks}
+            onRowClicked={(row, event) => {
+                navigate(`/admin/drivertask/${row.id}`);
+            }}
         /></pre>;
 
 
@@ -185,7 +199,12 @@ const OrdersList = () => {
                 year: 'numeric',
             }),
             center: true,
-        }
+        },
+        {
+            name: "ТН",
+            selector: (row, index) => <button className="btn btn-success" onClick={(event) => downloadTN(row.id)}>Скачать ТН</button>,
+            center: true,
+        },
     ];
 
     const customStyles = {

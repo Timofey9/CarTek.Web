@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../../services/cartekApiService";
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
@@ -10,28 +10,71 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-
-//редактирование со стороны водителя: 1) поменять статус; 2) добавить комментарий; 3) загрузить фото. Все выполняется одним запросом
-
-const DriverEditTask = () => {
+const AdminEditTask = () => {
     const [driver, setDriver] = useState({});
+    const [drivers, setDrivers] = useState([]);
+    const [cars, setCars] = useState([]);
     const [car, setCar] = useState({});
+    const [isEdit, setIsEdit] = useState(false);
     const [driverTask, setDriverTask] = useState({});
     const [order, setOrder] = useState({});
-    const [status, setStatus] = useState(0);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
-    const [note, setNote] = useState("");
-    const [formData, setFormData] = useState(new FormData());
     const [notes, setNotes] = useState([]);
     const [statuses, setStatuses] = useState([]);
-
     const constStatuses = ['Назначена', 'Принята', 'Загрузка', 'Загружен', 'В пути', 'Разгрузка', 'Разгружен', 'Документы загружены', 'Оригиналы получены', 'Завершена'];
 
     const navigate = useNavigate();
-
     let { driverTaskId } = useParams();
+
+    useEffect(() => {
+        setLoading(true);
+        if (driverTaskId) {
+            ApiService.getDriverTaskById(driverTaskId)
+                .then(({ data }) => {
+                    setDriverTask(data);
+                    setDriver(data.driver);
+                    setOrder(data.order);
+                    setCar(data.car);
+                    setActiveStep(data.status);
+                    setNotes(data.notes);
+                    setStatuses(constStatuses);
+                }).
+                catch((error) => {
+                    setError(error.response.data);
+                });
+        }
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        setLoading(true);
+        if (driverTaskId) {
+            ApiService.getAllDrivers()
+                .then(({ data }) => {
+                    setDrivers(data);
+                }).
+                catch((error) => {
+                    setError(error.response.data);
+                });
+        }
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        setLoading(true);
+        if (driverTaskId) {
+            ApiService.getAllCars()
+                .then(({ data }) => {
+                    setCars(data);
+                }).
+                catch((error) => {
+                    setError(error.response.data);
+                });
+        }
+        setLoading(false);
+    }, []);
 
     const unitToString = (unit) => {
         switch (unit) {
@@ -46,24 +89,18 @@ const DriverEditTask = () => {
         }
     }
 
-    const selectFile = (e) => {
-        formData.delete("Files");
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        var data = {
+            "TaskId" : driverTask.id,
+            "DriverId" : driver.id,
+            "CarId" : car.id
+        };
 
-        for (let file of e.target.files) {
-            formData.append("Files", file);
-        }
-    };
-
-
-    const handleSubmit = () => {
-        formData.append("DriverTaskId", driverTask.id);
-        formData.append("UpdatedStatus", status);
-        formData.append("Note", note);
-
-        ApiService.EditDriverTaskAsync(formData)
+        ApiService.AdminEditDriverTaskAsync(data)
             .then(({ data }) => {
-                alert("Статус обновлен принята");
-                navigate("/driver-dashboard");
+                alert("Задача обновлена");
+                navigate(-1);
             })
             .catch((error) => {
                 if (error.response.data.message) {
@@ -72,65 +109,54 @@ const DriverEditTask = () => {
             });
     };
 
-    const statusToButtonTxt = (status) => {
-        switch (status) {
-            case 0:
-                return "Принять";
-            case 1:
-                return "На загрузку";
-            case 2:
-                return "Загрузка окончена";
-            case 3:
-                return "В путь";
-            case 4:
-                return "На разгрузку";
-            case 5:
-                return "Разгрузка окончена";
-            case 6:
-                return "Загрузить документы";
-            case 7:
-                return "Получить оригиналы";
-            case 8:
-                return "Завершить";
-            default:
-                return "Отправить";
-        }
-    }
-
-    useEffect(() => {
-        setLoading(true);
-        if (driverTaskId) {
-            ApiService.getDriverTaskById(driverTaskId)
-                .then(({ data }) => {
-                    console.log(data);
-                    setDriverTask(data);
-                    setDriver(data.driver);
-                    setOrder(data.order);
-                    setActiveStep(data.status);
-                    setNotes(data.notes);
-                    setStatuses(constStatuses);
-                    setCar(data.car);
-                }).
-                catch((error) => {
-                    setError(error.response.data);
-                });
-        }
-        setLoading(false);
-    }, []);
-
-    return <div className="container">
+    return <div>
         {!loading && (
             <>
                 <div className="row">
-                    <h1>Задача по заявке # {order.id} для "{order.clientName}"</h1>
+                    <div className="col-md-6"> 
+                        <h1>Задача по заявке # {order.id} для "{order.clientName}"</h1>
+                    </div>
+                    <div className="col-md-6">
+                        {isEdit
+                            ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success">Сохранить</button>
+                            : <button onClick={() => setIsEdit(true)} className="btn btn-warning">Редактировать</button>
+                        }
+                    </div>
                 </div>
 
                 <dl className="row">
                     <dt className="col-sm-3">Заказчик: </dt>
                     <dd className="col-sm-9">{order.clientName}</dd>
 
+                    <dt className="col-sm-3">Водитель: </dt>
+                    <dd className="col-sm-9">
+                        {isEdit ?
+                            <Autocomplete
+                                disablePortal
+                                onChange={(e, newvalue) => setDriver(newvalue)}
+                                id="combo-box-demo"
+                                options={drivers}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.fullName}`}
+                                renderInput={(params) => <TextField {...params} label="Выберите водителя" />} />
+                            :
+                            <span>{driver.fullName}</span>}
+                    </dd>
+
                     <dt className="col-sm-3">Тягач: </dt>
-                    <dd className="col-sm-9">{car.brand} {car.model}: {car.plate}</dd>
+                    <dd className="col-sm-9">
+                        {isEdit ?
+                            <Autocomplete
+                                disablePortal
+                                onChange={(e, newvalue) => setCar(newvalue)}
+                                id="combo-box-demo"
+                                options={cars}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.brand}:${option.plate}`}
+                                renderInput={(params) => <TextField {...params} label="Выберите тягач" />}
+                            />
+                            :
+                            <span>{car.plate}</span>}</dd>
 
                     <dt className="col-sm-3">Материал: </dt>
                     <dd className="col-sm-9">{order.material && order.material.name}</dd>
@@ -162,7 +188,7 @@ const DriverEditTask = () => {
                 </dl>
 
                 <div className="row">
-                    <div className="col-md-3">
+                    <div className="col-md-12">
                         <Box sx={{ width: '100%' }}>
                             <Stepper orientation="vertical" activeStep={activeStep}>
                                 {constStatuses.map((label, index) => {
@@ -171,7 +197,6 @@ const DriverEditTask = () => {
                                     return (
                                         <Step key={label} {...stepProps} expanded={true}>
                                             <StepLabel {...labelProps}>{label}</StepLabel>
-
                                             <StepContent>
                                                 {notes.filter((n) => n.status === index).map((note, noteindex) => {
                                                     let showLinks = false;
@@ -181,12 +206,12 @@ const DriverEditTask = () => {
                                                         showLinks = true
                                                     }
                                                     return (
-                                                        <div key={noteindex}>
+                                                        <div>
                                                             <div>{new Date(note.dateCreated).toLocaleString('ru-Ru')}</div>
                                                             <Typography>{note.text}</Typography>
                                                             {showLinks && links.map((link, linkindex) => {
                                                                 const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                return (<div key={linkindex}><a target="_blank" href={fullLink}>Изображение {linkindex}</a></div>);
+                                                                return (<div><a target="_blank" href={fullLink}>Изображение {linkindex}</a></div>);
                                                             })}
                                                         </div>
                                                     )
@@ -198,43 +223,10 @@ const DriverEditTask = () => {
                             </Stepper>
                         </Box>
                     </div>
-                    <div className="col-md-9">
-                        <div className="row">
-                            <div className="col-md-12">
-                                <div>
-                                    <Autocomplete
-                                        disablePortal
-                                        onChange={(e, newvalue) => statuses.indexOf(newvalue)}
-                                        id="combo-box-demo"
-                                        options={statuses}
-                                        sx={{ width: 300 }}
-                                        renderInput={(params) => <TextField {...params} label="Выберите статус" />} />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-12">
-                                <textarea id="acceptanceComment" onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-12">
-                                <label htmlFor="files">Прикрепить фотографии</label>
-                                <input type="file" id="files" accept=".jpg, .png, .jpeg" multiple onChange={(e) => selectFile(e)}></input>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-12">
-                                <button type="submit" onClick={handleSubmit} className="btn btn-success">
-                                    {statusToButtonTxt()}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </>
         )}
     </div>
 };
 
-export default DriverEditTask;
+export default AdminEditTask;
