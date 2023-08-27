@@ -168,6 +168,10 @@ class ApiService {
         return this.get(`notification/getnotifications/?${query}`);
     }
 
+    saveDeviceToken(data) {
+        return this.post(`notification/savedeviceinfo/`, data);
+    }
+
     deleteQuestionary(uniqueId) {
         var res = this.delete(`questionary/${uniqueId}`);
         return res;

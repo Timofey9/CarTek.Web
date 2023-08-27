@@ -6,6 +6,8 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
+import Notification from './component/notifications.component'
+
 import DriverForm from "./components/add-driver.component";
 
 import Login from "./components/login.component";
@@ -162,6 +164,7 @@ class App extends Component {
                 </nav>
 
                 <div className="container mt-3">
+                    <Notification />
                     <Routes>
                         <Route exact path="/" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
                         <Route exact path="/home" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
