@@ -25,7 +25,8 @@ export const requestForToken = () => {
 
     let localUser = JSON.parse(localStorage.getItem("user"));
 
-    return getToken(messaging, { vapidKey: `aY94hIBbP3Zn6a3Tb0Q0sYuJ0fFdasCgsXuIYjadQF8` })
+    return getToken(messaging, {
+        vapidKey: `BDK-Y_OdQPQv8mvFrUQCddzb9iXQ7VHfpMMCH4Y1CnVdq_QggosLsKCIJBJey6PHRsIJBi7jr9Tqknzpo10nhRU` })
         .then((currentToken) => {
             if (currentToken) {
                 console.log('current token for client: ', currentToken);
