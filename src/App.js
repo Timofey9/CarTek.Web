@@ -6,7 +6,7 @@ import "bootstrap/dist/js/bootstrap.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-import Notification from './component/notifications.component'
+import Notification from './components/notifications.component'
 
 import DriverForm from "./components/add-driver.component";
 
