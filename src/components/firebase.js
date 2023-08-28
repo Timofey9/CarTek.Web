@@ -31,11 +31,15 @@ export const requestForToken = () => {
             if (currentToken) {
                 console.log('current token for client: ', currentToken);
                 if (localUser) {
-                    ApiService.saveDeviceToken({
-                        userId: localUser.identity.id,
-                        token: currentToken,
-                        isDriver: localUser.isDriver
-                    });
+                    if (!isTokenSentToServer(currentToken)) {
+
+                        ApiService.saveDeviceToken({
+                            token: currentToken,
+                            userId: localUser.identity.id,
+                            isDriver: localUser.isDriver
+                        });
+                        setTokenSentToServer(currentToken);
+                    }
                 }
             } else {
                 // Show permission request UI
@@ -47,6 +51,18 @@ export const requestForToken = () => {
         });
 };
 
+// используем localStorage для отметки того,
+// что пользователь уже подписался на уведомления
+function isTokenSentToServer(currentToken) {
+    return window.localStorage.getItem('sentFirebaseMessagingToken') == currentToken;
+}
+
+function setTokenSentToServer(currentToken) {
+    window.localStorage.setItem(
+        'sentFirebaseMessagingToken',
+        currentToken ? currentToken : ''
+    );
+}
 
 // Handle incoming messages. Called when:
 // - a message is received while the app has focus
