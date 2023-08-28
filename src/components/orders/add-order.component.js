@@ -25,7 +25,7 @@ function OrderForm() {
     const [materialsList, setMaterialsList] = useState([]);
     const [material, setMaterial] = useState({});
     const [volume, setVolume] = useState(0);
-    const [loadUnit, setLoadUnit] = useState({});
+    const [loadUnit, setLoadUnit] = useState(0);
     const [unloadUnit, setUnloadUnit] = useState({});
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
