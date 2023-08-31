@@ -43,6 +43,9 @@ const CarsWork = () => {
             dense='true'
             progressPending={loading}
             data={data.driverTasks}
+            onRowClicked={(row, event) => {
+                navigate(`/`)
+            }}
         /></pre>;
 
     const handleClickOpen = (carId) => {
@@ -93,7 +96,6 @@ const CarsWork = () => {
         ApiService.getCarsWithTasks({
             startDate: startDate.toUTCString(),
         }).then(({ data }) => {
-            console.log(data);
             setCars(data);
         });
 
@@ -235,9 +237,6 @@ const CarsWork = () => {
             expandableRows
             expandableRowDisabled={rowPreDisabled}
             expandableRowsComponent={ExpandedComponent}
-            onRowClicked={(row, event) => {
-                navigate(`/`)
-            }}
         />
 
         <Dialog

@@ -27,6 +27,8 @@ const DriverEditTask = () => {
     const [notes, setNotes] = useState([]);
     const [statuses, setStatuses] = useState([]);
 
+    const newStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов','Погрузился','Выехал со склада','Прибыл на объект выгрузки','Выгрузка','Резерв'];
+
     const constStatuses = ['Назначена', 'Принята', 'Загрузка', 'Загружен', 'В пути', 'Разгрузка', 'Разгружен', 'Документы загружены', 'Оригиналы получены', 'Завершена'];
 
     const navigate = useNavigate();
@@ -53,7 +55,6 @@ const DriverEditTask = () => {
             formData.append("Files", file);
         }
     };
-
 
     const handleSubmit = () => {
         formData.append("DriverTaskId", driverTask.id);

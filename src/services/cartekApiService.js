@@ -148,6 +148,10 @@ class ApiService {
         return this.post("order/createtask", data);
     }
 
+    createDriverTasksMultiple(data) {
+        return this.post("order/createtasksmultiple", data);
+    }
+
     sendQuestionary(data) {
         var res = this.post(`questionary`, data, { 'Content-Type': 'multipart/form-data' });
         return res;

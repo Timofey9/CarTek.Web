@@ -14,6 +14,7 @@ function DriverForm() {
     const [password, setPassword] = useState("");
     const [carId, setCarId] = useState(0);
     const [phone, setPhone] = useState();
+    const [login, setLogin] = useState();
     const [selectedItem, setSelectedItem] = useState(0);
     const [error, setError] = useState("");
     const [notificationShown, setNotificationShown] = useState(false);
@@ -50,6 +51,7 @@ function DriverForm() {
                     setCarId(data.carId);
                     setPassword(data.password);
                     setPhone(data.phone);
+                    setLogin(data.login);
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -68,7 +70,8 @@ function DriverForm() {
                 lastName: lastName,
                 password: password,
                 phone: phone,
-                carId: carId
+                carId: carId,
+                login: login
             };
 
             if (driverId) {
@@ -162,7 +165,7 @@ function DriverForm() {
             </div>
             <div className="form-row">
                 <div className="form-group col-md-6">
-                    <label htmlFor="login">Телефон</label>
+                    <label htmlFor="phone">Телефон</label>
                     <input
                         className="form-control"
                         form="profile-form"
@@ -171,13 +174,22 @@ function DriverForm() {
                 </div>
 
                 <div className="form-group col-md-6">
-                    <label htmlFor="login">Пароль</label>
+                    <label htmlFor="login">Логин для входа в ЛК:</label>
+                    <input
+                        className="form-control"
+                        form="profile-form"
+                        onChange={(e) => setPhone(e.target.value)}
+                        value={phone} />
+                </div>
+
+                <div className="form-group col-md-6">
+                    <label htmlFor="login">Пароль (для подтверждения осмотра и входа в ЛК)</label>
                     <input
                         type="text"
                         className="form-control"
                         form="profile-form"
-                        onChange={(e) => setPassword(e.target.value)}
-                        value={password} />
+                        onChange={(e) => setLogin(e.target.value)}
+                        value={login} />
                 </div>
 
                 {driver.car ? <div className="form-group col-md-6">

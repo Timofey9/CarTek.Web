@@ -107,7 +107,7 @@ class Login extends Component {
                     <div className="form-group">
                         <label htmlFor="password">Пароль</label>
                         <input
-                            type="password"
+                            type="text"
                             className="form-control"
                             name="password"
                             value={this.state.password}

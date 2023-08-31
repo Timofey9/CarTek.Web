@@ -4,12 +4,15 @@ import ApiService from "../../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import DatePicker, { registerLocale } from "react-datepicker";
+import StateRadioButtonGroup from "../radiobuttongroup";
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import ClientForm from './add-client.component'
 import AddressForm from './add-address.component'
+import Divider from '@mui/material/Divider';
+
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
@@ -25,7 +28,7 @@ function OrderForm() {
     const [materialsList, setMaterialsList] = useState([]);
     const [material, setMaterial] = useState({});
     const [volume, setVolume] = useState(0);
-    const [loadUnit, setLoadUnit] = useState(0);
+    const [loadUnit, setLoadUnit] = useState("");
     const [unloadUnit, setUnloadUnit] = useState({});
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -37,9 +40,16 @@ function OrderForm() {
     const [reload, setReload] = useState(0);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const [price, setPrice] = useState("");
+    const [mileage, setMileage] = useState("");
     const [open, setOpen] = useState(false);
     const [openAddress, setOpenAddress] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [tasksToCreate, setTasksToCreate] = useState([]);
+    const [cars, setCars] = useState([]);
+    const [drivers, setDrivers] = useState([]);
+    const [isOrderCreated, setIsOrderCreated] = useState(false);
+    const [orderId, setOrderId] = useState(0);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -61,7 +71,36 @@ function OrderForm() {
 
     const navigate = useNavigate();
 
-    let { orderId } = useParams();
+    useEffect(() => {
+        setLoading(true);
+        ApiService.getAllDrivers()
+            .then(({ data }) => {
+                setDrivers(data);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        setLoading(true);
+        ApiService.getAllCars()
+            .then(({ data }) => {
+                console.log(data);
+                setCars(data);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+
+        setLoading(false);
+    }, []);
 
     useEffect(() => {
         setLoading(true);
@@ -144,6 +183,41 @@ function OrderForm() {
     //    }
     //}
 
+    function handleCreateDriverTasks(event) {
+        event.preventDefault();
+        setMessage("");
+
+        console.log(tasksToCreate);
+
+        var formattedTasks = [];
+        for (var i = 0; i < tasksToCreate.length; i++) {
+            formattedTasks.push(
+                {
+                    driverId: tasksToCreate[i].driver.id,
+                    orderId: orderId,
+                    carId: tasksToCreate[i].car.id,
+                    shift: tasksToCreate[i].shift,
+                    taskDate: tasksToCreate[i].taskDate,
+                    forceChange: true
+                });
+        }
+
+        const data = {
+            orderId: orderId,
+            tasks: formattedTasks
+        };
+
+        ApiService.createDriverTasksMultiple(data)
+            .then(({ data }) => {
+                alert(data.message);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+    }
+
     function handleSubmit(event) {
         event.preventDefault();
         setMessage("");
@@ -151,6 +225,7 @@ function OrderForm() {
         const newOrder = {
             name: orderName,
             clientName: client.clientName,
+            clientId: client.id,
             materialId: material.id,
             volume: volume,
             loadUnit: loadUnit,
@@ -160,18 +235,23 @@ function OrderForm() {
             startDate: startDate,
             locationA: locationA,
             locationB: locationB,
-            price: 10,
             carCount: carCount,
             note: note,
-            service: serviceType
+            service: serviceType,
+            mileage: mileage,
+            price: price
         };
-
 
         ApiService.createOrder(newOrder)
             .then(({ data }) => {
-                console.log(data);
-                alert(data.message);
-                navigate("/admin/orders/");
+                alert(`Заявка создана, номер: ${data.message}`);
+                let array = [];
+                for (let i = 0; i < carCount; i++) {
+                    array.push({ car: {}, driver: {}, taskDate: new Date(), shift: false });
+                }
+                console.log(array);
+                setOrderId(data.message);
+                setTasksToCreate(array);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -268,7 +348,7 @@ function OrderForm() {
 
                     <div className="form-group col-md-6">
                         <label>Единица измерения погрузки</label>
-                        <select defaultValue={'none'} className="form-select" value="loadUnit" aria-label="Единица измерения" onChange={(e) => setLoadUnit(e.target.value)}>
+                        <select defaultValue={'none'} className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => setLoadUnit(e.target.value)}>
                             <option value="none">Единица измерения</option>
                             <option value="0">М3</option>
                             <option value="1">шт.</option>
@@ -288,11 +368,6 @@ function OrderForm() {
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
 
                         <label>{addressA && addressA.textAddress}</label>
-
-
-                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
-                            Добавить адрес
-                        </button>
                     </div>
 
                     <div className="form-group col-md-6">
@@ -307,11 +382,15 @@ function OrderForm() {
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
 
                         <label>{addressB && addressB.textAddress}</label>
+
+                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                            Добавить адрес
+                        </button>
                     </div>
 
                     <div className="form-group col-md-6">
                         <label>Услуга</label>
-                        <select defaultValue={'none'} className="form-select" aria-label="Услуга" onChange={(e) => setServiceType(e.target.value)}>
+                        <select defaultValue={'none'} className="form-select" value={serviceType} aria-label="Услуга" onChange={(e) => setServiceType(e.target.value)}>
                             <option value="none">Услуга</option>
                             <option value="0">Перевозка</option>
                             <option value="1">Поставка</option>
@@ -339,8 +418,27 @@ function OrderForm() {
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setNote(e.target.value)}
-                            value={note}
-                        />
+                            value={note}/>
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <label>Километраж</label>
+                        <input
+                            type="number"
+                            className="form-control"
+                            form="profile-form"
+                            onChange={(e) => setMileage(e.target.value)}
+                            value={mileage}/>
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <label>Стоимость рейса</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            form="profile-form"
+                            onChange={(e) => setPrice(e.target.value)}
+                            value={price}/>
                     </div>
 
                     <div className="form-group col-md-6">
@@ -350,8 +448,7 @@ function OrderForm() {
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setCarCount(e.target.value)}
-                            value={carCount}
-                        />
+                            value={carCount}/>
                     </div>
                 </div>
 
@@ -362,7 +459,6 @@ function OrderForm() {
                         </div>
                     </div>
                 )}
-
 
                 <div className="row mt-5">
                     <div className="col-md-3"></div>
@@ -379,6 +475,7 @@ function OrderForm() {
                                     Отмена
                                 </Link>
                             </div>
+
                             <div className="col-md-2">
                                 <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
                                     Сохранить
@@ -387,8 +484,70 @@ function OrderForm() {
                         </div>
                     </div>
                 </div>
-            </div>
 
+                <div className="row mt-5">
+                    {
+                        tasksToCreate.map((task, index) => {
+                            return (<div className = "form-row">
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <label>Выберите водителя</label>
+                                        <Autocomplete
+                                            options={drivers}
+                                            disablePortal
+                                            onChange={(e, newvalue) => { task.driver = newvalue }}
+                                            sx={{ width: 300 }}
+                                            isOptionEqualToValue={(option, value) => option.fullName === value.fullName}
+                                            getOptionLabel={(option) => `${option.fullName}`}
+                                            renderInput={(params) => <TextField {...params} label="Список водителей" />} />
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label>Выберите тягач</label>
+                                        <Autocomplete
+                                            options={cars}
+                                            disablePortal
+                                            onChange={(e, newvalue) => { task.car = newvalue }}
+                                            sx={{ width: 300 }}
+                                            getOptionLabel={(option) => `${option.plate}`}
+                                            isOptionEqualToValue={(option, value) => option.plate === value.plate}
+                                            renderInput={(params) => <TextField {...params} label="Список тягачей" />} />
+                                    </div>
+
+                                    <div key={"shift" + index} className="form-group col-md-6">
+                                        <StateRadioButtonGroup type={"Смена"} isActive={task.shift} option1="Дневная" option2="Ночная" onChange={(event) => {
+                                            task.shift = event.target.value === 'true' ? true : false; setReload(reload + 1); }} />
+                                    </div>
+                                </div>
+
+                                <div key={"task" + index} className="form-row">
+                                    <div className="input-group mb-3 col-md-6 pl-1">
+                                        <label>Дата начала</label>
+                                        <DatePicker locale="ru" selected={task.taskDate} onChange={(date) => {
+                                            task.taskDate = date; setReload(reload + 1);} } />
+                                    </div>
+                                </div>
+
+                                <Divider sx={{ borderBottomWidth: 5 }}></Divider>
+                            </div>)
+                        })
+                    }    
+                </div>
+
+                <div className="row mt-5">
+                    <div className="col-md-3"></div>
+                    <div className="col-md-6">
+                        <div className="row">
+                            {orderId &&
+                                <div className="col-md-2">
+                                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleCreateDriverTasks(e) }}>
+                                        Создать задачи
+                                    </button>
+                                </div>}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <Dialog
                 fullScreen
