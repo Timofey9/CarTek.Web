@@ -32,7 +32,6 @@ export const requestForToken = () => {
                 console.log('current token for client: ', currentToken);
                 if (localUser) {
                     if (!isTokenSentToServer(currentToken)) {
-
                         ApiService.saveDeviceToken({
                             token: currentToken,
                             userId: localUser.identity.id,
