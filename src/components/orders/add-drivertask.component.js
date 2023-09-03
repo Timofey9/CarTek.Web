@@ -48,7 +48,6 @@ function DriverTaskForm({orderId, handleClose}) {
         setLoading(true);
         ApiService.getAllCars()
             .then(({ data }) => {
-                console.log(data);
                 setCars(data);
             }).
             catch((error) => {
@@ -81,6 +80,8 @@ function DriverTaskForm({orderId, handleClose}) {
             }).
             catch((error) => {
                 setMessage(error.response.data.message);
+                setForceChange(true);
+                console.log(forceChange);
             });
     }
 

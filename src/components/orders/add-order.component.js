@@ -11,6 +11,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import ClientForm from './add-client.component'
 import AddressForm from './add-address.component'
+import MaterialForm from './add-material.component'
 import Divider from '@mui/material/Divider';
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -32,8 +33,6 @@ function OrderForm() {
     const [unloadUnit, setUnloadUnit] = useState({});
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [locationA, setLocationA] = useState("");
-    const [locationB, setLocationB] = useState("");
     const [note, setNote] = useState("");
     const [carCount, setCarCount] = useState(1);
     const [serviceType, setServiceType] = useState("");
@@ -44,6 +43,7 @@ function OrderForm() {
     const [mileage, setMileage] = useState("");
     const [open, setOpen] = useState(false);
     const [openAddress, setOpenAddress] = useState(false);
+    const [openMaterial, setOpenMaterial] = useState(false);
     const [loading, setLoading] = useState(true);
     const [tasksToCreate, setTasksToCreate] = useState([]);
     const [cars, setCars] = useState([]);
@@ -64,8 +64,17 @@ function OrderForm() {
         setOpenAddress(true);
     };
 
+    const handleMaterialOpen = () => {
+        setOpenMaterial(true);
+    };
+
     const handleAddressClose = () => {
         setOpenAddress(false);
+        setReload(reload + 1);
+    };
+
+    const handleMaterialClose = () => {
+        setOpenMaterial(false);
         setReload(reload + 1);
     };
 
@@ -233,8 +242,8 @@ function OrderForm() {
             isComplete: false,
             dueDate: endDate,
             startDate: startDate,
-            locationA: locationA,
-            locationB: locationB,
+            addressAId: addressA.id,
+            addressBId: addressB.id,
             carCount: carCount,
             note: note,
             service: serviceType,
@@ -333,6 +342,10 @@ function OrderForm() {
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.name}`}
                             renderInput={(params) => <TextField {...params} label="Список материалов" />} />
+
+                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
+                            Добавить материал
+                        </button>
                     </div>
 
                     <div className="form-group col-md-6">
@@ -515,7 +528,7 @@ function OrderForm() {
                                     </div>
 
                                     <div key={"shift" + index} className="form-group col-md-6">
-                                        <StateRadioButtonGroup type={"Смена"} isActive={task.shift} option1="Дневная" option2="Ночная" onChange={(event) => {
+                                        <StateRadioButtonGroup id={"shift" + index} type={"Смена"} isActive={task.shift} option1="Дневная" option2="Ночная" onChange={(event) => {
                                             task.shift = event.target.value === 'true' ? true : false; setReload(reload + 1); }} />
                                     </div>
                                 </div>
@@ -575,6 +588,20 @@ function OrderForm() {
                     </Toolbar>
                 </AppBar>
                 <AddressForm handleClose={handleAddressClose}></AddressForm>
+            </Dialog>
+
+            <Dialog
+                fullScreen
+                open={openMaterial}
+                onClose={handleMaterialClose}>
+                <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                    <Toolbar>
+                        <Button autoFocus color="inherit" onClick={handleMaterialClose}>
+                            Закрыть
+                        </Button>
+                    </Toolbar>
+                </AppBar>
+                <MaterialForm handleClose={handleMaterialClose}></MaterialForm>
             </Dialog>
         </>);
 };

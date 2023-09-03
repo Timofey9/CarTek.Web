@@ -51,7 +51,7 @@ const NotificationsList = () => {
         {
             name: "Дата",
             sortBy: "date",
-            selector: (row, index) => <div>{row.dateSent}</div>,
+            selector: (row, index) => <div>{new Date(row.dateSent).toLocaleString('ru-Ru')}</div>,
             minWidth: '1em',
             sortable: true
         },

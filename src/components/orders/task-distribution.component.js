@@ -44,7 +44,7 @@ const CarsWork = () => {
             progressPending={loading}
             data={data.driverTasks}
             onRowClicked={(row, event) => {
-                navigate(`/`)
+                navigate(`/admin/drivertask/${row.id}`);
             }}
         /></pre>;
 
@@ -150,7 +150,11 @@ const CarsWork = () => {
         },
         {
             name: "Дата",
-            selector: (row, index) => <div>{row.driver.fullName}</div>,
+            selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            }),
             center: true,
         },
         {

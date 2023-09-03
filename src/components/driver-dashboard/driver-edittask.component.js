@@ -150,13 +150,10 @@ const DriverEditTask = () => {
                     <dd className="col-sm-9">{driverTask.shift === 0 ? "Дневная" : "Ночная"}</dd>
 
                     <dt className="col-sm-3">Точка А: </dt>
-                    <dd className="col-sm-9">{order.locationA}</dd>
+                    <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.name}</a></dd>
 
                     <dt className="col-sm-3">Точка Б: </dt>
-                    <dd className="col-sm-9">{order.locationB}</dd>
-
-                    <dt className="col-sm-3">Карта</dt>
-                    <dd className="col-sm-9"><a href={order.locationB && "https://yandex.ru/maps/?ll=30.310182,59.951059&z=11&text=" + encodeURIComponent(order.locationB.trim())}>{order.locationB}</a></dd>
+                    <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.name}</a></dd>
 
                     <dt className="col-sm-3">Комментарий:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
@@ -205,7 +202,7 @@ const DriverEditTask = () => {
                                 <div>
                                     <Autocomplete
                                         disablePortal
-                                        onChange={(e, newvalue) => statuses.indexOf(newvalue)}
+                                        onChange={(e, newvalue) => setStatus(statuses.indexOf(newvalue))}
                                         id="combo-box-demo"
                                         options={statuses}
                                         sx={{ width: 300 }}

@@ -119,6 +119,7 @@ function DriverTaskCarForm({carId, handleClose}) {
             }).
             catch((error) => {
                 setMessage(error.response.data.message);
+                setForceChange(true);
             });
     }
 

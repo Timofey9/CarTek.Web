@@ -50,6 +50,8 @@ const MyTasksList = () => {
 
         ApiService.getDriverTasks(request).then(({ data }) => {
             const { totalNumber, list } = data;
+
+            console.log(data);
             setTotalNumber(totalNumber);
             setOrders(list);
         });
@@ -79,8 +81,13 @@ const MyTasksList = () => {
             center: true,
         },
         {
-            name: "Контакты",
-            selector: (row, index) => row.shift === 0 ? "Дневная" : "Ночная",
+            name: "Точка А",
+            selector: (row, index) => row.locationA.name,
+            center: true,
+        },
+        {
+            name: "Точка B",
+            selector: (row, index) => row.locationB.name,
             center: true,
         }
     ];
