@@ -14,10 +14,11 @@ import AddressForm from './add-address.component'
 import MaterialForm from './add-material.component'
 import Divider from '@mui/material/Divider';
 import "react-datepicker/dist/react-datepicker.css";
+import "./orders.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
-function OrderForm({handleCloseOrderForm}) {
+function EditOrderForm({orderId, handleCloseOrderForm }) {
     const [clients, setClients] = useState([]);
     const [client, setClient] = useState({});
     const [addresses, setAddresses] = useState([]);
@@ -45,8 +46,8 @@ function OrderForm({handleCloseOrderForm}) {
     const [loading, setLoading] = useState(true);
     const [tasksToCreate, setTasksToCreate] = useState([]);
     const [cars, setCars] = useState([]);
+    const [isEdit, setIsEdit] = useState(false);
     const [drivers, setDrivers] = useState([]);
-    const [orderId, setOrderId] = useState(0);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -77,9 +78,39 @@ function OrderForm({handleCloseOrderForm}) {
 
     useEffect(() => {
         setLoading(true);
+        ApiService.getOrderById(orderId)
+            .then(({ data }) => {
+                setOrderName(data.name);
+                setServiceType(data.service);
+                setClient(data.client);
+                setMaterial(data.material);
+                setVolume(data.volume);
+                setLoadUnit(data.loadUnit);
+                setAddressA(data.locationA);
+                setAddressB(data.locationB);
+                setStartDate(new Date(data.startDate));
+                setEndDate(new Date(data.dueDate));
+                setNote(data.note);
+                setPrice(data.price);
+                setCarCount(data.carCount);
+                setMileage(data.mileage);
+                console.log(data);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+
+        setLoading(false);
+    },[]);
+
+    useEffect(() => {
+        setLoading(true);
         ApiService.getAllDrivers()
             .then(({ data }) => {
                 setDrivers(data);
+
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -149,6 +180,19 @@ function OrderForm({handleCloseOrderForm}) {
         setLoading(false);
     }, [reload]);
 
+    function deleteOrder() {
+        ApiService.deleteOrder(orderId)
+            .then(({ data }) => {
+                alert("Заявка удалена");
+                handleCloseOrderForm();
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+    }
+
     function handleCreateDriverTasks(event) {
         event.preventDefault();
         setMessage("");
@@ -185,6 +229,8 @@ function OrderForm({handleCloseOrderForm}) {
         event.preventDefault();
         setMessage("");
 
+        console.log(client.id);
+
         const newOrder = {
             name: orderName,
             clientName: client.clientName,
@@ -196,8 +242,8 @@ function OrderForm({handleCloseOrderForm}) {
             isComplete: false,
             dueDate: endDate,
             startDate: startDate,
-            addressAId: addressA.id,
-            addressBId: addressB.id,
+            locationAId: addressA.id,
+            locationBId: addressB.id,
             carCount: carCount,
             note: note,
             service: serviceType,
@@ -205,15 +251,9 @@ function OrderForm({handleCloseOrderForm}) {
             price: price
         };
 
-        ApiService.createOrder(newOrder)
+        ApiService.updateOrder(orderId, newOrder)
             .then(({ data }) => {
-                alert(`Заявка создана, номер: ${data.message}`);
-                let array = [];
-                for (let i = 0; i < carCount; i++) {
-                    array.push({ car: {}, driver: {}, taskDate: new Date(), shift: false });
-                }
-                setOrderId(data.message);
-                setTasksToCreate(array);
+                alert(`Заявка обновлена`);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -235,61 +275,68 @@ function OrderForm({handleCloseOrderForm}) {
                     </div>
                 </div>
 
-                <h1>Создание заявки</h1>
+                <h1>Заявка от "дата" {orderName}</h1>
+
+                <div className="row">
+                    <div className="col-md-8"></div>
+                    <div className="col-md-4">
+                        <button onClick={() => deleteOrder()} className="btn btn-danger mr-10">Удалить</button>
+                        {!isEdit && <button onClick={(e) => setIsEdit(true)} className="btn btn-warning">Редактировать</button>} 
+                    </div>
+                </div>
+
                 <div className="form-row">
                     <div className="form-group col-md-6">
-                        <label>Название заявки</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            form="profile-form"
-                            onChange={(e) => setOrderName(e.target.value)}
-                            value={orderName}
-                        />
-                    </div>
-
-                    <div className="form-group col-md-6">
-                        <label>Услуга</label>
-                        <select className="form-select" value={serviceType} aria-label="Услуга" onChange={(e) => setServiceType(e.target.value)}>
+                        <label className="bold-label">Услуга</label>
+                        <select disabled={!isEdit} className="form-select" value={serviceType} aria-label="Услуга" onChange={(e) => setServiceType(e.target.value)}>
                             <option value="none">Услуга</option>
-                            <option value="0">Перевозка</option>
-                            <option value="1">Поставка</option>
+                            <option value={0} label="Перевозка"></option>
+                            <option value={1} label="Поставка"></option>
                         </select>
                     </div>
 
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                     <div className="form-group col-md-6">
-                        <label>Грузополучатель</label>
-                        <Autocomplete
+                        <label className="bold-label">Грузополучатель</label>
+                        <label>{client.clientName}</label>
+
+                        {isEdit && <Autocomplete
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setClient(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
-                            renderInput={(params) => <TextField {...params} label="Список клиентов" />} />
+                            renderInput={(params) => <TextField {...params} label="Список клиентов" />} />}
+
                     </div>
+
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
 
                     {serviceType === "0" &&
                         <div className="form-group col-md-6">
-                            <label>Грузоотправитель</label>
-                            <Autocomplete
+                            <label className="bold-label">Грузоотправитель</label>
+                            {isEdit && <Autocomplete
                                 options={clients}
                                 disablePortal
                                 onChange={(e, newvalue) => { setClient(newvalue) }}
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.clientName}`}
-                                renderInput={(params) => <TextField {...params} label="Список клиентов" />} />
-                        </div> 
+                                renderInput={(params) => <TextField {...params} label="Список клиентов" />} />}
+                        </div>
                     }
 
                     <div className="form-group col-md-6">
-                        <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
+                        {isEdit && <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
                             Добавить юр.лицо
-                        </button>
-                    </div> 
+                        </button>}
+                    </div>
 
                     <div className="form-row">
-                        <label>Тип груза</label>
-                        <Autocomplete
+                        <label className="bold-label">Тип груза</label>
+                        <label>{material.name}</label>
+                        {isEdit &&                         
+                            <><Autocomplete
                             options={materialsList}
                             disablePortal
                             onChange={(e, newvalue) => { setMaterial(newvalue) }}
@@ -299,12 +346,16 @@ function OrderForm({handleCloseOrderForm}) {
 
                         <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
                             Добавить тип груза
-                        </button>
+                            </button></>}
+
                     </div>
 
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                     <div className="form-group col-md-6">
-                        <label>Объем</label>
+                        <label className="bold-label">Объем</label>
                         <input
+                            disabled={!isEdit}
                             type="text"
                             className="form-control"
                             form="profile-form"
@@ -313,9 +364,11 @@ function OrderForm({handleCloseOrderForm}) {
                         />
                     </div>
 
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                     <div className="form-group col-md-6">
-                        <label>Единица измерения погрузки</label>
-                        <select className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => setLoadUnit(e.target.value)}>
+                        <label className="bold-label">Единица измерения погрузки</label>
+                        <select disabled={!isEdit} className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => setLoadUnit(e.target.value)}>
                             <option value="none">Единица измерения</option>
                             <option value="0">М3</option>
                             <option value="1">шт.</option>
@@ -323,88 +376,94 @@ function OrderForm({handleCloseOrderForm}) {
                         </select>
                     </div>
 
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                     <div className="form-group col-md-6">
-                        <label>Прием груза</label>
-                        <Autocomplete
+                        <label className="bold-label">Прием груза</label>
+                        {isEdit && <Autocomplete
                             options={addresses}
                             disablePortal
-                            onChange={(e, newvalue) => { setAddressA(newvalue) }}   
+                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.name}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
-                        <label>{addressA && addressA.textAddress}</label>
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
+
+                        <label>{addressA && addressA.name}: {addressA && addressA.textAddress}</label>
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Сдача груза</label>
-
-                        <Autocomplete
+                        <label className="bold-label">Сдача груза</label>
+                        {isEdit && <Autocomplete
                             options={addresses}
                             disablePortal
                             onChange={(e, newvalue) => { setAddressB(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.name}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
-                        <label>{addressB && addressB.textAddress}</label>
+                        <label>{addressB && addressB.name}: {addressB && addressB.textAddress}</label>
 
-                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                        {isEdit && <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
                             Добавить адрес
-                        </button>
+                        </button>}
                     </div>
                 </div>
 
                 <div className="form-row">
                     <div className="input-group mb-3 col-md-6 pl-1">
-                        <label>Дата начала</label>
-                        <DatePicker locale="ru" selected={startDate} onChange={(date) => { setStartDate(date); let date2 = new Date(date); date2.setDate(date.getDate() + 1); setEndDate(date2) }} />
+                        <label className="bold-label">Дата начала</label>
+                        <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
                     </div>
 
                     <div className="input-group mb-3 col-md-6 pl-1">
-                        <label>Срок выполнения</label>
-                        <DatePicker locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
+                        <label className="bold-label">Срок выполнения</label>
+                        <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
                     </div>
                 </div>
 
                 <div className="form-row">
                     <div className="form-group col-md-6">
-                        <label>Комментарий по заявке (общий)</label>
+                        <label className="bold-label">Комментарий по заявке (общий)</label>
                         <input
+                            disabled={!isEdit} 
                             type="text"
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setNote(e.target.value)}
-                            value={note}/>
+                            value={note} />
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Километраж</label>
+                        <label className="bold-label">Километраж</label>
                         <input
+                            disabled={!isEdit} 
                             type="number"
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setMileage(e.target.value)}
-                            value={mileage}/>
+                            value={mileage} />
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Стоимость рейса</label>
+                        <label className="bold-label">Стоимость рейса</label>
                         <input
+                            disabled={!isEdit} 
                             type="text"
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setPrice(e.target.value)}
-                            value={price}/>
+                            value={price} />
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Количество машин</label>
+                        <label className="bold-label">Количество машин</label>
                         <input
+                            disabled={!isEdit} 
                             type="number"
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setCarCount(e.target.value)}
-                            value={carCount}/>
+                            value={carCount} />
                     </div>
                 </div>
 
@@ -421,87 +480,15 @@ function OrderForm({handleCloseOrderForm}) {
                     <div className="col-md-3">
                         <div className="row">
                             <div className="col-md-6">
-                                <button onClick={() => handleCloseOrderForm()} className="btn btn-warning mr-1">
+                                <button onClick={() => handleCloseOrderForm()} className="btn btn-warning pull-right mr-1">
                                     Отмена
                                 </button>
                             </div>
                             <div className="col-md-6">
-                                <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
+                                <button type="submit" form="profile-form" className="btn btn-success pull-right" onClick={(e) => { handleSubmit(e) }}>
                                     Сохранить
                                 </button>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row mt-5">
-                    {tasksToCreate.length > 0 &&
-                        tasksToCreate.map((task, index) => {
-                            return (<div className = "form-row">
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <label>Выберите водителя</label>
-                                        <Autocomplete
-                                            options={drivers}
-                                            disablePortal
-                                            onChange={(e, newvalue) => { task.driver = newvalue }}
-                                            sx={{ width: 300 }}
-                                            isOptionEqualToValue={(option, value) => option.fullName === value.fullName}
-                                            getOptionLabel={(option) => `${option.fullName}`}
-                                            renderInput={(params) => <TextField {...params} label="Список водителей" />} />
-                                    </div>
-
-                                    <div className="col-md-6">
-                                        <label>Выберите тягач</label>
-                                        <Autocomplete
-                                            options={cars}
-                                            disablePortal
-                                            onChange={(e, newvalue) => { task.car = newvalue }}
-                                            sx={{ width: 300 }}
-                                            getOptionLabel={(option) => `${option.plate}`}
-                                            isOptionEqualToValue={(option, value) => option.plate === value.plate}
-                                            renderInput={(params) => <TextField {...params} label="Список тягачей" />} />
-                                    </div>
-
-                                    <div className="col-md-6">
-                                        <label>Комментарий для водителя</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            onChange={(e) => task.comment = e.target.value}
-                                            value={task.comment} />
-                                    </div>
-
-                                    <div key={"shift" + index} className="col-md-6">
-                                        <StateRadioButtonGroup id={"shift" + index} type={"Смена"} isActive={task.shift} option1="Дневная" option2="Ночная" onChange={(event) => {
-                                            task.shift = event.target.value === 'true' ? true : false; setReload(reload + 1); }} />
-                                    </div>
-                                </div>
-
-                                <div key={"task" + index} className="form-row">
-                                    <div className="input-group mb-3 col-md-6 pl-1">
-                                        <label>Дата начала</label>
-                                        <DatePicker locale="ru" selected={task.taskDate} onChange={(date) => {
-                                            task.taskDate = date; setReload(reload + 1);} } />
-                                    </div>
-                                </div>
-
-                                <Divider sx={{ borderBottomWidth: 5 }}></Divider>
-                            </div>)
-                        })
-                    }    
-                </div>
-
-                <div className="row mt-5">
-                    <div className="col-md-3"></div>
-                    <div className="col-md-6">
-                        <div className="row">
-                            {orderId != 0 &&
-                                <div className="col-md-2">
-                                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleCreateDriverTasks(e) }}>
-                                        Создать задачи
-                                    </button>
-                                </div>}
                         </div>
                     </div>
                 </div>
@@ -551,4 +538,4 @@ function OrderForm({handleCloseOrderForm}) {
         </div>);
 };
 
-export default OrderForm;
+export default EditOrderForm;

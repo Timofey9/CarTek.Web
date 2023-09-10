@@ -18,6 +18,7 @@ function DriverTaskForm({orderId, handleClose}) {
     const [driver, setDriver] = useState({});
     const [forceChange, setForceChange] = useState(false);
     const [startDate, setStartDate] = useState("");
+    const [comment, setComment] = useState("");
     const [volume, setVolume] = useState(0);
     const [unit, setUnit] = useState(0);
 
@@ -121,9 +122,17 @@ function DriverTaskForm({orderId, handleClose}) {
                         renderInput={(params) => <TextField {...params} label="Список тягачей" />} />
                 </div>
 
-
                 <div className="form-group col-md-6">
                     <StateRadioButtonGroup type={"Смена"} id={"shift"} isActive={shift} option1="Дневная" option2="Ночная" onChange={(event) => setShift(event.target.value === 'true' ? true : false)} />
+                </div>
+
+                <div className="col-md-6">
+                    <label>Комментарий для водителя</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        onChange={(e) => setComment(e.target.value)}
+                        value={comment} />
                 </div>
             </div>
 

@@ -1,9 +1,3 @@
-//Здесь я получаю список машин и тяну список их работ
-//Если на выбранную дату у машины нет работы -> пишу сообщение
-//Затем открываю в диалоге форму для создания задачи
-
-//Список всех машин в одной колонке, в другой колонке - за какой заявкой машина закреплена на этот день
-
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import ApiService from "../../services/cartekApiService";
@@ -13,6 +7,7 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
+import AdminEditTask from "./admin-edittask.component";
 import DriverTaskCarForm from './add-drivertaskCar.component';
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
@@ -32,6 +27,8 @@ const CarsWork = () => {
     const [startDate, setStartDate] = useState(new Date());
     const [open, setOpen] = useState(false);
     const [selectedCarId, setSelectedCarId] = useState(0);
+    const [selectedTaskId, setSelectedTaskId] = useState(0);
+    const [openEditTask, setOpenEditTask] = useState(false);
 
     const ExpandedComponent = ({ data }) => <pre>
         <DataTable
@@ -61,6 +58,16 @@ const CarsWork = () => {
     const search = () => {
         setReload(reload + 1);
     }
+
+    const handleClickOpenTask = (taskId) => {
+        setSelectedTaskId(taskId);
+        setOpenEditTask(true);
+    }
+
+    const handleCloseTaskForm = () => {
+        setOpenEditTask(false);
+        setReload(reload + 1);
+    };
 
     const getTaskStatus = (statusInt) => {
         switch (statusInt) {
@@ -166,6 +173,11 @@ const CarsWork = () => {
             name: "Статус",
             selector: (row, index) => <div>{getTaskStatus(row.status)}</div>,
             center: true,
+        },
+        {
+            name: "Открыть",
+            selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpenTask(row.id)}><i class="fa fa-external-link" aria-hidden="true"></i></Button>,
+            center: true
         }
     ];
 
@@ -216,7 +228,7 @@ const CarsWork = () => {
                 <div className="col-md-7">
                     <div className="input-group mt-3">
                         <div className="mb-3 col-md-4 pl-1">
-                            <DatePicker className="form-control" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
+                            <DatePicker dateFormat="dd.MM.yyyy" className="form-control" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
                         </div>
                         <div className="input-group-append">
                             <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
@@ -255,6 +267,20 @@ const CarsWork = () => {
                 </Toolbar>
             </AppBar>
             <DriverTaskCarForm handleClose={handleClose} carId={selectedCarId}></DriverTaskCarForm>
+        </Dialog>
+
+        <Dialog
+            fullScreen
+            open={openEditTask}
+            onClose={handleCloseTaskForm}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="outlined">
+                    <Button autoFocus color="inherit" onClick={handleCloseTaskForm}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <AdminEditTask driverTaskId={selectedTaskId} handleCloseTaskForm={handleCloseTaskForm}></AdminEditTask>
         </Dialog>
     </>;
 };

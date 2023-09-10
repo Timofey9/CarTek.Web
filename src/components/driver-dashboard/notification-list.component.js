@@ -5,8 +5,7 @@ import DataTable from 'react-data-table-component';
 
 const NotificationsList = () => {
     let cancelled = false;
-    const navigate = useNavigate();
-
+    const navigate = useNavigate
     const [loading, setLoading] = useState(false);
     const [sortBy, setSortBy] = useState("name");
     const [searchBy, setSearchBy] = useState("plate");
@@ -17,8 +16,6 @@ const NotificationsList = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const [notifications, setNotifications] = useState([]);
     const [user, setUser] = useState({});
-
-
 
     useEffect(() => {
 

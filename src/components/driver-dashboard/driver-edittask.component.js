@@ -10,9 +10,6 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-
-//редактирование со стороны водителя: 1) поменять статус; 2) добавить комментарий; 3) загрузить фото. Все выполняется одним запросом
-
 const DriverEditTask = () => {
     const [driver, setDriver] = useState({});
     const [car, setCar] = useState({});
@@ -21,15 +18,11 @@ const DriverEditTask = () => {
     const [status, setStatus] = useState(0);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
-    const [activeStep, setActiveStep] = useState(0);
     const [note, setNote] = useState("");
     const [formData, setFormData] = useState(new FormData());
     const [notes, setNotes] = useState([]);
-    const [statuses, setStatuses] = useState([]);
 
-    const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов','Погрузился','Выехал со склада','Прибыл на объект выгрузки','Выгрузка','Резерв'];
-
-    //const constStatuses = ['Назначена', 'Принята', 'Загрузка', 'Загружен', 'В пути', 'Разгрузка', 'Разгружен', 'Документы загружены', 'Оригиналы получены', 'Завершена'];
+    const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов','Завершить'];
 
     const navigate = useNavigate();
 
@@ -58,7 +51,7 @@ const DriverEditTask = () => {
 
     const handleSubmit = () => {
         formData.append("DriverTaskId", driverTask.id);
-        formData.append("UpdatedStatus", status);
+        formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
 
         ApiService.EditDriverTaskAsync(formData)
@@ -80,7 +73,7 @@ const DriverEditTask = () => {
             case 1:
                 return "Выехал на линию";
             case 2:
-                return "Выписка документов";
+                return "К выписке документов";
             case 3:
                 return "Погрузился";
             case 4:
@@ -92,6 +85,8 @@ const DriverEditTask = () => {
             case 7:
                 return "Выгрузка";
             case 8:
+                return "К выписке документов";
+            case 9:
                 return "Завершить";
             default:
                 return "Отправить";
@@ -103,13 +98,11 @@ const DriverEditTask = () => {
         if (driverTaskId) {
             ApiService.getDriverTaskById(driverTaskId)
                 .then(({ data }) => {
-                    console.log(data);
                     setDriverTask(data);
                     setDriver(data.driver);
                     setOrder(data.order);
-                    setActiveStep(data.status);
+                    setStatus(data.status);
                     setNotes(data.notes);
-                    setStatuses(constStatuses);
                     setCar(data.car);
                 }).
                 catch((error) => {
@@ -162,7 +155,7 @@ const DriverEditTask = () => {
                 <div className="row">
                     <div className="col-md-3">
                         <Box sx={{ width: '100%' }}>
-                            <Stepper orientation="vertical" activeStep={activeStep}>
+                            <Stepper orientation="vertical" activeStep={status}>
                                 {constStatuses.map((label, index) => {
                                     const stepProps = {};
                                     const labelProps = {};
@@ -197,19 +190,19 @@ const DriverEditTask = () => {
                         </Box>
                     </div>
                     <div className="col-md-9">
-                        <div className="row">
-                            <div className="col-md-12">
-                                <div>
-                                    <Autocomplete
-                                        disablePortal
-                                        onChange={(e, newvalue) => setStatus(statuses.indexOf(newvalue))}
-                                        id="combo-box-demo"
-                                        options={statuses}
-                                        sx={{ width: 300 }}
-                                        renderInput={(params) => <TextField {...params} label="Выберите статус" />} />
-                                </div>
-                            </div>
-                        </div>
+                        {/*<div className="row">*/}
+                        {/*    <div className="col-md-12">*/}
+                        {/*        <div>*/}
+                        {/*            <Autocomplete*/}
+                        {/*                disablePortal*/}
+                        {/*                onChange={(e, newvalue) => setStatus(statuses.indexOf(newvalue))}*/}
+                        {/*                id="combo-box-demo"*/}
+                        {/*                options={statuses}*/}
+                        {/*                sx={{ width: 300 }}*/}
+                        {/*                renderInput={(params) => <TextField {...params} label="Выберите статус" />} />*/}
+                        {/*        </div>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
                         <div className="row">
                             <div className="col-md-12">
                                 <textarea id="acceptanceComment" onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
@@ -224,7 +217,7 @@ const DriverEditTask = () => {
                         <div className="row">
                             <div className="col-md-12">
                                 <button type="submit" onClick={handleSubmit} className="btn btn-success">
-                                    {statusToButtonTxt()}
+                                    {statusToButtonTxt(status)}
                                 </button>
                             </div>
                         </div>

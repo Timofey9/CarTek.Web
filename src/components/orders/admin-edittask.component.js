@@ -10,7 +10,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-const AdminEditTask = () => {
+const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [driver, setDriver] = useState({});
     const [drivers, setDrivers] = useState([]);
     const [cars, setCars] = useState([]);
@@ -26,9 +26,9 @@ const AdminEditTask = () => {
     const constStatuses = ['Назначена', 'Принята', 'Загрузка', 'Загружен', 'В пути', 'Разгрузка', 'Разгружен', 'Документы загружены', 'Оригиналы получены', 'Завершена'];
 
     const navigate = useNavigate();
-    let { driverTaskId } = useParams();
 
     useEffect(() => {
+        console.log(driverTaskId);
         setLoading(true);
         if (driverTaskId) {
             ApiService.getDriverTaskById(driverTaskId)
@@ -109,7 +109,7 @@ const AdminEditTask = () => {
             });
     };
 
-    return <div>
+    return <div className="m-5">
         {!loading && (
             <>
                 <div className="row">

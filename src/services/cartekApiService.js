@@ -2,8 +2,8 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32768/api/";
-const API_URL = "https://api-cartek.ru/api/";
+const API_URL = "https://localhost:32768/api/";
+//const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
 
@@ -92,6 +92,14 @@ class ApiService {
 
     getDriverTaskById(id) {
         return this.get(`drivers/getdrivertask/${id}`);
+    }
+
+    getOrderById(id) {
+        return this.get(`order/getorderbyid/${id}`);
+    }
+
+    deleteOrder(id) {
+        return this.delete(`order/deleteorder/${id}`);
     }
 
     async EditDriverTaskAsync(data) {
@@ -252,6 +260,18 @@ class ApiService {
         }));
 
         return this.patch(`drivers/updatedriver/${driverId}`, data);
+    };
+
+    updateOrder = (orderId, params) => {
+        const data = JSON.stringify(Object.keys(params).map(key => {
+            return {
+                op: "add",
+                path: `/${key}`,
+                value: params[key]
+            }
+        }));
+
+        return this.patch(`order/updateorder/${orderId}`, data);
     };
 
     updateCar = (carId, params) => {

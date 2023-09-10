@@ -35,10 +35,10 @@ function MaterialForm({ handleClose }) {
                 </div>
             </div>
 
-            <h1 className="mt-3">Добавить материал</h1>
+            <h1 className="mt-3">Р”РѕР±Р°РІРёС‚СЊ РјР°С‚РµСЂРёР°Р»</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
-                    <label>Название</label>
+                    <label>РќР°Р·РІР°РЅРёРµ</label>
                     <input
                         type="text"
                         className="form-control"
@@ -54,12 +54,12 @@ function MaterialForm({ handleClose }) {
                     <div className="row">
                         <div className="col-md-2">
                             <button onClick={() => handleClose()} className="btn btn-warning mr-1">
-                                Отмена
+                                РћС‚РјРµРЅР°
                             </button>
                         </div>
                         <div className="col-md-2">
                             <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
-                                Сохранить
+                                РЎРѕС…СЂР°РЅРёС‚СЊ
                             </button>
                         </div>
                     </div>

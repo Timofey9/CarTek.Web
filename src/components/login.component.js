@@ -44,7 +44,7 @@ class Login extends Component {
 
     onChangeIsDriver(e) {
         this.setState({
-            isDriver: e.target.value == 'on' ? true : false,
+            isDriver: e.target.value === 'on' ? true : false,
         });
     }
 

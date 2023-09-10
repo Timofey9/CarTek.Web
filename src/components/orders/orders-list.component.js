@@ -9,6 +9,10 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { saveAs } from 'file-saver';
 import DriverTaskForm from './add-drivertask.component';
+import OrderForm from './add-order.component';
+import EditOrderForm from './view-order.component';
+import AdminEditTask from "./admin-edittask.component";
+
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
@@ -30,7 +34,12 @@ const OrdersList = () => {
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
     const [open, setOpen] = useState(false);
+    const [openOrder, setOpenOrder] = useState(false);
+    const [openEditOrder, setOpenEditOrder] = useState(false);
+    const [openEditTask, setOpenEditTask] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(0);
+    const [selectedTaskId, setSelectedTaskId] = useState(0);
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'На складе загрузки', 'Выписка документов', 'Погрузился', 'Выехал со склада', 'На объекте выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const handleClickOpen = (orderId) => {
         setOpen(true);
@@ -41,6 +50,36 @@ const OrdersList = () => {
         setOpen(false);
         setReload(reload + 1);
     };
+
+    const handleClickOpenOrder = () => {
+        setOpenOrder(true);
+    };
+
+    const handleCloseOrderForm = () => {
+        setOpenOrder(false);
+        setReload(reload + 1);
+    };
+
+    const handleClickOpenEditOrder = (orderId) => {
+        setSelectedOrderId(orderId);
+        setOpenEditOrder(true);
+    };
+
+    const handleCloseEditOrderForm = () => {
+        setOpenEditOrder(false);
+        setReload(reload + 1);
+    };
+
+    const handleClickOpenTask = (taskId) => {
+        setSelectedTaskId(taskId);
+        setOpenEditTask(true);
+    }
+
+    const handleCloseTaskForm = () => {
+        setOpenEditTask(false);
+        setReload(reload + 1);
+    };
+
 
     const search = () => {
         setReload(reload + 1);
@@ -79,9 +118,6 @@ const OrdersList = () => {
             progressPending={loading}
             customStyles={subCustomStyles}
             data={data.driverTasks}
-            onRowClicked={(row, event) => {
-                navigate(`/admin/drivertask/${row.id}`);
-            }}
         /></pre>;
 
 
@@ -134,12 +170,6 @@ const OrdersList = () => {
 
     const columns = [
         {
-            name: "#",
-            selector: (row, index) => <div>{row.id}</div>,
-            sortable: false,
-            maxWidth: '1em'
-        },
-        {
             name: "Название",
             selector: (row, index) => <div>{row.name}</div>,
             center: true,
@@ -169,8 +199,13 @@ const OrdersList = () => {
             center: true,
         },    
         {
-            name: "Создать",
+            name: "Создать задачу",
             selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpen(row.id)}>+</Button>,
+            center: true
+        },
+        {
+            name: "Просмотр",
+            selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpenEditOrder(row.id)}><i class="fa fa-external-link" aria-hidden="true"></i></Button>,
             center: true
         }
     ];
@@ -183,13 +218,29 @@ const OrdersList = () => {
         },
         {
             name: "Тягач",
-            selector: (row, index) => <div>{row.car.plate} - {row.car.brand} {row.car.model}</div>,
+            selector: (row, index) => <div>{row.car.plate}</div>,
             center: true,
         },
         {
             name: "Смена",
             selector: (row, index) => row.shift === 0 ? "Дневная" : "Ночная",
             center: true,
+        },
+        {
+            name: "Статус",
+            selector: (row, index) => <div>{constStatuses[row.status]}</div>,
+            center: true,
+            conditionalCellStyles: [
+                {
+                    when: row => row.status === 0,
+                    style: {
+                        backgroundColor: '#ff726f',
+                        color: 'white',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                }]
         },
         {
             name: "Дата",
@@ -200,11 +251,16 @@ const OrdersList = () => {
             }),
             center: true,
         },
+        //{
+        //    name: "ТН",
+        //    selector: (row, index) => <button className="btn btn-success" onClick={(event) => downloadTN(row.id)}>Скачать ТН</button>,
+        //    center: true,
+        //},
         {
-            name: "ТН",
-            selector: (row, index) => <button className="btn btn-success" onClick={(event) => downloadTN(row.id)}>Скачать ТН</button>,
-            center: true,
-        },
+            name: "Открыть",
+            selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpenTask(row.id)}><i class="fa fa-external-link" aria-hidden="true"></i></Button>,
+            center: true
+        }
     ];
 
     const customStyles = {
@@ -244,16 +300,16 @@ const OrdersList = () => {
         return <div><h1>ЗАГРУЗКА...</h1></div>
     }
 
-    return <>
+    return (<>
         <form>
             <div className="row">
                 <div className="col-md-7">
                     <div className="input-group mt-3">
                         <div className="mb-3 col-md-4 pl-1">
-                            <DatePicker className="form-control" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
+                            <DatePicker className="form-control" dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
                         </div>
                         <div className="mb-3 col-md-4 pl-1">
-                            <DatePicker className="form-control" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
+                            <DatePicker className="form-control" dateFormat="dd.MM.yyyy" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
                         </div>
                         <div className="input-group-append">
                             <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
@@ -264,10 +320,11 @@ const OrdersList = () => {
                     </div>
                 </div>
                 <div className="form-group col-md-5">
-                   <Link to="/admin/orders/create" type="submit" className="pull-right btn btn-success mb-2">Создать заявку</Link>
+                    <Button variant="contained" color="success" onClick={() => handleClickOpenOrder()} className="pull-right mb-2">Создать заявку</Button>
                 </div>
             </div>
         </form>
+
         <DataTable
             columns={columns}
             responsive
@@ -306,7 +363,7 @@ const OrdersList = () => {
             open={open}
             onClose={handleClose}>
             <AppBar sx={{ bgcolor: "#F6CC3" }}>
-                <Toolbar>
+                <Toolbar variant="dense">
                     <Button autoFocus color="inherit" onClick={handleClose}>
                         Закрыть
                     </Button>
@@ -314,7 +371,49 @@ const OrdersList = () => {
             </AppBar>
             <DriverTaskForm handleClose={handleClose} orderId={selectedOrderId}></DriverTaskForm>
         </Dialog>
-    </>;
+
+        <Dialog
+            fullScreen
+            open={openOrder}
+            onClose={handleCloseOrderForm}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="dense">
+                    <Button autoFocus color="inherit" onClick={handleCloseOrderForm}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <OrderForm handleCloseOrderForm={handleCloseOrderForm}></OrderForm>
+        </Dialog>
+
+        <Dialog
+            fullScreen
+            open={openEditOrder}
+            onClose={handleCloseEditOrderForm}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="outlined">
+                    <Button autoFocus color="inherit" onClick={handleCloseEditOrderForm}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <EditOrderForm orderId={selectedOrderId} handleCloseOrderForm={handleCloseEditOrderForm}></EditOrderForm>
+        </Dialog>
+
+        <Dialog
+            fullScreen
+            open={openEditTask}
+            onClose={handleCloseTaskForm}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="outlined">
+                    <Button autoFocus color="inherit" onClick={handleCloseTaskForm}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <AdminEditTask driverTaskId={selectedTaskId} handleCloseTaskForm={handleCloseTaskForm}></AdminEditTask>
+        </Dialog>
+    </>);
 };
 
 export default OrdersList;
