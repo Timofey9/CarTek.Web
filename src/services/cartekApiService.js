@@ -2,8 +2,8 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-const API_URL = "https://localhost:32768/api/";
-//const API_URL = "https://api-cartek.ru/api/";
+//const API_URL = "https://localhost:32768/api/";
+const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
 
@@ -107,6 +107,15 @@ class ApiService {
         return await res;
     }
 
+    async startTn(data) {
+        var res = await this.post(`drivers/starttn`, data, { 'Content-Type': 'multipart/form-data' });
+        return await res;
+    }
+
+    async finalizeTn(data) {
+        var res = await this.post(`drivers/finalizetn`, data, { 'Content-Type': 'multipart/form-data' });
+        return await res;
+    }
 
     async AdminEditDriverTaskAsync(data) {
         var res = await this.post(`order/updatedrivertask`, data);

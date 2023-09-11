@@ -22,6 +22,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [loading, setLoading] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
     const [notes, setNotes] = useState([]);
+    const [adminComment, setAdminComment] = useState("");
     const [statuses, setStatuses] = useState([]);
     const constStatuses = ['Назначена', 'Принята', 'Загрузка', 'Загружен', 'В пути', 'Разгрузка', 'Разгружен', 'Документы загружены', 'Оригиналы получены', 'Завершена'];
 
@@ -40,6 +41,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     setActiveStep(data.status);
                     setNotes(data.notes);
                     setStatuses(constStatuses);
+                    setAdminComment(data.adminComment);
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -94,7 +96,8 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         var data = {
             "TaskId" : driverTask.id,
             "DriverId" : driver.id,
-            "CarId" : car.id
+            "CarId": car.id,
+            "AdminComment": adminComment
         };
 
         ApiService.AdminEditDriverTaskAsync(data)
@@ -114,7 +117,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
             <>
                 <div className="row">
                     <div className="col-md-6"> 
-                        <h1>Задача по заявке # {order.id} для "{order.clientName}"</h1>
+                        <h1>Задача по заявке для "{order.clientName}"</h1>
                     </div>
                     <div className="col-md-6">
                         {isEdit
@@ -172,7 +175,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     })}</dd>
 
                     <dt className="col-sm-3">Смена: </dt>
-                    <dd className="col-sm-9">{driverTask.shift === 0 ? "Дневная" : "Ночная"}</dd>
+                    <dd className="col-sm-9">{driverTask.shift === 0 ? "Дневная (08:00 - 20:00)" : "Ночная (20:00 - 08:00)"}</dd>
 
                     <dt className="col-sm-3">Точка А: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.textAddress}</a></dd>
@@ -180,8 +183,18 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     <dt className="col-sm-3">Точка Б: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
             
-                    <dt className="col-sm-3">Комментарий:</dt>
+                    <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
+
+                    <dt className="col-sm-3">Комментарий по задаче:</dt>
+                    <dd className="col-sm-9">
+                        <input
+                            disabled={!isEdit}
+                            type="text"
+                            className="form-control"
+                            onChange={(e) => setAdminComment(e.target.value)}
+                            value={adminComment} />
+                    </dd>
                 </dl>
 
                 <div className="row">

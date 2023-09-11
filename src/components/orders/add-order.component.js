@@ -17,9 +17,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
-function OrderForm({handleCloseOrderForm}) {
+function OrderForm({ handleCloseOrderForm }) {
     const [clients, setClients] = useState([]);
     const [client, setClient] = useState({});
+    const [gp, setGp] = useState({});
     const [addresses, setAddresses] = useState([]);
     const [addressA, setAddressA] = useState({});
     const [addressB, setAddressB] = useState({});
@@ -188,6 +189,7 @@ function OrderForm({handleCloseOrderForm}) {
         const newOrder = {
             name: orderName,
             clientName: client.clientName,
+            gpId: gp.id,
             clientId: client.id,
             materialId: material.id,
             volume: volume,
@@ -258,37 +260,35 @@ function OrderForm({handleCloseOrderForm}) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Грузополучатель</label>
+                        <label>Грузоотправитель (1)</label>
                         <Autocomplete
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setClient(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
-                            renderInput={(params) => <TextField {...params} label="Список клиентов" />} />
+                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
                     </div>
 
-                    {serviceType === "0" &&
-                        <div className="form-group col-md-6">
-                            <label>Грузоотправитель</label>
-                            <Autocomplete
-                                options={clients}
-                                disablePortal
-                                onChange={(e, newvalue) => { setClient(newvalue) }}
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.clientName}`}
-                                renderInput={(params) => <TextField {...params} label="Список клиентов" />} />
-                        </div> 
-                    }
+                    <div className="form-group col-md-6">
+                        <label>Грузополучатель (2)</label>
+                        <Autocomplete
+                            options={clients}
+                            disablePortal
+                            onChange={(e, newvalue) => { setGp(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.clientName}`}
+                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                    </div>
 
                     <div className="form-group col-md-6">
                         <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
                             Добавить юр.лицо
                         </button>
-                    </div> 
+                    </div>
 
                     <div className="form-row">
-                        <label>Тип груза</label>
+                        <label>Тип груза (3)</label>
                         <Autocomplete
                             options={materialsList}
                             disablePortal
@@ -303,7 +303,7 @@ function OrderForm({handleCloseOrderForm}) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Объем</label>
+                        <label>Объем (общий)</label>
                         <input
                             type="text"
                             className="form-control"
@@ -314,7 +314,7 @@ function OrderForm({handleCloseOrderForm}) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Единица измерения погрузки</label>
+                        <label>Единица измерения</label>
                         <select className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => setLoadUnit(e.target.value)}>
                             <option value="none">Единица измерения</option>
                             <option value="0">М3</option>
@@ -324,11 +324,11 @@ function OrderForm({handleCloseOrderForm}) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Прием груза</label>
+                        <label>Прием груза (8)</label>
                         <Autocomplete
                             options={addresses}
                             disablePortal
-                            onChange={(e, newvalue) => { setAddressA(newvalue) }}   
+                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.name}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
@@ -336,7 +336,7 @@ function OrderForm({handleCloseOrderForm}) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Сдача груза</label>
+                        <label>Выдача груза (10)</label>
 
                         <Autocomplete
                             options={addresses}
@@ -357,12 +357,12 @@ function OrderForm({handleCloseOrderForm}) {
                 <div className="form-row">
                     <div className="input-group mb-3 col-md-6 pl-1">
                         <label>Дата начала</label>
-                        <DatePicker locale="ru" selected={startDate} onChange={(date) => { setStartDate(date); let date2 = new Date(date); date2.setDate(date.getDate() + 1); setEndDate(date2) }} />
+                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={startDate} onChange={(date) => { setStartDate(date); let date2 = new Date(date); date2.setDate(date.getDate() + 1); setEndDate(date2) }} />
                     </div>
 
                     <div className="input-group mb-3 col-md-6 pl-1">
                         <label>Срок выполнения</label>
-                        <DatePicker locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
+                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={endDate} onChange={(date) => setEndDate(date)} />
                     </div>
                 </div>
 
@@ -374,7 +374,7 @@ function OrderForm({handleCloseOrderForm}) {
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setNote(e.target.value)}
-                            value={note}/>
+                            value={note} />
                     </div>
 
                     <div className="form-group col-md-6">
@@ -384,7 +384,7 @@ function OrderForm({handleCloseOrderForm}) {
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setMileage(e.target.value)}
-                            value={mileage}/>
+                            value={mileage} />
                     </div>
 
                     <div className="form-group col-md-6">
@@ -394,7 +394,7 @@ function OrderForm({handleCloseOrderForm}) {
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setPrice(e.target.value)}
-                            value={price}/>
+                            value={price} />
                     </div>
 
                     <div className="form-group col-md-6">
@@ -404,7 +404,7 @@ function OrderForm({handleCloseOrderForm}) {
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setCarCount(e.target.value)}
-                            value={carCount}/>
+                            value={carCount} />
                     </div>
                 </div>
 
@@ -437,7 +437,7 @@ function OrderForm({handleCloseOrderForm}) {
                 <div className="row mt-5">
                     {tasksToCreate.length > 0 &&
                         tasksToCreate.map((task, index) => {
-                            return (<div className = "form-row">
+                            return (<div className="form-row">
                                 <div className="row">
                                     <div className="col-md-6">
                                         <label>Выберите водителя</label>
@@ -473,23 +473,25 @@ function OrderForm({handleCloseOrderForm}) {
                                     </div>
 
                                     <div key={"shift" + index} className="col-md-6">
-                                        <StateRadioButtonGroup id={"shift" + index} type={"Смена"} isActive={task.shift} option1="Дневная" option2="Ночная" onChange={(event) => {
-                                            task.shift = event.target.value === 'true' ? true : false; setReload(reload + 1); }} />
+                                        <StateRadioButtonGroup id={"shift" + index} type={"Смена"} isActive={task.shift} option1="Дневная (08:00-20:00)" option2="Ночная (20:00 - 08:00)" onChange={(event) => {
+                                            task.shift = event.target.value === 'true' ? true : false; setReload(reload + 1);
+                                        }} />
                                     </div>
                                 </div>
 
                                 <div key={"task" + index} className="form-row">
                                     <div className="input-group mb-3 col-md-6 pl-1">
                                         <label>Дата начала</label>
-                                        <DatePicker locale="ru" selected={task.taskDate} onChange={(date) => {
-                                            task.taskDate = date; setReload(reload + 1);} } />
+                                        <DatePicker dateFormat="dd.MM.yyyy" locale="ru" selected={task.taskDate} onChange={(date) => {
+                                            task.taskDate = date; setReload(reload + 1);
+                                        }} />
                                     </div>
                                 </div>
 
                                 <Divider sx={{ borderBottomWidth: 5 }}></Divider>
                             </div>)
                         })
-                    }    
+                    }
                 </div>
 
                 <div className="row mt-5">

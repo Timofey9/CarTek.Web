@@ -4,7 +4,6 @@ import ApiService from "../../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import DatePicker, { registerLocale } from "react-datepicker";
-import StateRadioButtonGroup from "../radiobuttongroup";
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -18,9 +17,10 @@ import "./orders.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
-function EditOrderForm({orderId, handleCloseOrderForm }) {
+function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [clients, setClients] = useState([]);
     const [client, setClient] = useState({});
+    const [gp, setGp] = useState({});
     const [addresses, setAddresses] = useState([]);
     const [addressA, setAddressA] = useState({});
     const [addressB, setAddressB] = useState({});
@@ -103,7 +103,7 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
             });
 
         setLoading(false);
-    },[]);
+    }, []);
 
     useEffect(() => {
         setLoading(true);
@@ -229,8 +229,6 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
         event.preventDefault();
         setMessage("");
 
-        console.log(client.id);
-
         const newOrder = {
             name: orderName,
             clientName: client.clientName,
@@ -281,7 +279,7 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                     <div className="col-md-8"></div>
                     <div className="col-md-4">
                         <button onClick={() => deleteOrder()} className="btn btn-danger mr-10">Удалить</button>
-                        {!isEdit && <button onClick={(e) => setIsEdit(true)} className="btn btn-warning">Редактировать</button>} 
+                        {!isEdit && <button onClick={(e) => setIsEdit(true)} className="btn btn-warning">Редактировать</button>}
                     </div>
                 </div>
 
@@ -298,33 +296,31 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                     <Divider sx={{ borderBottomWidth: 3 }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Грузополучатель</label>
-                        <label>{client.clientName}</label>
-
+                        <label className="bold-label">Грузоотправитель (1)</label>
                         {isEdit && <Autocomplete
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setClient(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
-                            renderInput={(params) => <TextField {...params} label="Список клиентов" />} />}
+                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
+                        <label>{client.clientName}</label>
 
                     </div>
 
                     <Divider sx={{ borderBottomWidth: 3 }}></Divider>
 
-                    {serviceType === "0" &&
-                        <div className="form-group col-md-6">
-                            <label className="bold-label">Грузоотправитель</label>
-                            {isEdit && <Autocomplete
-                                options={clients}
-                                disablePortal
-                                onChange={(e, newvalue) => { setClient(newvalue) }}
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.clientName}`}
-                                renderInput={(params) => <TextField {...params} label="Список клиентов" />} />}
-                        </div>
-                    }
+                    <div className="form-group col-md-6">
+                        <label className="bold-label">Грузополучатель (2)</label>
+                        {isEdit && <Autocomplete
+                            options={clients}
+                            disablePortal
+                            onChange={(e, newvalue) => { setGp(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.clientName}`}
+                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
+                        <label>{gp.clientName}</label>
+                    </div>
 
                     <div className="form-group col-md-6">
                         {isEdit && <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
@@ -333,27 +329,27 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-row">
-                        <label className="bold-label">Тип груза</label>
+                        <label className="bold-label">Груз (3)</label>
                         <label>{material.name}</label>
-                        {isEdit &&                         
+                        {isEdit &&
                             <><Autocomplete
-                            options={materialsList}
-                            disablePortal
-                            onChange={(e, newvalue) => { setMaterial(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.name}`}
-                            renderInput={(params) => <TextField {...params} label="Список материалов" />} />
+                                options={materialsList}
+                                disablePortal
+                                onChange={(e, newvalue) => { setMaterial(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.name}`}
+                                renderInput={(params) => <TextField {...params} label="Список материалов" />} />
 
-                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
-                            Добавить тип груза
-                            </button></>}
+                                <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
+                                    Добавить тип груза
+                                </button></>}
 
                     </div>
 
                     <Divider sx={{ borderBottomWidth: 3 }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Объем</label>
+                        <label className="bold-label">Объем (общий)</label>
                         <input
                             disabled={!isEdit}
                             type="text"
@@ -367,7 +363,7 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                     <Divider sx={{ borderBottomWidth: 3 }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Единица измерения погрузки</label>
+                        <label className="bold-label">Единица измерения</label>
                         <select disabled={!isEdit} className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => setLoadUnit(e.target.value)}>
                             <option value="none">Единица измерения</option>
                             <option value="0">М3</option>
@@ -379,7 +375,7 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                     <Divider sx={{ borderBottomWidth: 3 }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Прием груза</label>
+                        <label className="bold-label">Прием груза (8)</label>
                         {isEdit && <Autocomplete
                             options={addresses}
                             disablePortal
@@ -391,8 +387,10 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                         <label>{addressA && addressA.name}: {addressA && addressA.textAddress}</label>
                     </div>
 
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Сдача груза</label>
+                        <label className="bold-label">Выдача груза (10)</label>
                         {isEdit && <Autocomplete
                             options={addresses}
                             disablePortal
@@ -409,6 +407,8 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                     </div>
                 </div>
 
+                <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                 <div className="form-row">
                     <div className="input-group mb-3 col-md-6 pl-1">
                         <label className="bold-label">Дата начала</label>
@@ -421,11 +421,13 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                     </div>
                 </div>
 
+                <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                 <div className="form-row">
                     <div className="form-group col-md-6">
                         <label className="bold-label">Комментарий по заявке (общий)</label>
                         <input
-                            disabled={!isEdit} 
+                            disabled={!isEdit}
                             type="text"
                             className="form-control"
                             form="profile-form"
@@ -433,10 +435,12 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                             value={note} />
                     </div>
 
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                     <div className="form-group col-md-6">
                         <label className="bold-label">Километраж</label>
                         <input
-                            disabled={!isEdit} 
+                            disabled={!isEdit}
                             type="number"
                             className="form-control"
                             form="profile-form"
@@ -444,10 +448,12 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                             value={mileage} />
                     </div>
 
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                     <div className="form-group col-md-6">
                         <label className="bold-label">Стоимость рейса</label>
                         <input
-                            disabled={!isEdit} 
+                            disabled={!isEdit}
                             type="text"
                             className="form-control"
                             form="profile-form"
@@ -455,10 +461,12 @@ function EditOrderForm({orderId, handleCloseOrderForm }) {
                             value={price} />
                     </div>
 
+                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+
                     <div className="form-group col-md-6">
                         <label className="bold-label">Количество машин</label>
                         <input
-                            disabled={!isEdit} 
+                            disabled={!isEdit}
                             type="number"
                             className="form-control"
                             form="profile-form"

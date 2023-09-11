@@ -6,9 +6,13 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
+import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker, { registerLocale } from "react-datepicker";
+import ru from 'date-fns/locale/ru';
+registerLocale('ru', ru);
 
 const DriverEditTask = () => {
     const [driver, setDriver] = useState({});
@@ -21,8 +25,28 @@ const DriverEditTask = () => {
     const [note, setNote] = useState("");
     const [formData, setFormData] = useState(new FormData());
     const [notes, setNotes] = useState([]);
+    const [reload, setReload] = useState(0);
+    const [unit, setUnit] = useState("none");
+    const [materialsList, setMaterialsList] = useState([]);
+    const [addresses, setAddresses] = useState([]);
+    const [clients, setClients] = useState([]);
+    const [material, setMaterial] = useState({});
+    const [addressA, setAddressA] = useState({});
+    const [addressB, setAddressB] = useState({});
+    const [message, setMessage] = useState("");
+    const [tnNumber, setTnNumber] = useState("");
+    const [loadVolume, setLoadVolume] = useState(0);
+    const [go, setGo] = useState({});
+    const [gp, setGp] = useState({});
+    const [pickupArrivalDate, setPickupArrivalDate] = useState(new Date());
+    const [pickupArrivalTime, setPickupArrivalTime] = useState("");
+    const [pickupDepartureDate, setPickupDepartureDate] = useState(new Date());
+    const [pickupDepartureTime, setPickupDepartureTime] = useState("");
+    const [dropoffArrivalDate, setDropoffArrivalDate] = useState(new Date());
+    const [dropoffArrivalTime, setDropoffArrivalTime] = useState("");
+    const [dropoffDepartureTime, setDropoffDepartureTime] = useState("");
 
-    const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов','Завершить'];
+    const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
     const navigate = useNavigate();
 
@@ -54,10 +78,57 @@ const DriverEditTask = () => {
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
 
+        if (status === 4) {
+            formData.append("Number", tnNumber);
+            formData.append("GoId", go.id);
+            formData.append("GpId", gp.id);
+            formData.append("LoadVolume", loadVolume);
+            formData.append("Unit", unit);
+            formData.append("LocationAId", addressA.id);
+            formData.append("PickUpArrivalDate", pickupArrivalDate.toUTCString());
+            formData.append("PickUpArrivalTime", pickupArrivalTime);
+            formData.append("PickUpDepartureDate", pickupDepartureDate.toUTCString());
+            formData.append("PickUpDepartureTime", pickupDepartureTime);
+
+            ApiService.startTn(formData)
+                .then(({ data }) => {
+                    alert("Статус обновлен");
+                })
+                .catch((error) => {
+                    if (error.response.data.message) {
+                        setError(error.response.data.message);
+                    }
+                });
+
+            return;
+        }
+
+        if (status === 9) {
+            formData.append("UnloadVolume", loadVolume);
+            formData.append("LocationBId", addressB.id);
+            formData.append("DropOffArrivalDate", pickupArrivalDate.toUTCString());
+            formData.append("DropOffArrivalTime", pickupArrivalTime);
+            formData.append("DropOffDepartureDate", pickupDepartureDate.toUTCString());
+            formData.append("DropOffDepartureTime", pickupDepartureTime);
+
+            ApiService.finalizeTn(formData)
+                .then(({ data }) => {
+                    alert("Статус обновлен");
+                })
+                .catch((error) => {
+                    if (error.response.data.message) {
+                        setError(error.response.data.message);
+                    }
+                });
+
+            return;
+        }
+
+        console.log("Не должно");
+
         ApiService.EditDriverTaskAsync(formData)
             .then(({ data }) => {
-                alert("Статус обновлен принята");
-                navigate("/driver-dashboard");
+                alert("Статус обновлен");
             })
             .catch((error) => {
                 if (error.response.data.message) {
@@ -71,11 +142,11 @@ const DriverEditTask = () => {
             case 0:
                 return "Принять";
             case 1:
-                return "Выехал на линию";
+                return "Выехать на линию";
             case 2:
                 return "К выписке документов";
             case 3:
-                return "Погрузился";
+                return "Выписать документы (Погрузился)";
             case 4:
                 return "Выехал со склада";
             case 5:
@@ -112,16 +183,65 @@ const DriverEditTask = () => {
         setLoading(false);
     }, []);
 
+    useEffect(() => {
+        setLoading(true);
+        ApiService.getMaterials()
+            .then(({ data }) => {
+                setMaterialsList(data);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        setLoading(true);
+        ApiService.getClients()
+            .then(({ data }) => {
+                setClients(data);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+
+        setLoading(false);
+    }, [reload]);
+
+    useEffect(() => {
+        setLoading(true);
+        ApiService.getAddresses()
+            .then(({ data }) => {
+                setAddresses(data);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+
+        setLoading(false);
+    }, [reload]);
+
+
     return <div className="container">
         {!loading && (
             <>
                 <div className="row">
-                    <h1>Задача по заявке # {order.id} для "{order.clientName}"</h1>
+                    <h1>Задача по заявке на {new Date(order.startDate).toLocaleDateString('ru-Ru', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                    })}</h1>
                 </div>
 
                 <dl className="row">
-                    <dt className="col-sm-3">Заказчик: </dt>
-                    <dd className="col-sm-9">{order.clientName}</dd>
+                    {/*<dt className="col-sm-3">Заказчик: </dt>*/}
+                    {/*<dd className="col-sm-9">{order.clientName}</dd>*/}
 
                     <dt className="col-sm-3">Тягач: </dt>
                     <dd className="col-sm-9">{car.brand} {car.model}: {car.plate}</dd>
@@ -140,7 +260,7 @@ const DriverEditTask = () => {
                     })}</dd>
 
                     <dt className="col-sm-3">Смена: </dt>
-                    <dd className="col-sm-9">{driverTask.shift === 0 ? "Дневная" : "Ночная"}</dd>
+                    <dd className="col-sm-9">{driverTask.shift === 0 ? "Дневная (08:00 - 20:00)" : "Ночная (20:00 - 08:00)"}</dd>
 
                     <dt className="col-sm-3">Точка А: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.name}</a></dd>
@@ -148,10 +268,175 @@ const DriverEditTask = () => {
                     <dt className="col-sm-3">Точка Б: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.name}</a></dd>
 
-                    <dt className="col-sm-3">Комментарий:</dt>
+                    <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
+
+                    <dt className="col-sm-3">Комментарий по задаче:</dt>
+                    <dd className="col-sm-9">{driverTask.adminComment}</dd>
                 </dl>
 
+                {status === 4 &&
+                    <div className="form-row">
+                        <div className="form-group col-md-6">
+                            <label>Номер ТН</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => setTnNumber(e.target.value)}
+                                value={tnNumber} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Грузоотправитель (1)</label>
+                            <Autocomplete
+                                options={clients}
+                                disablePortal
+                                onChange={(e, newvalue) => { setGo(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.clientName}`}
+                                renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                            {driverTask.order.clientName}
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Грузополучатель (2)</label>
+                            <Autocomplete
+                                options={clients}
+                                disablePortal
+                                onChange={(e, newvalue) => { setGp(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.clientName}`}
+                                renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                            {driverTask.order.client.name}
+                        </div>
+
+                        <div className="form-row">
+                            <label>Тип груза (3)</label>
+                            <Autocomplete
+                                options={materialsList}
+                                disablePortal
+                                onChange={(e, newvalue) => { setMaterial(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.name}`}
+                                renderInput={(params) => <TextField {...params} label="Список материалов" />} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Объем загрузки</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => setLoadVolume(e.target.value)}
+                                value={loadVolume} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Единица измерения</label>
+                            <select className="form-select" value={unit} aria-label="Единица измерения" onChange={(e) => setUnit(e.target.value)}>
+                                <option value="none">Единица измерения</option>
+                                <option value="0">М3</option>
+                                <option value="1">шт.</option>
+                                <option value="2">тонны</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Прием груза (8)</label>
+                            <Autocomplete
+                                options={addresses}
+                                disablePortal
+                                onChange={(e, newvalue) => { setAddressA(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.name}`}
+                                renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата прибытия на склад погрузки</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Время прибытия на склад погрузки</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => setPickupArrivalTime(e.target.value)}
+                                value={pickupArrivalTime} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата выезда со склада погрузки</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Время выезда со склада погрузки</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => setPickupDepartureTime(e.target.value)}
+                                value={pickupDepartureTime} />
+                        </div>
+                    </div>}
+
+                {status === 9 &&
+                    <div className="form-row">
+                        <div className="form-group col-md-6">
+                            <label>Объем выгрузки</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => setLoadVolume(e.target.value)}
+                                value={loadVolume} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Выдача груза (8)</label>
+                            <Autocomplete
+                                options={addresses}
+                                disablePortal
+                                onChange={(e, newvalue) => { setAddressB(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.name}`}
+                                renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата прибытия на склад выгрузки</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Время прибытия на склад выгрузки</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => setPickupArrivalTime(e.target.value)}
+                                value={pickupArrivalTime} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата выезда со склада выгрузки</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Время выезда со склада выгрузки</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => setPickupDepartureTime(e.target.value)}
+                                value={pickupDepartureTime} />
+                        </div>
+                    </div>}
                 <div className="row">
                     <div className="col-md-3">
                         <Box sx={{ width: '100%' }}>
@@ -190,19 +475,6 @@ const DriverEditTask = () => {
                         </Box>
                     </div>
                     <div className="col-md-9">
-                        {/*<div className="row">*/}
-                        {/*    <div className="col-md-12">*/}
-                        {/*        <div>*/}
-                        {/*            <Autocomplete*/}
-                        {/*                disablePortal*/}
-                        {/*                onChange={(e, newvalue) => setStatus(statuses.indexOf(newvalue))}*/}
-                        {/*                id="combo-box-demo"*/}
-                        {/*                options={statuses}*/}
-                        {/*                sx={{ width: 300 }}*/}
-                        {/*                renderInput={(params) => <TextField {...params} label="Выберите статус" />} />*/}
-                        {/*        </div>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
                         <div className="row">
                             <div className="col-md-12">
                                 <textarea id="acceptanceComment" onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
@@ -216,7 +488,7 @@ const DriverEditTask = () => {
                         </div>
                         <div className="row">
                             <div className="col-md-12">
-                                <button type="submit" onClick={handleSubmit} className="btn btn-success">
+                                <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
                                     {statusToButtonTxt(status)}
                                 </button>
                             </div>
