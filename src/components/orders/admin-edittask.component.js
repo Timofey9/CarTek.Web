@@ -24,12 +24,9 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [notes, setNotes] = useState([]);
     const [adminComment, setAdminComment] = useState("");
     const [statuses, setStatuses] = useState([]);
-    const constStatuses = ['Назначена', 'Принята', 'Загрузка', 'Загружен', 'В пути', 'Разгрузка', 'Разгружен', 'Документы загружены', 'Оригиналы получены', 'Завершена'];
-
-    const navigate = useNavigate();
+    const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
     useEffect(() => {
-        console.log(driverTaskId);
         setLoading(true);
         if (driverTaskId) {
             ApiService.getDriverTaskById(driverTaskId)
@@ -103,7 +100,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         ApiService.AdminEditDriverTaskAsync(data)
             .then(({ data }) => {
                 alert("Задача обновлена");
-                navigate(-1);
+                handleCloseTaskForm();
             })
             .catch((error) => {
                 if (error.response.data.message) {

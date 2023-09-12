@@ -29,6 +29,7 @@ const CarsWork = () => {
     const [selectedCarId, setSelectedCarId] = useState(0);
     const [selectedTaskId, setSelectedTaskId] = useState(0);
     const [openEditTask, setOpenEditTask] = useState(false);
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'На складе загрузки', 'Выписка документов', 'Погрузился', 'Выехал со склада', 'На объекте выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const ExpandedComponent = ({ data }) => <pre>
         <DataTable
@@ -69,32 +70,7 @@ const CarsWork = () => {
         setReload(reload + 1);
     };
 
-    const getTaskStatus = (statusInt) => {
-        switch (statusInt) {
-            case 0:
-                return "Назначена";
-            case 1:
-                return "Принята";
-            case 2:
-                return "Загрузка";
-            case 3:
-                return "Загружен";
-            case 4:
-                return "В пути";
-            case 5:
-                return "Разгрузка";
-            case 6:
-                return "Разгружен";
-            case 7:
-                return "Документы загружены";
-            case 8:
-                return "Оригиналы получены";
-            case 9:
-                return "Завершена";
-            default:
-                return "Неизвестный статус";
-        }
-    }
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -135,7 +111,7 @@ const CarsWork = () => {
             name: "Статус",
             selector: (row, index) => row.state === 0 ? "На базе" : "На линии",
             sortable: false,
-            maxWidth: '1em'
+            maxWidth: '1em',
         },
         {
             name: "Создать",
@@ -154,6 +130,8 @@ const CarsWork = () => {
             name: "Водитель",
             selector: (row, index) => <div>{row.driver.fullName}</div>,
             center: true,
+            grow: 2,
+            wrap: true
         },
         {
             name: "Дата",
@@ -166,13 +144,33 @@ const CarsWork = () => {
         },
         {
             name: "Смена",
-            selector: (row, index) => row.shift === 0 ? "Дневная" : "Ночная",
+            selector: (row, index) => row.shift === 0 ? "Дневная (08:00 - 20:00)" : "Ночная (20:00 - 08:00)",
             center: true,
         },
         {
             name: "Статус",
-            selector: (row, index) => <div>{getTaskStatus(row.status)}</div>,
+            selector: (row, index) => <div>{constStatuses[row.status]}</div>,
             center: true,
+            conditionalCellStyles: [
+                {
+                    when: row => row.status === 0,
+                    style: {
+                        backgroundColor: '#ff726f',
+                        color: 'white',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                },
+                {
+                    when: row => row.status === 10,
+                    style: {
+                        backgroundColor: '#d1ffbd',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                }]
         },
         {
             name: "Открыть",

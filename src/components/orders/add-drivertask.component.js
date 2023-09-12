@@ -71,6 +71,7 @@ function DriverTaskForm({orderId, handleClose}) {
             carId: car.id,
             taskDate: startDate,
             forceChange: forceChange,
+            comment: comment,
             isComplete: false
         };
 
@@ -123,7 +124,7 @@ function DriverTaskForm({orderId, handleClose}) {
                 </div>
 
                 <div className="form-group col-md-6">
-                    <StateRadioButtonGroup type={"Смена"} id={"shift"} isActive={shift} option1="Дневная" option2="Ночная" onChange={(event) => setShift(event.target.value === 'true' ? true : false)} />
+                    <StateRadioButtonGroup type={"Смена"} id={"shift"} isActive={shift} option1="Дневная (08:00 - 20:00)" option2="Ночная (20:00 - 08:00)" onChange={(event) => setShift(event.target.value === 'true' ? true : false)} />
                 </div>
 
                 <div className="col-md-6">

@@ -267,6 +267,7 @@ function OrderForm({ handleCloseOrderForm }) {
                             onChange={(e, newvalue) => { setClient(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
+                            isOptionEqualToValue={(o,v) => o === v.clientName} 
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
                     </div>
 

@@ -39,7 +39,7 @@ const OrdersList = () => {
     const [openEditTask, setOpenEditTask] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(0);
     const [selectedTaskId, setSelectedTaskId] = useState(0);
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'На складе загрузки', 'Выписка документов', 'Погрузился', 'Выехал со склада', 'На объекте выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'На складе загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'На объекте выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const handleClickOpen = (orderId) => {
         setOpen(true);
@@ -120,8 +120,6 @@ const OrdersList = () => {
             data={data.driverTasks}
         /></pre>;
 
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         setLoading(true);
@@ -205,7 +203,7 @@ const OrdersList = () => {
         },
         {
             name: "Просмотр",
-            selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpenEditOrder(row.id)}><i class="fa fa-external-link" aria-hidden="true"></i></Button>,
+            selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpenEditOrder(row.id)}><i className="fa fa-external-link" aria-hidden="true"></i></Button>,
             center: true
         }
     ];
@@ -215,6 +213,8 @@ const OrdersList = () => {
             name: "Водитель",
             selector: (row, index) => <div>{row.driver.fullName}</div>,
             center: true,
+            grow: 2,
+            wrap:true
         },
         {
             name: "Тягач",
@@ -223,8 +223,10 @@ const OrdersList = () => {
         },
         {
             name: "Смена",
-            selector: (row, index) => row.shift === 0 ? "Дневная" : "Ночная",
+            selector: (row, index) => row.shift === 0 ? "Дневная (08:00-20:00)" : "Ночная (20:00 - 08:00)",
             center: true,
+            grow: 2,
+            wrap: true
         },
         {
             name: "Статус",
@@ -240,7 +242,17 @@ const OrdersList = () => {
                             cursor: 'pointer',
                         }
                     }
-                }]
+                },
+                {
+                    when: row => row.status === 10,
+                    style: {
+                        backgroundColor: '#d1ffbd',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                }
+            ]
         },
         {
             name: "Дата",
@@ -251,16 +263,26 @@ const OrdersList = () => {
             }),
             center: true,
         },
-        //{
-        //    name: "ТН",
-        //    selector: (row, index) => <button className="btn btn-success" onClick={(event) => downloadTN(row.id)}>Скачать ТН</button>,
-        //    center: true,
-        //},
+        {
+            name: "Дата назначения",
+            selector: (row, index) => new Date(row.dateCreated).toLocaleDateString('ru-Ru', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            }),
+            center: true,
+        },
         {
             name: "Открыть",
             selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpenTask(row.id)}><i class="fa fa-external-link" aria-hidden="true"></i></Button>,
-            center: true
-        }
+            center: true,
+        },
+        {
+            name: "ТН",
+            selector: (row, index) => row.status === 10 ? <Button variant="contained" color="success" onClick={(event) => downloadTN(row.id)}><i className="fa fa-download" aria-hidden="true"></i></Button> : "-",
+            center: true,
+            grow: 1
+        },
     ];
 
     const customStyles = {
@@ -312,7 +334,7 @@ const OrdersList = () => {
                             <DatePicker className="form-control" dateFormat="dd.MM.yyyy" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
                         </div>
                         <div className="input-group-append">
-                            <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
+                            <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i class="fa fa-search"></i></button>
                         </div>
                         <div className="input-group-append">
                             <button className="btn btn-default" onClick={(e) => { e.preventDefault(); downloadFile() }}>СКАЧАТЬ</button>
@@ -325,38 +347,43 @@ const OrdersList = () => {
             </div>
         </form>
 
-        <DataTable
-            columns={columns}
-            responsive
-            noHeader
-            striped="true"
-            highlightOnHover
-            sortServer
-            paginationServer
-            defaultSortFieldId={1}
-            defaultSortAsc
-            conditionalRowStyles={conditionalRowStyles}
-            noDataComponent="Заявок за указанный период не найдено"
-            progressPending={loading}
-            paginationTotalRows={totalNumber}
-            customStyles={customStyles}
-            onSort={(column, direction) => {
-                !cancelled && setSortBy(column.sortBy);
-                !cancelled && setDir(direction);
-            }}
-            data={orders}
-            pagination
-            expandableRows
-            expandableRowDisabled={rowPreDisabled}
-            expandableRowsComponent={ExpandedComponent}
-            onChangePage={(page, totalRows) => {
-                !cancelled && setPageNumber(page);
-            }}
-            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
-                !cancelled && setPageSize(currentRowsPerPage);
-            }}
-            paginationPerPage={pageSize}
-        />
+        <div className="row">
+            <div className="col-md-12">
+                <DataTable
+                    columns={columns}
+                    responsive
+                    noHeader
+                    striped="true"
+                    highlightOnHover
+                    sortServer
+                    paginationServer
+                    defaultSortFieldId={1}
+                    defaultSortAsc
+                    conditionalRowStyles={conditionalRowStyles}
+                    noDataComponent="Заявок за указанный период не найдено"
+                    progressPending={loading}
+                    paginationTotalRows={totalNumber}
+                    customStyles={customStyles}
+                    onSort={(column, direction) => {
+                        !cancelled && setSortBy(column.sortBy);
+                        !cancelled && setDir(direction);
+                    }}
+                    data={orders}
+                    pagination
+                    expandableRows
+                    expandableRowDisabled={rowPreDisabled}
+                    expandableRowsComponent={ExpandedComponent}
+                    onChangePage={(page, totalRows) => {
+                        !cancelled && setPageNumber(page);
+                    }}
+                    onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
+                        !cancelled && setPageSize(currentRowsPerPage);
+                    }}
+                    paginationPerPage={pageSize}
+                />
+
+            </div>
+        </div>
 
         <Dialog
             fullScreen

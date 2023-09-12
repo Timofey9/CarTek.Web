@@ -20,6 +20,7 @@ registerLocale('ru', ru);
 function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [clients, setClients] = useState([]);
     const [client, setClient] = useState({});
+    const [order, setOrder] = useState({});
     const [gp, setGp] = useState({});
     const [addresses, setAddresses] = useState([]);
     const [addressA, setAddressA] = useState({});
@@ -273,7 +274,11 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     </div>
                 </div>
 
-                <h1>Заявка от "дата" {orderName}</h1>
+                <h1>Заявка от {new Date(startDate).toLocaleDateString('ru-Ru', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                })} {orderName}</h1>
 
                 <div className="row">
                     <div className="col-md-8"></div>
@@ -293,7 +298,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         </select>
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Грузоотправитель (1)</label>
@@ -308,7 +313,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Грузополучатель (2)</label>
@@ -346,7 +351,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Объем (общий)</label>
@@ -360,7 +365,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         />
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Единица измерения</label>
@@ -372,7 +377,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         </select>
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Прием груза (8)</label>
@@ -387,7 +392,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         <label>{addressA && addressA.name}: {addressA && addressA.textAddress}</label>
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Выдача груза (10)</label>
@@ -407,7 +412,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     </div>
                 </div>
 
-                <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                 <div className="form-row">
                     <div className="input-group mb-3 col-md-6 pl-1">
@@ -421,7 +426,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     </div>
                 </div>
 
-                <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                 <div className="form-row">
                     <div className="form-group col-md-6">
@@ -435,7 +440,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             value={note} />
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Километраж</label>
@@ -448,7 +453,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             value={mileage} />
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Стоимость рейса</label>
@@ -461,7 +466,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             value={price} />
                     </div>
 
-                    <Divider sx={{ borderBottomWidth: 3 }}></Divider>
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Количество машин</label>

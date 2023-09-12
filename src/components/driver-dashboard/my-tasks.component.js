@@ -66,7 +66,16 @@ const MyTasksList = () => {
             center: true,
         },
         {
-            name: "Дата",
+            name: "Дата назначения",
+            selector: (row, index) => new Date(row.dateCreated).toLocaleDateString('ru-Ru', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            }),
+            center: true,
+        },
+        {
+            name: "Дата выполнения",
             selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
                 day: '2-digit',
                 month: '2-digit',
@@ -76,7 +85,7 @@ const MyTasksList = () => {
         },
         {
             name: "Смена",
-            selector: (row, index) => row.shift === 0 ? "Дневная" : "Ночная",
+            selector: (row, index) => row.shift === 0 ? "Дневная (08:00-20:00)" : "Ночная (20:00 - 08:00)",
             center: true,
         },
         {

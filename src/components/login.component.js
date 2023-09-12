@@ -44,7 +44,7 @@ class Login extends Component {
 
     onChangeIsDriver(e) {
         this.setState({
-            isDriver: e.target.value === 'on' ? true : false,
+            isDriver: e.target.checked
         });
     }
 
@@ -81,7 +81,6 @@ class Login extends Component {
 
     render() {
         const { isLoggedIn, message, isDriver } = this.props;
-        console.log(this.props);
         if (isLoggedIn) {
             if (isDriver) {
                 return <Navigate to="/driver-dashboard" />;
@@ -116,7 +115,7 @@ class Login extends Component {
 
                     <div className="form-group">
                         <label htmlFor="isDriver">Водитель</label>
-                        <Switch name="isDriver" onChange={this.onChangeIsDriver} />
+                        <Switch name="isDriver" onChange={(e) => this.onChangeIsDriver(e)} />
                     </div>
 
                     <div className="form-group">

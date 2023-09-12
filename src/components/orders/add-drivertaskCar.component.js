@@ -19,7 +19,7 @@ function DriverTaskCarForm({carId, handleClose}) {
     const [driver, setDriver] = useState({});
     const [forceChange, setForceChange] = useState(false);
     const [startDate, setStartDate] = useState(new Date());
-
+    const [comment, setComment] = useState("");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
 
@@ -50,7 +50,6 @@ function DriverTaskCarForm({carId, handleClose}) {
         };
         ApiService.getAllActiveOrders(req)
             .then(({ data }) => {
-                console.log(data);
                 setOrders(data);
             }).
             catch((error) => {
@@ -160,9 +159,20 @@ function DriverTaskCarForm({carId, handleClose}) {
                 </div>
 
                 <div className="form-group col-md-6">
-                    <StateRadioButtonGroup type={"Смена"} id={"shift"} isActive={shift} option1="Дневная" option2="Ночная" onChange={(event) => setShift(event.target.value === 'true' ? true : false)} />
+                    <StateRadioButtonGroup type={"Смена"} id={"shift"} isActive={shift} option1="Дневная (08:00 - 20:00)" option2="Ночная (20:00 - 08:00)" onChange={(event) => setShift(event.target.value === 'true' ? true : false)} />
+                </div>
+
+                <div className="col-md-6">
+                    <label>Комментарий для водителя</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        onChange={(e) => setComment(e.target.value)}
+                        value={comment} />
                 </div>
             </div>
+
+
 
             <div className="form-row">
                 <div className="input-group mb-3 col-md-6 pl-1">
