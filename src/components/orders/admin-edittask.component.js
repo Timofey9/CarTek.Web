@@ -24,10 +24,18 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [notes, setNotes] = useState([]);
     const [adminComment, setAdminComment] = useState("");
     const [statuses, setStatuses] = useState([]);
+    const [localUser, setLocalUser] = useState({});
+
     const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
     useEffect(() => {
         setLoading(true);
+        let user = JSON.parse(localStorage.getItem("user"));
+
+        if (user) {
+            setLocalUser(user);
+        }
+
         if (driverTaskId) {
             ApiService.getDriverTaskById(driverTaskId)
                 .then(({ data }) => {
@@ -116,12 +124,14 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     <div className="col-md-6"> 
                         <h1>Задача по заявке для "{order.clientName}"</h1>
                     </div>
-                    <div className="col-md-6">
-                        {isEdit
-                            ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success">Сохранить</button>
-                            : <button onClick={() => setIsEdit(true)} className="btn btn-warning">Редактировать</button>
-                        }
-                    </div>
+                    {localUser.identity && !localUser.identity.isDispatcher &&
+                        <div className="col-md-6">
+                            {isEdit
+                                ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success">Сохранить</button>
+                                : <button onClick={() => setIsEdit(true)} className="btn btn-warning">Редактировать</button>
+                            }
+                        </div>
+                    }
                 </div>
 
                 <dl className="row">

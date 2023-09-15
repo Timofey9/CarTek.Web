@@ -49,6 +49,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [cars, setCars] = useState([]);
     const [isEdit, setIsEdit] = useState(false);
     const [drivers, setDrivers] = useState([]);
+    const [localUser, setLocalUser] = useState({});
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -79,6 +80,12 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
     useEffect(() => {
         setLoading(true);
+        let user = JSON.parse(localStorage.getItem("user"));
+
+        if (user) {
+            setLocalUser(user);
+        }
+
         ApiService.getOrderById(orderId)
             .then(({ data }) => {
                 setOrderName(data.name);
@@ -280,13 +287,15 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     year: 'numeric',
                 })} {orderName}</h1>
 
-                <div className="row">
-                    <div className="col-md-8"></div>
-                    <div className="col-md-4">
-                        <button onClick={() => deleteOrder()} className="btn btn-danger mr-10">Удалить</button>
-                        {!isEdit && <button onClick={(e) => setIsEdit(true)} className="btn btn-warning">Редактировать</button>}
+                {localUser.identity && !localUser.identity.isDispatcher &&
+                    <div className="row">
+                        <div className="col-md-8"></div>
+                        <div className="col-md-4">
+                            <button onClick={() => deleteOrder()} className="btn btn-danger mr-10">Удалить</button>
+                            {!isEdit && <button onClick={(e) => setIsEdit(true)} className="btn btn-warning">Редактировать</button>}
+                        </div>
                     </div>
-                </div>
+                }
 
                 <div className="form-row">
                     <div className="form-group col-md-6">
@@ -488,23 +497,25 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     </div>
                 )}
 
-                <div className="row mt-5">
-                    <div className="col-md-3"></div>
-                    <div className="col-md-3">
-                        <div className="row">
-                            <div className="col-md-6">
-                                <button onClick={() => handleCloseOrderForm()} className="btn btn-warning pull-right mr-1">
-                                    Отмена
-                                </button>
-                            </div>
-                            <div className="col-md-6">
-                                <button type="submit" form="profile-form" className="btn btn-success pull-right" onClick={(e) => { handleSubmit(e) }}>
-                                    Сохранить
-                                </button>
+                {localUser.identity && !localUser.identity.isDispatcher &&
+                    <div className="row mt-5">
+                        <div className="col-md-3"></div>
+                        <div className="col-md-3">
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <button onClick={() => handleCloseOrderForm()} className="btn btn-warning pull-right mr-1">
+                                        Отмена
+                                    </button>
+                                </div>
+                                <div className="col-md-6">
+                                    <button type="submit" form="profile-form" className="btn btn-success pull-right" onClick={(e) => { handleSubmit(e) }}>
+                                        Сохранить
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
             </div>
 
             <Dialog

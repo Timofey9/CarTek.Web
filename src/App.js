@@ -53,6 +53,7 @@ class App extends Component {
             showModeratorBoard: false,
             showAdminBoard: false,
             showDriver: false,
+            isDispatcher: false,
             currentUser: undefined,
         };
 
@@ -69,6 +70,7 @@ class App extends Component {
                 currentUser: user,
                 showModeratorBoard: user.identity.isAdmin,
                 showAdminBoard: user.identity.isAdmin,
+                isDispatcher: user.identity.isDispatcher,
                 showDriver: user.isDriver
             });
         }
@@ -93,7 +95,7 @@ class App extends Component {
     }
 
     render() {
-        const { currentUser, showAdminBoard, showDriver } = this.state;
+        const { currentUser, showAdminBoard, isDispatcher, showDriver } = this.state;
 
         return (
             <BrowserRouter location={history.location} navigator={history}>
@@ -114,7 +116,22 @@ class App extends Component {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav mr-auto">
 
-                            {!showDriver && (
+                            {isDispatcher && (
+                                <>
+                                    <li className="nav-item">
+                                        <Link to={"/admin/orders"} className="nav-link">
+                                            Заявки
+                                        </Link>
+                                    </li>
+
+                                    <li className="nav-item">
+                                        <Link to={"/admin/workload"} className="nav-link">
+                                            Задачи
+                                        </Link>
+                                    </li>
+                                </>)}
+
+                            {!showDriver && !isDispatcher && (
                                 <>
                                     <li className="nav-item">
                                         <Link to={"/home"} className="nav-link">

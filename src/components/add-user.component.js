@@ -39,6 +39,7 @@ class UserForm extends Component {
             lastName: "",
             phone: "",
             isAdmin: false,
+            isDispatcher: false,
             password: "",
             email: "",
             notificationShown: false,
@@ -55,6 +56,7 @@ class UserForm extends Component {
                     login: this.state.login,
                     phone: this.state.phone,
                     isAdmin: this.state.isAdmin,
+                    isDispatcher: this.state.isDispatcher
                 };
                 const { login } = this.props.params;
                 if (login) {
@@ -126,6 +128,7 @@ class UserForm extends Component {
         this.handleMiddleNameChange = this.handleMiddleNameChange.bind(this);
         this.handleLastNameChange = this.handleLastNameChange.bind(this);
         this.handleIsAdminChange = this.handleIsAdminChange.bind(this);
+        this.handleIsDispatcherChange = this.handleIsDispatcherChange.bind(this);
         this.handlePhoneNumberChange = this.handlePhoneNumberChange.bind(this);
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handleLoginChange = this.handleLoginChange.bind(this);
@@ -177,13 +180,22 @@ class UserForm extends Component {
         this.setState({ isAdmin: event.target.value === "on" });
     }
 
+    handleIsDispatcherChange(event) {
+        if (event.target.value === "on") {
+            this.setState({ isDispatcher: true });
+            this.setState({ isAdmin: false });
+        } else {
+            this.setState({ isDispatcher: false });
+        }
+    }
+
     handlePhoneNumberChange(event) {
         this.setState({ phone: event.target.value });
     }
 
     render() {
 
-        const { loading, error, firstName, middleName, lastName, isAdmin, phone, login, email, password } = this.state;
+        const { loading, error, firstName, middleName, lastName, isAdmin, isDispatcher, phone, login, email, password } = this.state;
 
         if (loading) {
             return "ЗАГРУЗКА...";
@@ -295,6 +307,39 @@ class UserForm extends Component {
                             checked={!isAdmin}
                         />
                         <label className="form-check-label" htmlFor="admin_off">
+                            Нет
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div className="form-row pb-2">
+                <div className="col-md-2">
+                    <label>Диспетчер</label>
+                    <div className="form-check">
+                        <input className="form-check-input"
+                            type="radio"
+                            name="isDispatcher"
+                            onChange={this.handleIsDispatcherChange}
+                            id="isDispatcher_on"
+                            value="on"
+                            form="profile-form"
+                            checked={isDispatcher}
+                        />
+                        <label className="form-check-label" htmlFor="isDispatcher_on">
+                            Да
+                        </label>
+                    </div>
+                    <div className="form-check">
+                        <input className="form-check-input"
+                            type="radio"
+                            name="isDispatcher"
+                            id="isDispatcher_off"
+                            value="off"
+                            onChange={this.handleIsDispatcherChange}
+                            form="profile-form"
+                            checked={!isDispatcher}
+                        />
+                        <label className="form-check-label" htmlFor="isDispatcher_off">
                             Нет
                         </label>
                     </div>

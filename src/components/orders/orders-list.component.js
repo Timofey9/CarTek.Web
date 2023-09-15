@@ -39,6 +39,7 @@ const OrdersList = () => {
     const [openEditTask, setOpenEditTask] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(0);
     const [selectedTaskId, setSelectedTaskId] = useState(0);
+    const [localUser, setLocalUser] = useState({});
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'На складе загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'На объекте выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const handleClickOpen = (orderId) => {
@@ -123,6 +124,11 @@ const OrdersList = () => {
 
     useEffect(() => {
         setLoading(true);
+        let user = JSON.parse(localStorage.getItem("user"));
+
+        if (user) {
+            setLocalUser(user);
+        }
 
         ApiService.getOrdersBetweenDates({
             sortColumn: sortBy,
@@ -199,7 +205,8 @@ const OrdersList = () => {
         {
             name: "Создать задачу",
             selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpen(row.id)}>+</Button>,
-            center: true
+            center: true,
+            omit: localUser.identity && localUser.identity.isDispatcher
         },
         {
             name: "Просмотр",
@@ -341,9 +348,11 @@ const OrdersList = () => {
                         </div>
                     </div>
                 </div>
-                <div className="form-group col-md-5">
-                    <Button variant="contained" color="success" onClick={() => handleClickOpenOrder()} className="pull-right mb-2">Создать заявку</Button>
-                </div>
+                {localUser.identity && !localUser.identity.isDispatcher &&
+                    <div className="form-group col-md-5">
+                        <Button variant="contained" color="success" onClick={() => handleClickOpenOrder()} className="pull-right mb-2">Создать заявку</Button>
+                    </div>
+                }
             </div>
         </form>
 

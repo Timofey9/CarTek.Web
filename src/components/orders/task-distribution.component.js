@@ -29,6 +29,7 @@ const CarsWork = () => {
     const [selectedCarId, setSelectedCarId] = useState(0);
     const [selectedTaskId, setSelectedTaskId] = useState(0);
     const [openEditTask, setOpenEditTask] = useState(false);
+    const [localUser, setLocalUser] = useState({});
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'На складе загрузки', 'Выписка документов', 'Погрузился', 'Выехал со склада', 'На объекте выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const ExpandedComponent = ({ data }) => <pre>
@@ -75,6 +76,11 @@ const CarsWork = () => {
 
     useEffect(() => {
         setLoading(true);
+        let user = JSON.parse(localStorage.getItem("user"));
+
+        if (user) {
+            setLocalUser(user);
+        }
 
         ApiService.getCarsWithTasks({
             startDate: startDate.toUTCString(),
@@ -116,7 +122,8 @@ const CarsWork = () => {
         {
             name: "Создать",
             selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpen(row.id)}>+</Button>,
-            center: true
+            center: true,
+            omit: localUser.identity && localUser.identity.isDispatcher
         }
     ];
 
