@@ -102,6 +102,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setPrice(data.price);
                 setCarCount(data.carCount);
                 setMileage(data.mileage);
+                setGp(data.gp);
                 console.log(data);
             }).
             catch((error) => {
@@ -319,7 +320,6 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
                         <label>{client.clientName}</label>
-
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>

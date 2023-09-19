@@ -13,6 +13,7 @@ import ClientForm from './add-client.component'
 import AddressForm from './add-address.component'
 import MaterialForm from './add-material.component'
 import Divider from '@mui/material/Divider';
+import "./orders.css";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
@@ -29,11 +30,10 @@ function OrderForm({ handleCloseOrderForm }) {
     const [material, setMaterial] = useState({});
     const [volume, setVolume] = useState(0);
     const [loadUnit, setLoadUnit] = useState("none");
-    const [unloadUnit, setUnloadUnit] = useState({});
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [note, setNote] = useState("");
-    const [carCount, setCarCount] = useState(1);
+    const [carCount, setCarCount] = useState(0);
     const [serviceType, setServiceType] = useState("none");
     const [reload, setReload] = useState(0);
     const [error, setError] = useState("");
@@ -48,6 +48,9 @@ function OrderForm({ handleCloseOrderForm }) {
     const [cars, setCars] = useState([]);
     const [drivers, setDrivers] = useState([]);
     const [orderId, setOrderId] = useState(0);
+    const [isValid, setIsValid] = useState(false);
+    const [validated, setValidated] = useState(false);
+    const [isOrderCreated, setIsOrderCreated] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -75,6 +78,45 @@ function OrderForm({ handleCloseOrderForm }) {
         setOpenMaterial(false);
         setReload(reload + 1);
     };
+
+    const validate = () => {
+        setValidated(true);
+        let valid = true;
+
+        if (serviceType === "none"){
+            valid = false;
+        }   
+
+        if (Object.keys(client).length === 0){
+            valid = false;
+        }
+
+        if (Object.keys(gp).length === 0){
+            valid = false;
+        }
+
+        if (Object.keys(addressA).length === 0) {
+            valid = false;
+        }
+
+        if (Object.keys(addressB).length === 0) {
+            valid = false;
+        }
+
+        if (Object.keys(material).length === 0) {
+            valid = false;
+        }
+
+        if (carCount === 0) {
+            valid = false;
+        }
+        if (!valid) {
+            setMessage("Не все обязательные поля заполнены")
+        }
+
+        setIsValid(valid);
+        return valid;
+    }
 
     useEffect(() => {
         setLoading(true);
@@ -118,7 +160,7 @@ function OrderForm({ handleCloseOrderForm }) {
                 }
             });
         setLoading(false);
-    }, []);
+    }, [reload]);
 
     useEffect(() => {
         setLoading(true);
@@ -162,6 +204,7 @@ function OrderForm({ handleCloseOrderForm }) {
                     carId: tasksToCreate[i].car.id,
                     shift: tasksToCreate[i].shift,
                     taskDate: tasksToCreate[i].taskDate,
+                    comment: tasksToCreate[i].comment,
                     forceChange: true
                 });
         }
@@ -184,7 +227,7 @@ function OrderForm({ handleCloseOrderForm }) {
 
     function handleSubmit(event) {
         event.preventDefault();
-        setMessage("");
+        setMessage("");        
 
         const newOrder = {
             name: orderName,
@@ -193,8 +236,7 @@ function OrderForm({ handleCloseOrderForm }) {
             clientId: client.id,
             materialId: material.id,
             volume: volume,
-            loadUnit: loadUnit,
-            unloadUnit: loadUnit,
+            loadUnit: loadUnit === "none" ? 3 : loadUnit,
             isComplete: false,
             dueDate: endDate,
             startDate: startDate,
@@ -207,21 +249,24 @@ function OrderForm({ handleCloseOrderForm }) {
             price: price
         };
 
-        ApiService.createOrder(newOrder)
-            .then(({ data }) => {
-                alert(`Заявка создана, номер: ${data.message}`);
-                let array = [];
-                for (let i = 0; i < carCount; i++) {
-                    array.push({ car: {}, driver: {}, taskDate: new Date(), shift: false });
-                }
-                setOrderId(data.message);
-                setTasksToCreate(array);
-            }).
-            catch((error) => {
-                if (error.response.data.message) {
-                    setMessage(error.response.data.message);
-                }
-            });
+        if (validate()) {
+            ApiService.createOrder(newOrder)
+                .then(({ data }) => {
+                    alert(`Заявка создана, номер: ${data.message}`);
+                    let array = [];
+                    for (let i = 0; i < carCount; i++) {
+                        array.push({ car: {}, driver: {}, taskDate: new Date(), shift: false });
+                    }
+                    setOrderId(data.message);
+                    setIsOrderCreated(true);
+                    setTasksToCreate(array);
+                }).
+                catch((error) => {
+                    if (error.response.data.message) {
+                        setMessage(error.response.data.message);
+                    }
+                });
+        }
     }
 
     if (loading) {
@@ -252,7 +297,9 @@ function OrderForm({ handleCloseOrderForm }) {
 
                     <div className="form-group col-md-6">
                         <label>Услуга</label>
-                        <select className="form-select" value={serviceType} aria-label="Услуга" onChange={(e) => setServiceType(e.target.value)}>
+                        <select
+                            className={validated && serviceType === "none" ? "form-select not-valid-input-border" : "form-select"}
+                            value={serviceType} aria-label="Услуга" onChange={(e) => setServiceType(e.target.value)}>
                             <option value="none">Услуга</option>
                             <option value="0">Перевозка</option>
                             <option value="1">Поставка</option>
@@ -262,6 +309,7 @@ function OrderForm({ handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Грузоотправитель (1)</label>
                         <Autocomplete
+                            className={validated && Object.keys(client).length === 0 ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setClient(newvalue) }}
@@ -274,6 +322,7 @@ function OrderForm({ handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Грузополучатель (2)</label>
                         <Autocomplete
+                            className={validated && Object.keys(gp).length === 0 ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setGp(newvalue) }}
@@ -291,6 +340,7 @@ function OrderForm({ handleCloseOrderForm }) {
                     <div className="form-row">
                         <label>Тип груза (3)</label>
                         <Autocomplete
+                            className={validated && Object.keys(material).length === 0 ? "not-valid-input-border" : ""}
                             options={materialsList}
                             disablePortal
                             onChange={(e, newvalue) => { setMaterial(newvalue) }}
@@ -327,11 +377,12 @@ function OrderForm({ handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Прием груза (8)</label>
                         <Autocomplete
+                            className={validated && Object.keys(addressA).length === 0 ? "not-valid-input-border" : ""}
                             options={addresses}
                             disablePortal
                             onChange={(e, newvalue) => { setAddressA(newvalue) }}
                             sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.name}`}
+                            getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
                         <label>{addressA && addressA.textAddress}</label>
                     </div>
@@ -340,11 +391,12 @@ function OrderForm({ handleCloseOrderForm }) {
                         <label>Выдача груза (10)</label>
 
                         <Autocomplete
+                            className={validated && Object.keys(addressB).length === 0 ? "not-valid-input-border" : ""}
                             options={addresses}
                             disablePortal
                             onChange={(e, newvalue) => { setAddressB(newvalue) }}
                             sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.name}`}
+                            getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
 
                         <label>{addressB && addressB.textAddress}</label>
@@ -363,7 +415,7 @@ function OrderForm({ handleCloseOrderForm }) {
 
                     <div className="input-group mb-3 col-md-6 pl-1">
                         <label>Срок выполнения</label>
-                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={endDate} onChange={(date) => setEndDate(date)} />
+                        <DatePicker disabled locale="ru" dateFormat="dd.MM.yyyy" selected={endDate} onChange={(date) => setEndDate(date)} />
                     </div>
                 </div>
 
@@ -401,8 +453,8 @@ function OrderForm({ handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Количество машин</label>
                         <input
+                            className={validated && carCount === 0 ? "form-control not-valid-input-border" : "form-control"}
                             type="number"
-                            className="form-control"
                             form="profile-form"
                             onChange={(e) => setCarCount(e.target.value)}
                             value={carCount} />
@@ -417,23 +469,24 @@ function OrderForm({ handleCloseOrderForm }) {
                     </div>
                 )}
 
-                <div className="row mt-5">
-                    <div className="col-md-3"></div>
-                    <div className="col-md-3">
-                        <div className="row">
-                            <div className="col-md-6">
-                                <button onClick={() => handleCloseOrderForm()} className="btn btn-warning mr-1">
-                                    Отмена
-                                </button>
-                            </div>
-                            <div className="col-md-6">
-                                <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
-                                    Сохранить
-                                </button>
+                {!isOrderCreated &&
+                    <div className="row mt-5">
+                        <div className="col-md-3"></div>
+                        <div className="col-md-3">
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <button onClick={() => handleCloseOrderForm()} className="btn btn-warning mr-1">
+                                        Отмена
+                                    </button>
+                                </div>
+                                <div className="col-md-6">
+                                    <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
+                                        Сохранить
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </div>}
 
                 <div className="row mt-5">
                     {tasksToCreate.length > 0 &&

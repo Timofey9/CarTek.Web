@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import ApiService from "../../services/cartekApiService";
 
-function ClientForm({ handleClose }) {
+function ClientForm({client, handleClose }) {
     const [name, setName] = useState(""); 
     const [inn, setInn] = useState("");
-    const [ogrn, setOgrn] = useState("");
-    const [kpp, setKpp] = useState("");
     const [address, setAddress] = useState("");
-
+    const [isClient, setIsClient] = useState(false);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
 
-    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        if (client !== undefined) {
+            setAddress(client.clientAddress);
+            setInn(client.inn);
+            setName(client.clientName);
+            setIsClient(true);
+        }
+    }, [])
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -20,12 +25,37 @@ function ClientForm({ handleClose }) {
         const newClient = {
             clientName: name,
             inn: inn,
-            ogrn: ogrn,
-            kpp: kpp,
             clientAddress: address
         };
 
-        ApiService.createClient(newClient)
+        if (isClient) {
+            newClient.id = client.id;
+
+            ApiService.updateClient(newClient)
+                .then(({ data }) => {
+                    alert(data.message);
+                    handleClose();
+                }).
+                catch((error) => {
+                    setMessage(error.response.data.message);
+                });
+        } else {
+            ApiService.createClient(newClient)
+                .then(({ data }) => {
+                    alert(data.message);
+                    handleClose();
+                }).
+                catch((error) => {
+                    setMessage(error.response.data.message);
+                });
+        }
+    }
+
+    function handleDelete(event) {
+        event.preventDefault();
+        setMessage("");
+
+        ApiService.deleteClient(client.id)
             .then(({ data }) => {
                 alert(data.message);
                 handleClose();
@@ -43,10 +73,10 @@ function ClientForm({ handleClose }) {
                 </div>
             </div>
 
-            <h1 className="mt-3">Добавить клиента</h1>
+            <h1 className="mt-3">Добавить юр.лицо</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
-                    <label>Название клиента</label>
+                    <label>Название юр.лица</label>
                     <input
                         type="text"
                         className="form-control"
@@ -70,30 +100,6 @@ function ClientForm({ handleClose }) {
             </div>
             <div className="form-row">
                 <div className="form-group col-md-6">
-                    <label>ОГРН</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        form="profile-form"
-                        onChange={(e) => setOgrn(e.target.value)}
-                        value={ogrn}
-                    />
-                </div>
-            </div>
-            <div className="form-row">
-                <div className="form-group col-md-6">
-                    <label>КПП</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        form="profile-form"
-                        onChange={(e) => setKpp(e.target.value)}
-                        value={kpp}
-                    />
-                </div>
-            </div>
-            <div className="form-row">
-                <div className="form-group col-md-6">
                     <label>Юридический адрес</label>
                     <input
                         type="text"
@@ -108,14 +114,20 @@ function ClientForm({ handleClose }) {
                 <div className="col-md-3"></div>
                 <div className="col-md-6">
                     <div className="row">
-                        <div className="col-md-2">
+                        <div className="col-md-2 m-3">
                             <button onClick={() => handleClose()} className="btn btn-warning mr-1">
                                 Отмена
                             </button>
                         </div>
-                        <div className="col-md-2">
+                        {isClient &&
+                            <div className="col-md-2 m-3">
+                                <button type="submit" form="profile-form" className="btn btn-danger" onClick={(e) => { handleDelete(e) }}>
+                                    Удалить
+                                </button>
+                            </div>}
+                        <div className="col-md-2 m-3">
                             <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
-                                Сохранить
+                                {isClient ? "Обновить" : "Сохранить"}
                             </button>
                         </div>
                     </div>

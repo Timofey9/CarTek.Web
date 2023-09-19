@@ -47,6 +47,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     setNotes(data.notes);
                     setStatuses(constStatuses);
                     setAdminComment(data.adminComment);
+                    console.log(data);
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -82,6 +83,19 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         }
         setLoading(false);
     }, []);
+
+    function deleteTask() {
+        ApiService.deleteTask(driverTaskId)
+            .then(({ data }) => {
+                alert("Задача удалена");
+                handleCloseTaskForm();
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setError(error.response.data.message);
+                }
+            });
+    }
 
     const unitToString = (unit) => {
         switch (unit) {
@@ -126,11 +140,13 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     </div>
                     {localUser.identity && !localUser.identity.isDispatcher &&
                         <div className="col-md-6">
+                            <button onClick={() => deleteTask()} className="btn btn-danger mr-10">Удалить</button>
                             {isEdit
                                 ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success">Сохранить</button>
                                 : <button onClick={() => setIsEdit(true)} className="btn btn-warning">Редактировать</button>
                             }
                         </div>
+                        
                     }
                 </div>
 

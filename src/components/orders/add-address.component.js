@@ -1,25 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import ApiService from "../../services/cartekApiService";
 
-function AddressForm({ handleClose }) {
+function AddressForm({ address, handleClose }) {
     const [name, setName] = useState("");
     const [coordinates, setCoordinates] = useState("");
     const [textAddress, setTextAddress] = useState("");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(true);
+    const [isAddress, setIsAddress] = useState(false);
+
+    useEffect(() => {      
+        if (address !== undefined) {
+            setTextAddress(address.textAddress);
+            setCoordinates(address.coordinates);
+            setIsAddress(true);
+        }
+    }, [])
 
     function handleSubmit(event) {
         event.preventDefault();
         setMessage("");
 
-        const newClient = {
-            name: name,
+        const newAddress = {
             coordinates: coordinates,
             textAddress: textAddress,
         };
 
-        ApiService.createAddress(newClient)
+        if (isAddress) {
+            newAddress.id = address.id;
+            ApiService.updateAddress(newAddress)
+                .then(({ data }) => {
+                    alert(data.message);
+                    handleClose();
+                }).
+                catch((error) => {
+                    setMessage(error.response.data.message);
+                });
+        } else {
+            ApiService.createAddress(newAddress)
+                .then(({ data }) => {
+                    alert(data.message);
+                    handleClose();
+                }).
+                catch((error) => {
+                    setMessage(error.response.data.message);
+                });
+        }
+    }
+
+    function handleDelete(event) {
+        event.preventDefault();
+        setMessage("");
+
+        ApiService.deleteAddress(address.id)
             .then(({ data }) => {
                 alert(data.message);
                 handleClose();
@@ -38,18 +71,6 @@ function AddressForm({ handleClose }) {
             </div>
 
             <h1 className="mt-3">Добавить адрес</h1>
-            <div className="form-row">
-                <div className="form-group col-md-6">
-                    <label>Название</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        form="profile-form"
-                        onChange={(e) => setName(e.target.value)}
-                        value={name}
-                    />
-                </div>
-            </div>
             <div className="form-row">
                 <div className="form-group col-md-6">
                     <label>Адрес</label>
@@ -78,14 +99,20 @@ function AddressForm({ handleClose }) {
                 <div className="col-md-3"></div>
                 <div className="col-md-6">
                     <div className="row">
-                        <div className="col-md-2">
+                        <div className="col-md-2 m-3">
                             <button onClick={() => handleClose()} className="btn btn-warning mr-1">
                                 Отмена
                             </button>
                         </div>
-                        <div className="col-md-2">
+                        {isAddress &&
+                            <div className="col-md-2 m-3">
+                                <button type="submit" form="profile-form" className="btn btn-danger" onClick={(e) => { handleDelete(e) }}>
+                                    Удалить
+                                </button>
+                            </div>}
+                        <div className="col-md-2 m-3">
                             <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
-                                Сохранить
+                                {isAddress ? "Обновить" : "Сохранить"}
                             </button>
                         </div>
                     </div>

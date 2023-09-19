@@ -5,3 +5,8 @@
 .mr-10{
     margin-right: 5px;
 }
+
+.not-valid-input-border {
+    border: solid 2px red;
+    border-radius: 3px;
+}

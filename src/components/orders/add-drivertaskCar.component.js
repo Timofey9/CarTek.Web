@@ -108,7 +108,8 @@ function DriverTaskCarForm({carId, handleClose}) {
             carId: carId,
             taskDate: startDate,
             forceChange: forceChange,
-            isComplete: false
+            isComplete: false,
+            comment: comment
         };
 
         ApiService.createDriverTask(newTask)
@@ -177,7 +178,7 @@ function DriverTaskCarForm({carId, handleClose}) {
             <div className="form-row">
                 <div className="input-group mb-3 col-md-6 pl-1">
                     <label>Дата начала</label>
-                    <DatePicker locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
+                    <DatePicker dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
                 </div>
             </div>
 

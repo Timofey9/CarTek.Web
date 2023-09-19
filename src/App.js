@@ -33,6 +33,9 @@ import DriverDashboard from "./components/driver-dashboard/driver-dashboard.comp
 import DriverEditTask from "./components/driver-dashboard/driver-edittask.component";
 import AdminEditTask from "./components/orders/admin-edittask.component";
 import NotificationsList from "./components/driver-dashboard/notification-list.component";
+import AddressesList from "./components/addresses-list.component";
+import ClientsList from "./components/clients-list.component";
+import MaterialsList from "./components/materials-list.component";
 
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
@@ -216,6 +219,9 @@ class App extends Component {
                         <Route exact path="/admin/orders" element={<RequireAuth currentUser={currentUser}><OrdersList /></RequireAuth>} />
                         <Route exact path="/admin/workload" element={<RequireAuth currentUser={currentUser}><CarsWork /></RequireAuth>} />
                         <Route exact path="/admin/orders/create" element={<RequireAuth currentUser={currentUser}><OrderForm /></RequireAuth>} />
+                        <Route exact path="/admin/addresses" element={<RequireAuth currentUser={currentUser}><AddressesList /></RequireAuth>} />
+                        <Route exact path="/admin/clients" element={<RequireAuth currentUser={currentUser}><ClientsList /></RequireAuth>} />
+                        <Route exact path="/admin/materials" element={<RequireAuth currentUser={currentUser}><MaterialsList /></RequireAuth>} />
                         <Route exact path="/admin/drivertask/:driverTaskId" element={<RequireAuth currentUser={currentUser}><AdminEditTask /></RequireAuth>} />
                     </Routes>
                 </div>

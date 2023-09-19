@@ -102,6 +102,10 @@ class ApiService {
         return this.delete(`order/deleteorder/${id}`);
     }
 
+    deleteTask(id) {
+        return this.delete(`order/deletetask/${id}`);
+    }
+
     async EditDriverTaskAsync(data) {
         var res = await this.post(`drivers/updatedrivertask`, data, { 'Content-Type': 'multipart/form-data' });
         return await res;
@@ -133,27 +137,61 @@ class ApiService {
     }
 
     getMaterials() {
-        var res = this.get(`order/getmaterials`);
+        var res = this.get(`utils/getmaterials`);
         return res;
     }
 
     getClients() {
-        var res = this.get(`order/getclients`);
+        var res = this.get(`utils/getclients`);
         return res;
     }
 
     createClient(data) {
-        var res = this.post(`order/createclient`, data);
+        var res = this.post(`utils/createclient`, data);
         return res;
+    }
+
+
+    creatematerial(data) {
+        var res = this.post(`utils/creatematerial`, data);
+        return res;
+    }
+
+    updateMaterial(data) {
+        var res = this.post(`utils/updatematerial`, data);
+        return res;
+    }
+
+    deleteMaterial(id) {
+        return this.delete(`utils/deletematerial/${id}`);
     }
 
     createAddress(data) {
-        var res = this.post(`order/createaddress`, data);
+        var res = this.post(`utils/createaddress`, data);
         return res;
     }
 
+    updateAddress(data) {
+        var res = this.post(`utils/updateaddress`, data);
+        return res;
+    }
+
+    deleteAddress(id) {
+        return this.delete(`utils/deleteaddress/${id}`);
+    }
+
+    updateClient(data) {
+        var res = this.post(`utils/updateclient`, data);
+        return res;
+    }
+
+    deleteClient(id) {
+        return this.delete(`utils/deleteclient/${id}`);
+    }
+
+
     getAddresses() {
-        var res = this.get(`order/getaddresses`);
+        var res = this.get(`utils/getaddresses`);
         return res;
     }
 

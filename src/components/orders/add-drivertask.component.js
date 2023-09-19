@@ -141,7 +141,7 @@ function DriverTaskForm({orderId, handleClose}) {
             <div className="form-row">
                 <div className="input-group mb-3 col-md-6 pl-1">
                     <label>Дата начала</label>
-                    <DatePicker locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
+                    <DatePicker dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
                 </div>
             </div>
 

@@ -12,7 +12,7 @@ import DriverTaskForm from './add-drivertask.component';
 import OrderForm from './add-order.component';
 import EditOrderForm from './view-order.component';
 import AdminEditTask from "./admin-edittask.component";
-
+import "./orders.css";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
@@ -140,6 +140,7 @@ const OrdersList = () => {
             startDate: startDate.toUTCString(),
             endDate: endDate.toUTCString()
         }).then(({ data }) => {
+            console.log(data);
             const { totalNumber, list } = data;
             setTotalNumber(totalNumber);
             setOrders(list);
@@ -179,17 +180,14 @@ const OrdersList = () => {
             center: true,
         },    
         {
-            name: "Клиент",
-            selector: (row, index) => <div>{row.clientName}</div>,
+            name: "Заказчик",
+            selector: (row, index) => <div>{row.service === '0' ? row.clientName : row.gp.clientName}</div>,
             center: true,
         },    
         {
-            name: "Дата начала",
-            selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            }),
+            name: "Дата",
+            selector: (row, index) => buildDates(new Date(row.startDate), new Date(row.dueDate)),
+
             center: true,
         },        
         {
@@ -204,7 +202,7 @@ const OrdersList = () => {
         },    
         {
             name: "Создать задачу",
-            selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpen(row.id)}>+</Button>,
+            selector: (row, index) => <Button disabled={row.driverTasks.length >= row.carCount} variant="outlined" onClick={e => handleClickOpen(row.id)}>+</Button>,
             center: true,
             omit: localUser.identity && localUser.identity.isDispatcher
         },
@@ -258,21 +256,21 @@ const OrdersList = () => {
                             cursor: 'pointer',
                         }
                     }
-                }
+                },
+                {
+                    when: row => row.status !== 0 && row.status !== 10,
+                    style: {
+                        backgroundColor: '#ffefac',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                },
             ]
         },
         {
             name: "Дата",
             selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            }),
-            center: true,
-        },
-        {
-            name: "Дата назначения",
-            selector: (row, index) => new Date(row.dateCreated).toLocaleDateString('ru-Ru', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
@@ -324,6 +322,10 @@ const OrdersList = () => {
             },
         }
     };
+
+    const buildDates = (start, end) => {
+        return `${start.getDate()}-${end.toLocaleDateString('ru-Ru', {day: '2-digit',month: '2-digit',year: 'numeric'})}`
+    }
 
     if (loading) {
         return <div><h1>ЗАГРУЗКА...</h1></div>

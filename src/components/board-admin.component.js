@@ -35,6 +35,18 @@ export default class BoardAdmin extends Component {
                 <div className="col-md-3 pb-3">
                     <Link to="/admin/workload" className="w-100 btn btn-secondary">Задачи</Link>
                 </div>
+
+                <div className="col-md-3 pb-3">
+                    <Link to="/admin/materials" className="w-100 btn btn-secondary">Материалы</Link>
+                </div>
+
+                <div className="col-md-3 pb-3">
+                    <Link to="/admin/clients" className="w-100 btn btn-secondary">Клиенты</Link>
+                </div>
+
+                <div className="col-md-3 pb-3">
+                    <Link to="/admin/addresses" className="w-100 btn btn-secondary">Адреса</Link>
+                </div>
             </div>
         </div>
     );

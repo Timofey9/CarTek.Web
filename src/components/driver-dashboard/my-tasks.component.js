@@ -62,7 +62,7 @@ const MyTasksList = () => {
     const columns = [
         {
             name: "Тягач",
-            selector: (row, index) => <div>{row.car.plate} - {row.car.brand} {row.car.model}</div>,
+            selector: (row, index) => <div>{row.car.plate}</div>,
             center: true,
         },
         {
@@ -90,13 +90,46 @@ const MyTasksList = () => {
         },
         {
             name: "Точка А",
-            selector: (row, index) => row.locationA.name,
+            selector: (row, index) => row.locationA.textAddress,
             center: true,
+            wrap: true
         },
         {
             name: "Точка B",
-            selector: (row, index) => row.locationB.name,
+            selector: (row, index) => row.locationB.textAddress,
             center: true,
+            wrap: true
+        }
+    ];
+
+    const conditionalRowStyles = [
+        {
+            when: row => row.status === 0,
+            style: {
+                backgroundColor: '#ff726f',
+                color: 'white',
+                '&:hover': {
+                    cursor: 'pointer',
+                }
+            }
+        },
+        {
+            when: row => row.status === 10,
+            style: {
+                backgroundColor: '#d1ffbd',
+                '&:hover': {
+                    cursor: 'pointer',
+                }
+            }
+        },
+        {
+            when: row => row.status !== 0 && row.status !== 10,
+            style: {
+                backgroundColor: '#ffefac',
+                '&:hover': {
+                    cursor: 'pointer',
+                }
+            }
         }
     ];
 
@@ -149,6 +182,7 @@ const MyTasksList = () => {
             progressPending={loading}
             paginationTotalRows={totalNumber}
             customStyles={customStyles}
+            conditionalRowStyles={conditionalRowStyles}
             data={orders}
             pagination
             //expandableRows

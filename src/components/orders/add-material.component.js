@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import ApiService from "../../services/cartekApiService";
 
-function MaterialForm({ handleClose }) {
+function MaterialForm({ material, handleClose }) {
     const [name, setName] = useState("");
-
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
-
     const [loading, setLoading] = useState(true);
+    const [isMaterial, setIsMaterial] = useState(false);
+
+    useEffect(() => {
+        if (material !== undefined) {
+            setIsMaterial(true);
+            setName(material.name);
+        }
+    }, [])
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -17,7 +23,32 @@ function MaterialForm({ handleClose }) {
             name: name,
         };
 
-        ApiService.creatematerial(newMaterial)
+        if (isMaterial) {
+            newMaterial.id = material.id;
+            ApiService.updateMaterial(newMaterial)
+                .then(({ data }) => {
+                    alert(data.message);
+                }).
+                catch((error) => {
+                    setMessage(error.response.data.message);
+                });
+
+        } else {
+            ApiService.creatematerial(newMaterial)
+                .then(({ data }) => {
+                    alert(data.message);
+                }).
+                catch((error) => {
+                    setMessage(error.response.data.message);
+                });
+        }
+    }
+
+    function handleDelete(event) {
+        event.preventDefault();
+        setMessage("");
+
+        ApiService.deleteMaterial(material.id)
             .then(({ data }) => {
                 alert(data.message);
                 handleClose();
@@ -35,7 +66,7 @@ function MaterialForm({ handleClose }) {
                 </div>
             </div>
 
-            <h1 className="mt-3">Добавить материал</h1>
+            <h1 className="mt-3">Добавить тип груза</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
                     <label>Название</label>
@@ -52,12 +83,18 @@ function MaterialForm({ handleClose }) {
                 <div className="col-md-3"></div>
                 <div className="col-md-6">
                     <div className="row">
-                        <div className="col-md-2">
+                        <div className="col-md-2 m-3">
                             <button onClick={() => handleClose()} className="btn btn-warning mr-1">
                                 Отмена
                             </button>
                         </div>
-                        <div className="col-md-2">
+                        {isMaterial &&
+                            <div className="col-md-2 m-3">
+                                <button type="submit" form="profile-form" className="btn btn-danger" onClick={(e) => { handleDelete(e) }}>
+                                    Удалить
+                                </button>
+                            </div>}
+                        <div className="col-md-2 m-3">
                             <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
                                 Сохранить
                             </button>

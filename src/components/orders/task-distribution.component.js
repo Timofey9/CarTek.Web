@@ -120,6 +120,12 @@ const CarsWork = () => {
             maxWidth: '1em',
         },
         {
+            name: "Задачи",
+            selector: (row, index) => <div>{row.driverTasks.length}</div>,
+            sortable: false,
+            maxWidth: '1em',
+        },
+        {
             name: "Создать",
             selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpen(row.id)}>+</Button>,
             center: true,

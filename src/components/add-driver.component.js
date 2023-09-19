@@ -178,8 +178,8 @@ function DriverForm() {
                     <input
                         className="form-control"
                         form="profile-form"
-                        onChange={(e) => setPhone(e.target.value)}
-                        value={phone} />
+                        onChange={(e) => setLogin(e.target.value)}
+                        value={login} />
                 </div>
 
                 <div className="form-group col-md-6">
@@ -188,8 +188,8 @@ function DriverForm() {
                         type="text"
                         className="form-control"
                         form="profile-form"
-                        onChange={(e) => setLogin(e.target.value)}
-                        value={login} />
+                        onChange={(e) => setPassword(e.target.value)}
+                        value={password} />
                 </div>
 
                 {driver.car ? <div className="form-group col-md-6">
