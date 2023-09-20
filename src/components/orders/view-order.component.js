@@ -50,6 +50,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [isEdit, setIsEdit] = useState(false);
     const [drivers, setDrivers] = useState([]);
     const [localUser, setLocalUser] = useState({});
+    const [startDateChanged, setStartDateChanged] = useState(false);
+    const [applyChanges, setApplyChanges] = useState(true);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -202,36 +204,13 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             });
     }
 
-    function handleCreateDriverTasks(event) {
-        event.preventDefault();
-        setMessage("");
-        var formattedTasks = [];
-        for (var i = 0; i < tasksToCreate.length; i++) {
-            formattedTasks.push(
-                {
-                    driverId: tasksToCreate[i].driver.id,
-                    orderId: orderId,
-                    carId: tasksToCreate[i].car.id,
-                    shift: tasksToCreate[i].shift,
-                    taskDate: tasksToCreate[i].taskDate,
-                    forceChange: true
-                });
-        }
-
-        const data = {
-            orderId: orderId,
-            tasks: formattedTasks
-        };
-
-        ApiService.createDriverTasksMultiple(data)
-            .then(({ data }) => {
-                alert(data.message);
-            }).
-            catch((error) => {
-                if (error.response.data.message) {
-                    setMessage(error.response.data.message);
-                }
-            });
+    const updateStartDate = (date) => {
+        setStartDate(date);
+        let date2 = new Date(date);
+        date2.setDate(date.getDate() + 1);
+        setEndDate(date2);
+        setApplyChanges(false);
+        setStartDateChanged(true); 
     }
 
     function handleSubmit(event) {
@@ -245,7 +224,6 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             materialId: material.id,
             volume: volume,
             loadUnit: loadUnit,
-            unloadUnit: loadUnit,
             isComplete: false,
             dueDate: endDate,
             startDate: startDate,
@@ -258,15 +236,21 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             price: price
         };
 
-        ApiService.updateOrder(orderId, newOrder)
-            .then(({ data }) => {
-                alert(`Заявка обновлена`);
-            }).
-            catch((error) => {
-                if (error.response.data.message) {
-                    setMessage(error.response.data.message);
-                }
-            });
+        if (startDateChanged && !applyChanges) {
+            alert("Вы уверены, что хотите заменить дату? Нажмите \"Сохранить\" еще раз, чтобы применить изменения");
+            setApplyChanges(true);
+        }
+        else {
+            ApiService.updateOrder(orderId, newOrder)
+                .then(({ data }) => {
+                    alert(`Заявка обновлена`);
+                }).
+                catch((error) => {
+                    if (error.response.data.message) {
+                        setMessage(error.response.data.message);
+                    }
+                });
+        }
     }
 
     if (loading) {
@@ -398,7 +382,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             getOptionLabel={(option) => `${option.name}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
-                        <label>{addressA && addressA.name}: {addressA && addressA.textAddress}</label>
+                        <label>{addressA && addressA.textAddress}</label>
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -413,7 +397,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             getOptionLabel={(option) => `${option.name}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
-                        <label>{addressB && addressB.name}: {addressB && addressB.textAddress}</label>
+                        <label>{addressB && addressB.textAddress}</label>
 
                         {isEdit && <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
                             Добавить адрес
@@ -426,12 +410,12 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 <div className="form-row">
                     <div className="input-group mb-3 col-md-6 pl-1">
                         <label className="bold-label">Дата начала</label>
-                        <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
+                        <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => updateStartDate(date)} />
                     </div>
 
                     <div className="input-group mb-3 col-md-6 pl-1">
                         <label className="bold-label">Срок выполнения</label>
-                        <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
+                        <DatePicker disabled dateFormat="dd.MM.yyyy" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
                     </div>
                 </div>
 

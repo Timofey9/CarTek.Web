@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import StateRadioButtonGroup from "../radiobuttongroup";
+import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import TextField from '@mui/material/TextField';
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -14,7 +15,7 @@ function DriverTaskCarForm({carId, handleClose}) {
     const [order, setOrder] = useState({});
     const [cars, setCars] = useState([]);
     const [car, setCar] = useState({});
-    const [shift, setShift] = useState(true);
+    const [shift, setShift] = useState(0);
     const [drivers, setDrivers] = useState([]);
     const [driver, setDriver] = useState({});
     const [forceChange, setForceChange] = useState(false);
@@ -43,6 +44,10 @@ function DriverTaskCarForm({carId, handleClose}) {
         setLoading(false);
     }, []);
 
+    const handleShiftChange = (event) => {
+        setShift(event.target.value);
+    };
+
     useEffect(() => {
         setLoading(true);
         let req = {
@@ -60,42 +65,6 @@ function DriverTaskCarForm({carId, handleClose}) {
 
         setLoading(false);
     }, []);
-
-    //useEffect(() => {
-    //    setLoading(true);
-
-    //    if (carPlate) {
-    //        ApiService.getOrderById(orderId)
-    //            .then(({ data }) => {
-    //                setOrder(data);
-    //            }).
-    //            catch((error) => {
-    //                if (error.response.data.message) {
-    //                    setMessage(error.response.data.message);
-    //                }
-    //            });
-    //    }
-    //    setLoading(false);
-    //}, []);
-
-    //function deleteOrder(event) {
-    //    event.preventDefault();
-    //    if (!notificationShown) {
-    //        setMessage("Удаление атвомобиля приведет к удалению всех связанных с ним осмотров! Чтобы продолжить нажмите \"Удалить\" еще раз");
-    //        setNotificationShown(true);
-    //    } else {
-    //        ApiService.deleteCar(car.id)
-    //            .then(({ data }) => {
-    //                setLoading(false);
-    //                alert("Тягач удален");
-    //                navigate("/admin/cars/");
-    //            })
-    //            .catch((error) => {
-    //                setMessage(error.response.data);
-    //                setLoading(false);
-    //            })
-    //    }
-    //}
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -155,12 +124,12 @@ function DriverTaskCarForm({carId, handleClose}) {
                         disablePortal
                         onChange={(e, newvalue) => { setOrder(newvalue) }}
                         sx={{ width: 300 }}
-                        getOptionLabel={(option) => `${option.id} ${option.clientName}`}
+                        getOptionLabel={(option) => `от ${new Date(option.startDate).toLocaleDateString('ru-Ru', { day: '2-digit', month: '2-digit', year: 'numeric' })} для ${option.service === '0' ? option.clientName : option.gp.clientName}`}
                         renderInput={(params) => <TextField {...params} label="Список заявок" />} />
                 </div>
 
                 <div className="form-group col-md-6">
-                    <StateRadioButtonGroup type={"Смена"} id={"shift"} isActive={shift} option1="Дневная (08:00 - 20:00)" option2="Ночная (20:00 - 08:00)" onChange={(event) => setShift(event.target.value === 'true' ? true : false)} />
+                    <ShiftRadioButtonGroup value={shift} onChange={handleShiftChange} />
                 </div>
 
                 <div className="col-md-6">

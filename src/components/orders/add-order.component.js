@@ -4,7 +4,7 @@ import ApiService from "../../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import DatePicker, { registerLocale } from "react-datepicker";
-import StateRadioButtonGroup from "../radiobuttongroup";
+import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -255,7 +255,7 @@ function OrderForm({ handleCloseOrderForm }) {
                     alert(`Заявка создана, номер: ${data.message}`);
                     let array = [];
                     for (let i = 0; i < carCount; i++) {
-                        array.push({ car: {}, driver: {}, taskDate: new Date(), shift: false });
+                        array.push({ car: {}, driver: {}, taskDate: new Date(), shift: 0 });
                     }
                     setOrderId(data.message);
                     setIsOrderCreated(true);
@@ -527,8 +527,7 @@ function OrderForm({ handleCloseOrderForm }) {
                                     </div>
 
                                     <div key={"shift" + index} className="col-md-6">
-                                        <StateRadioButtonGroup id={"shift" + index} type={"Смена"} isActive={task.shift} option1="Дневная (08:00-20:00)" option2="Ночная (20:00 - 08:00)" onChange={(event) => {
-                                            task.shift = event.target.value === 'true' ? true : false; setReload(reload + 1);
+                                        <ShiftRadioButtonGroup value={task.shift} onChange={(event) => {task.shift = event.target.value; setReload(reload + 1);
                                         }} />
                                     </div>
                                 </div>

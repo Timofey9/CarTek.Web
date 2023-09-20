@@ -65,6 +65,19 @@ const DriverEditTask = () => {
         }
     }
 
+    const intToShift = (shift) => {
+        switch (shift) {
+            case 0:
+                return "Дневная (08:00 - 20:00)";
+            case 1:
+                return "Ночная (20:00 - 08:00)";
+            case 2:
+                return "Сутки";
+            case 3:
+                return "Сутки (не ограничено)";
+        }
+    } 
+
     const selectFile = (e) => {
         formData.delete("Files");
 
@@ -260,7 +273,7 @@ const DriverEditTask = () => {
                     })}</dd>
 
                     <dt className="col-sm-3">Смена: </dt>
-                    <dd className="col-sm-9">{driverTask.shift === 0 ? "Дневная (08:00 - 20:00)" : "Ночная (20:00 - 08:00)"}</dd>
+                    <dd className="col-sm-9">{intToShift(driverTask.shift)}</dd>
 
                     <dt className="col-sm-3">Точка А: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.name}</a></dd>

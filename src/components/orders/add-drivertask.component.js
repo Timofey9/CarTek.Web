@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import StateRadioButtonGroup from "../radiobuttongroup";
+import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import TextField from '@mui/material/TextField';
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -13,7 +14,7 @@ function DriverTaskForm({orderId, handleClose}) {
     const [order, setOrder] = useState({});
     const [cars, setCars] = useState([]);
     const [car, setCar] = useState({});
-    const [shift, setShift] = useState(true);
+    const [shift, setShift] = useState(0);
     const [drivers, setDrivers] = useState([]);
     const [driver, setDriver] = useState({});
     const [forceChange, setForceChange] = useState(false);
@@ -28,7 +29,9 @@ function DriverTaskForm({orderId, handleClose}) {
     const [loading, setLoading] = useState(true);
     const [notificationShown, setNotificationShown] = useState(false);
 
-    const navigate = useNavigate();
+    const handleShiftChange = (event) => {
+        setShift(event.target.value);
+    };
 
     useEffect(() => {
         setLoading(true);
@@ -66,7 +69,7 @@ function DriverTaskForm({orderId, handleClose}) {
 
         const newTask = {
             orderId: orderId,
-            shift: shift ? 0 : 1,
+            shift: shift,
             driverId: driver.id,
             carId: car.id,
             taskDate: startDate,
@@ -124,7 +127,7 @@ function DriverTaskForm({orderId, handleClose}) {
                 </div>
 
                 <div className="form-group col-md-6">
-                    <StateRadioButtonGroup type={"Смена"} id={"shift"} isActive={shift} option1="Дневная (08:00 - 20:00)" option2="Ночная (20:00 - 08:00)" onChange={(event) => setShift(event.target.value === 'true' ? true : false)} />
+                    <ShiftRadioButtonGroup value={shift} onChange={handleShiftChange}></ShiftRadioButtonGroup>
                 </div>
 
                 <div className="col-md-6">

@@ -47,7 +47,6 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     setNotes(data.notes);
                     setStatuses(constStatuses);
                     setAdminComment(data.adminComment);
-                    console.log(data);
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -83,6 +82,19 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         }
         setLoading(false);
     }, []);
+
+    const intToShift = (shift) => {
+        switch (shift) {
+            case 0:
+                return "Дневная (08:00 - 20:00)";
+            case 1:
+                return "Ночная (20:00 - 08:00)";
+            case 2:
+                return "Сутки";
+            case 3:
+                return "Сутки (не ограничено)";
+        }
+    } 
 
     function deleteTask() {
         ApiService.deleteTask(driverTaskId)
@@ -145,8 +157,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                 ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success">Сохранить</button>
                                 : <button onClick={() => setIsEdit(true)} className="btn btn-warning">Редактировать</button>
                             }
-                        </div>
-                        
+                        </div>                        
                     }
                 </div>
 
@@ -198,7 +209,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     })}</dd>
 
                     <dt className="col-sm-3">Смена: </dt>
-                    <dd className="col-sm-9">{driverTask.shift === 0 ? "Дневная (08:00 - 20:00)" : "Ночная (20:00 - 08:00)"}</dd>
+                    <dd className="col-sm-9">{intToShift(driverTask.shift)}</dd>
 
                     <dt className="col-sm-3">Точка А: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.textAddress}</a></dd>

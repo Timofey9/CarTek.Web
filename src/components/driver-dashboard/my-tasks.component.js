@@ -27,6 +27,19 @@ const MyTasksList = () => {
         setReload(reload + 1);
     }
 
+    const intToShift = (shift) => {
+        switch (shift) {
+            case 0:
+                return "Дневная (08:00 - 20:00)";
+            case 1:
+                return "Ночная (20:00 - 08:00)";
+            case 2:
+                return "Сутки";
+            case 3:
+                return "Сутки (не ограничено)";
+        }
+    } 
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -85,7 +98,7 @@ const MyTasksList = () => {
         },
         {
             name: "Смена",
-            selector: (row, index) => row.shift === 0 ? "Дневная (08:00-20:00)" : "Ночная (20:00 - 08:00)",
+            selector: (row, index) => intToShift(row.shift),
             center: true,
         },
         {
