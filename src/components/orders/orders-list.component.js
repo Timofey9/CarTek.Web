@@ -82,6 +82,12 @@ const OrdersList = () => {
     };
 
 
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
+
     const intToShift = (shift) => {
         switch (shift) {
             case 0:
@@ -288,11 +294,7 @@ const OrdersList = () => {
         },
         {
             name: "Дата",
-            selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            }),
+            selector: (row, index) => buildDates(new Date(row.startDate), addDays(new Date(row.startDate), 1)),
             center: true,
         },
         {
@@ -340,6 +342,7 @@ const OrdersList = () => {
             },
         }
     };
+
 
     const buildDates = (start, end) => {
         return `${start.getDate()}-${end.toLocaleDateString('ru-Ru', {day: '2-digit',month: '2-digit',year: 'numeric'})}`

@@ -46,7 +46,7 @@ const DriverEditTask = () => {
     const [hasSubTask, setHasSubTask] = useState(false); 
     const [continueWork, setContinueWork] = useState(false);
 
-    const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
     const navigate = useNavigate();
 
@@ -205,20 +205,22 @@ const DriverEditTask = () => {
             case 1:
                 return "Выехать на линию";
             case 2:
-                return "К выписке документов";
+                return "Прибыл на склад загрузки";
             case 3:
-                return "Выписать документы (Погрузился)";
+                return "К выписке документов";
             case 4:
-                return "Выехал со склада";
+                return "Выписать документы(Погрузился)";
             case 5:
-                return "Прибыл на объект выгрузки";
+                return "Выехал со склада";
             case 6:
-                return "Загрузить документы";
+                return "Прибыл на объект выгрузки";
             case 7:
                 return "Выгрузка";
             case 8:
-                return "К выписке документов";
+                return "Выгрузка";
             case 9:
+                return "Выписка документов";
+            case 10:
                 return "Завершить";
             default:
                 return "Отправить";
@@ -234,6 +236,7 @@ const DriverEditTask = () => {
                     setDriver(data.driver);
                     setOrder(data.order);
                     setStatus(data.status);
+                    data.notes.unshift({ status: 0, dateCreated: new Date(data.dateCreated), s3Links: [] });
                     setNotes(data.notes);
                     setCar(data.car);
 
@@ -306,7 +309,7 @@ const DriverEditTask = () => {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
-                    })}{currentSubTask &&
+                    })}{hasSubTask &&
                         <span>,рейс #{currentSubTask.sequenceNumber + 1}</span>}
                     </h1>                    
                 </div>
@@ -321,8 +324,8 @@ const DriverEditTask = () => {
                     <dt className="col-sm-3">Материал: </dt>
                     <dd className="col-sm-9">{order.material && order.material.name}</dd>
 
-                    <dt className="col-sm-3">Количество: </dt>
-                    <dd className="col-sm-9">{driverTask.volume} {unitToString(driverTask.unit)}</dd>
+                    {/*<dt className="col-sm-3">Количество: </dt>*/}
+                    {/*<dd className="col-sm-9">{driverTask.volume} {unitToString(driverTask.unit)}</dd>*/}
 
                     <dt className="col-sm-3">Дата: </dt>
                     <dd className="col-sm-9">{new Date(driverTask.startDate).toLocaleDateString('ru-Ru', {
@@ -335,10 +338,10 @@ const DriverEditTask = () => {
                     <dd className="col-sm-9">{intToShift(driverTask.shift)}</dd>
 
                     <dt className="col-sm-3">Точка А: </dt>
-                    <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.name}</a></dd>
+                    <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.textAddress}</a></dd>
 
                     <dt className="col-sm-3">Точка Б: </dt>
-                    <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.name}</a></dd>
+                    <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
@@ -510,7 +513,7 @@ const DriverEditTask = () => {
                         </div>
                     </div>}
                 <div>
-                    {status === 9 && 
+                    {status === 10 && 
                         <div className="row mt-3 mb-3">
                             <div className="col-md-9">
                                 <div className="alert alert-danger" role="alert">
@@ -529,7 +532,6 @@ const DriverEditTask = () => {
                                     return (
                                         <Step key={label} {...stepProps} expanded={true}>
                                             <StepLabel {...labelProps}>{label}</StepLabel>
-
                                             <StepContent>
                                                 {notes.filter((n) => n.status === index).map((note, noteindex) => {
                                                     let showLinks = false;
@@ -578,7 +580,7 @@ const DriverEditTask = () => {
                     </div>
                 </div>
 
-                {status === 10 && driverTask.shift === 3 && 
+                {status === 11 && driverTask.shift === 3 && 
                     <>
                         <div className="row">
                             <div className="col-md-12">

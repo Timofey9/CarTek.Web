@@ -42,9 +42,6 @@ const CarsWork = () => {
             dense='true'
             progressPending={loading}
             data={data.driverTasks}
-            onRowClicked={(row, event) => {
-                navigate(`/admin/drivertask/${row.id}`);
-            }}
         /></pre>;
 
     const handleClickOpen = (carId) => {
@@ -96,7 +93,7 @@ const CarsWork = () => {
         }
 
         ApiService.getCarsWithTasks({
-            startDate: startDate.toUTCString(),
+            startDate: startDate.toISOString(),
         }).then(({ data }) => {
             setCars(data);
         });
@@ -197,6 +194,15 @@ const CarsWork = () => {
                     when: row => row.status === 10,
                     style: {
                         backgroundColor: '#d1ffbd',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                },
+                {
+                    when: row => row.status !== 0 && row.status !== 10,
+                    style: {
+                        backgroundColor: '#ffefac',
                         '&:hover': {
                             cursor: 'pointer',
                         }

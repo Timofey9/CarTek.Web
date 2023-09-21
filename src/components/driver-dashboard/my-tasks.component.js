@@ -97,13 +97,13 @@ const MyTasksList = () => {
         },
         {
             name: "Точка А",
-            selector: (row, index) => row.locationA.textAddress,
+            selector: (row, index) => row.locationA && row.locationA.textAddress,
             center: true,
             wrap: true
         },
         {
             name: "Точка B",
-            selector: (row, index) => row.locationB.textAddress,
+            selector: (row, index) => row.locationB && row.locationB.textAddress,
             center: true,
             wrap: true
         }
