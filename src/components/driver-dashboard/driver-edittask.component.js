@@ -42,9 +42,9 @@ const DriverEditTask = () => {
     const [pickupArrivalTime, setPickupArrivalTime] = useState("");
     const [pickupDepartureDate, setPickupDepartureDate] = useState(new Date());
     const [pickupDepartureTime, setPickupDepartureTime] = useState("");
-    const [dropoffArrivalDate, setDropoffArrivalDate] = useState(new Date());
-    const [dropoffArrivalTime, setDropoffArrivalTime] = useState("");
-    const [dropoffDepartureTime, setDropoffDepartureTime] = useState("");
+    const [currentSubTask, setCurrentSubTask] = useState({});
+    const [hasSubTask, setHasSubTask] = useState(false); 
+    const [continueWork, setContinueWork] = useState(false);
 
     const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
@@ -86,12 +86,37 @@ const DriverEditTask = () => {
         }
     };
 
+    const createSubTask = () => {
+        var data = {
+            driverTaskId: driverTaskId
+        }
+
+        ApiService.createSubTask(data)
+            .then(({ data }) => {
+                alert("Подзадача добавлена");
+                setReload(reload + 1);
+                setContinueWork(true);
+            })
+            .catch((error) => {
+                if (error.response.data.message) {
+                    setError(error.response.data.message);
+                }
+            });
+    }
+
     const handleSubmit = () => {
-        formData.append("DriverTaskId", driverTask.id);
+        formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
 
         if (status === 4) {
+
+            if (hasSubTask) {
+                formData.set("DriverTaskId", driverTask.id);
+                formData.append("IsSubtask", true);
+                formData.append("SubTaskId", currentSubTask.id);
+            }
+
             formData.append("Number", tnNumber);
             formData.append("GoId", go.id);
             formData.append("GpId", gp.id);
@@ -106,17 +131,24 @@ const DriverEditTask = () => {
             ApiService.startTn(formData)
                 .then(({ data }) => {
                     alert("Статус обновлен");
+                    setReload(reload + 1);
+                    setFormData(new FormData());
                 })
                 .catch((error) => {
                     if (error.response.data.message) {
                         setError(error.response.data.message);
                     }
                 });
-
             return;
         }
 
         if (status === 9) {
+
+            if (hasSubTask) {
+                formData.append("IsSubtask", true);
+                formData.append("SubTaskId", currentSubTask.id);
+            }
+
             formData.append("UnloadVolume", loadVolume);
             formData.append("LocationBId", addressB.id);
             formData.append("DropOffArrivalDate", pickupArrivalDate.toUTCString());
@@ -127,6 +159,8 @@ const DriverEditTask = () => {
             ApiService.finalizeTn(formData)
                 .then(({ data }) => {
                     alert("Статус обновлен");
+                    setFormData(new FormData());
+                    setReload(reload + 1);
                 })
                 .catch((error) => {
                     if (error.response.data.message) {
@@ -137,17 +171,31 @@ const DriverEditTask = () => {
             return;
         }
 
-        console.log("Не должно");
-
-        ApiService.EditDriverTaskAsync(formData)
-            .then(({ data }) => {
-                alert("Статус обновлен");
-            })
-            .catch((error) => {
-                if (error.response.data.message) {
-                    setError(error.response.data.message);
-                }
-            });
+        if (hasSubTask) {
+            ApiService.EditDriverSubTaskAsync(formData)
+                .then(({ data }) => {
+                    alert("Статус обновлен");
+                    setFormData(new FormData());
+                    setReload(reload + 1);
+                })
+                .catch((error) => {
+                    if (error.response.data.message) {
+                        setError(error.response.data.message);
+                    }
+                });
+        } else {
+            ApiService.EditDriverTaskAsync(formData)
+                .then(({ data }) => {
+                    alert("Статус обновлен");
+                    setFormData(new FormData());
+                    setReload(reload + 1);
+                })
+                .catch((error) => {
+                    if (error.response.data.message) {
+                        setError(error.response.data.message);
+                    }
+                });
+        }
     };
 
     const statusToButtonTxt = (status) => {
@@ -188,13 +236,22 @@ const DriverEditTask = () => {
                     setStatus(data.status);
                     setNotes(data.notes);
                     setCar(data.car);
+
+                    if (data.subTasks && data.subTasks.length > 0) {
+                        let subTask = data.subTasks.reduce((max, task) => max.sequenceNumber > task.sequenceNumber ? max : task);
+                        setCurrentSubTask(subTask);
+                        setHasSubTask(true);
+                        setNotes(subTask.notes);
+                        setStatus(subTask.status);
+                    }
+
                 }).
                 catch((error) => {
                     setError(error.response.data);
                 });
         }
         setLoading(false);
-    }, []);
+    }, [reload]);
 
     useEffect(() => {
         setLoading(true);
@@ -208,7 +265,7 @@ const DriverEditTask = () => {
                 }
             });
         setLoading(false);
-    }, []);
+    }, [reload]);
 
     useEffect(() => {
         setLoading(true);
@@ -249,7 +306,9 @@ const DriverEditTask = () => {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
-                    })}</h1>
+                    })}{currentSubTask &&
+                        <span>,рейс #{currentSubTask.sequenceNumber + 1}</span>}
+                    </h1>                    
                 </div>
 
                 <dl className="row">
@@ -362,7 +421,7 @@ const DriverEditTask = () => {
                                 disablePortal
                                 onChange={(e, newvalue) => { setAddressA(newvalue) }}
                                 sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.name}`}
+                                getOptionLabel={(option) => `${option.textAddress}`}
                                 renderInput={(params) => <TextField {...params} label="Список адресов" />} />
                         </div>
 
@@ -416,7 +475,7 @@ const DriverEditTask = () => {
                                 disablePortal
                                 onChange={(e, newvalue) => { setAddressB(newvalue) }}
                                 sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.name}`}
+                                getOptionLabel={(option) => `${option.textAddress}`}
                                 renderInput={(params) => <TextField {...params} label="Список адресов" />} />
                         </div>
 
@@ -450,6 +509,16 @@ const DriverEditTask = () => {
                                 value={pickupDepartureTime} />
                         </div>
                     </div>}
+                <div>
+                    {status === 9 && 
+                        <div className="row mt-3 mb-3">
+                            <div className="col-md-9">
+                                <div className="alert alert-danger" role="alert">
+                                    ПРИКРЕПИТЬ ФОТО ТН!
+                                </div>
+                            </div>
+                        </div>}
+                </div>
                 <div className="row">
                     <div className="col-md-3">
                         <Box sx={{ width: '100%' }}>
@@ -508,6 +577,25 @@ const DriverEditTask = () => {
                         </div>
                     </div>
                 </div>
+
+                {status === 10 && driverTask.shift === 3 && 
+                    <>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="alert alert-primary" role="alert">
+                                    Продолжить работу?
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row mt-3">
+                                <div className="col-md-12">
+                            <button type="submit" onClick={createSubTask} className="btn btn-success mt-3">
+                                        Продолжить
+                                    </button>
+                                </div>
+                        </div>
+                    </>
+                }
             </>
         )}
     </div>

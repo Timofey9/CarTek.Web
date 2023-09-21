@@ -2,8 +2,8 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-const API_URL = "https://localhost:32768/api/";
-//const API_URL = "https://api-cartek.ru/api/";
+//const API_URL = "https://localhost:32768/api/";
+const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
 
@@ -106,8 +106,17 @@ class ApiService {
         return this.delete(`order/deletetask/${id}`);
     }
 
+    createSubTask(data) {
+        return this.post(`order/createsubtask`, data);
+    }
+
     async EditDriverTaskAsync(data) {
         var res = await this.post(`drivers/updatedrivertask`, data, { 'Content-Type': 'multipart/form-data' });
+        return await res;
+    }
+
+    async EditDriverSubTaskAsync(data) {
+        var res = await this.post(`drivers/updatesubtask`, data, { 'Content-Type': 'multipart/form-data' });
         return await res;
     }
 

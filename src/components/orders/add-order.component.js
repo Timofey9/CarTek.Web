@@ -231,7 +231,7 @@ function OrderForm({ handleCloseOrderForm }) {
 
         const newOrder = {
             name: orderName,
-            clientName: client.clientName,
+            clientName: serviceType === "0" ? client.clientName : gp.clientName,
             gpId: gp.id,
             clientId: client.id,
             materialId: material.id,
@@ -425,7 +425,6 @@ function OrderForm({ handleCloseOrderForm }) {
                         <input
                             type="text"
                             className="form-control"
-                            form="profile-form"
                             onChange={(e) => setNote(e.target.value)}
                             value={note} />
                     </div>

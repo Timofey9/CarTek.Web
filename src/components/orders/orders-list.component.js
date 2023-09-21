@@ -22,9 +22,9 @@ const rowPreDisabled = row => row.driverTasks < 1;
 const OrdersList = () => {
     let cancelled = false;
     const [loading, setLoading] = useState(true);
-    const [searchBy, setSearchBy] = useState("name");
-    const [sortBy, setSortBy] = useState("");
+    const [searchBy, setSearchBy] = useState("clientName");
     const [searchString, setSearchString] = useState("");
+    const [sortBy, setSortBy] = useState("");
     const [dir, setDir] = useState("desc");
     const [totalNumber, setTotalNumber] = useState(0);
     const [pageSize, setPageSize] = useState(15);
@@ -153,7 +153,6 @@ const OrdersList = () => {
             startDate: startDate.toUTCString(),
             endDate: endDate.toUTCString()
         }).then(({ data }) => {
-            console.log(data);
             const { totalNumber, list } = data;
             setTotalNumber(totalNumber);
             setOrders(list);
@@ -161,7 +160,7 @@ const OrdersList = () => {
 
         setLoading(false);
 
-    }, [sortBy, dir, pageSize, pageNumber, reload]);
+    }, [sortBy, dir, pageSize, pageNumber, searchBy, searchString, reload]);
 
     const conditionalRowStyles = [
         {
@@ -193,6 +192,11 @@ const OrdersList = () => {
             center: true,
         },    
         {
+            name: "Услуга",
+            selector: (row, index) => <div>{row.service === 0 ? "Перевозка" : "Поставка"}</div>,
+            center: true,
+        },    
+        {
             name: "Заказчик",
             selector: (row, index) => <div>{row.service === '0' ? row.clientName : row.gp.clientName}</div>,
             center: true,
@@ -212,6 +216,7 @@ const OrdersList = () => {
             name: "Задач",
             selector: (row, index) => <div>{row.driverTasks.length}/{row.carCount}</div>,
             center: true,
+            compact: true
         },    
         {
             name: "Создать задачу",
@@ -368,6 +373,25 @@ const OrdersList = () => {
                         <Button variant="contained" color="success" onClick={() => handleClickOpenOrder()} className="pull-right mb-2">Создать заявку</Button>
                     </div>
                 }
+            </div>
+
+            <div className="row">
+                <div className="col-md-7">
+                    <div className="input-group mt-3">
+                        <div className="mb-3 col-md-4 pl-1">
+                            <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
+                                <option value="clientName">Заказчик</option>
+                                <option value="material">Тип груза</option>
+                            </select>
+                        </div>
+                        <div className="mb-3 col-md-4 pl-1">
+                            <input className="form-control" type="text" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />
+                        </div>
+                        {/*<div className="input-group-append">*/}
+                        {/*    <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>*/}
+                        {/*</div>*/}
+                    </div>
+                </div>
             </div>
         </form>
 

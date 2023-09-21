@@ -108,7 +108,7 @@ const CarsList = () => {
             <div className="row">
                 <div className="form-group col-md-7">
                     <div className="row pl-3">
-                        <label htmlFor="staticEmail" className="col-md-3 mr-1">Поиск:</label>
+                        <label className="col-md-3 mr-1">Поиск:</label>
                         <select className="col-md-9" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
                             <option value="plate">Номер</option>
                             <option value="model">Модель</option>

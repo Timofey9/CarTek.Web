@@ -9,6 +9,11 @@ import StepContent from '@mui/material/StepContent';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ru from 'date-fns/locale/ru';
+registerLocale('ru', ru);
 
 const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [driver, setDriver] = useState({});
@@ -23,8 +28,11 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [activeStep, setActiveStep] = useState(0);
     const [notes, setNotes] = useState([]);
     const [adminComment, setAdminComment] = useState("");
+    const [subTasks, setSubTasks] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [localUser, setLocalUser] = useState({});
+    const [shift, setShift] = useState(0);
+    const [startDate, setStartDate] = useState(new Date());
 
     const constStatuses = ['Назначена', 'Принята', 'Выезд на линию', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
@@ -47,6 +55,9 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     setNotes(data.notes);
                     setStatuses(constStatuses);
                     setAdminComment(data.adminComment);
+                    setSubTasks(data.subTasks);
+                    setShift(data.shift);
+                    setStartDate(new Date(data.startDate));
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -109,6 +120,10 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
             });
     }
 
+    const handleShiftChange = (event) => {
+        setShift(event.target.value);
+    };
+
     const unitToString = (unit) => {
         switch (unit) {
             case 0:
@@ -128,7 +143,9 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
             "TaskId" : driverTask.id,
             "DriverId" : driver.id,
             "CarId": car.id,
-            "AdminComment": adminComment
+            "AdminComment": adminComment,
+            startDate: startDate,
+            shift: shift
         };
 
         ApiService.AdminEditDriverTaskAsync(data)
@@ -202,14 +219,16 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     <dd className="col-sm-9">{driverTask.volume} {unitToString(driverTask.unit)}</dd>
 
                     <dt className="col-sm-3">Дата: </dt>
-                    <dd className="col-sm-9">{new Date(driverTask.startDate).toLocaleDateString('ru-Ru', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                    })}</dd>
+                    <dd className="col-sm-9">
+                        <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
+                    </dd>
 
                     <dt className="col-sm-3">Смена: </dt>
-                    <dd className="col-sm-9">{intToShift(driverTask.shift)}</dd>
+                    <dd className="col-sm-9">{
+                        isEdit ? <div className="form-group col-md-6">
+                            <ShiftRadioButtonGroup value={shift} onChange={handleShiftChange}></ShiftRadioButtonGroup>
+                        </div> : <span>{intToShift(driverTask.shift)}</span>}                        
+                    </dd>
 
                     <dt className="col-sm-3">Точка А: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.textAddress}</a></dd>
@@ -232,7 +251,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                 </dl>
 
                 <div className="row">
-                    <div className="col-md-12">
+                    <div className="col-md-2">
                         <Box sx={{ width: '100%' }}>
                             <Stepper orientation="vertical" activeStep={activeStep}>
                                 {constStatuses.map((label, index) => {
@@ -242,7 +261,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                         <Step key={label} {...stepProps} expanded={true}>
                                             <StepLabel {...labelProps}>{label}</StepLabel>
                                             <StepContent>
-                                                {notes.filter((n) => n.status === index).map((note, noteindex) => {
+                                                {notes.filter((n) => n.status+1 === index).map((note, noteindex) => {
                                                     let showLinks = false;
                                                     let links;
                                                     if (note.s3Links.length > 0) {
@@ -267,6 +286,42 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                             </Stepper>
                         </Box>
                     </div>
+                    {subTasks.map((task, taskIndex) => {
+                        return (
+                            <div className="col-md-2">
+                                <label>Рейс #{task.sequenceNumber}</label>
+                                <Stepper orientation="vertical" activeStep={task.status}>
+                                    {constStatuses.map((label, index) => {
+                                        const stepProps = {};
+                                        const labelProps = {};
+                                        return (
+                                            <Step key={label} {...stepProps} expanded={true}>
+                                                <StepLabel {...labelProps}>{label}</StepLabel>
+                                                <StepContent>
+                                                    {task.notes.filter((n) => n.status+1 === index).map((note, noteindex) => {
+                                                        let showLinks = false;
+                                                        let links;
+                                                        if (note.s3Links.length > 0) {
+                                                            links = JSON.parse(note.s3Links);
+                                                            showLinks = true
+                                                        }
+                                                        return (
+                                                            <div>
+                                                                <div>{new Date(note.dateCreated).toLocaleString('ru-Ru')}</div>
+                                                                <Typography>{note.text}</Typography>
+                                                                {showLinks && links.map((link, linkindex) => {
+                                                                    const fullLink = "https://storage.yandexcloud.net/" + link;
+                                                                    return (<div><a target="_blank" href={fullLink}>Изображение {linkindex}</a></div>);
+                                                                })}
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </StepContent>
+                                            </Step>
+                                        );
+                                    })}
+                                </Stepper></div>)
+                    })}
                 </div>
             </>
         )}

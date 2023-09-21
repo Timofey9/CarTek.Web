@@ -6,6 +6,10 @@
     margin-right: 5px;
 }
 
+.ml-3{
+    margin-left: 0.8em;
+}
+
 .not-valid-input-border {
     border: solid 2px red;
     border-radius: 3px;

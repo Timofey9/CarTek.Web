@@ -20,8 +20,10 @@ const MyTasksList = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const [orders, setOrders] = useState([]);
     const [reload, setReload] = useState(0);
-    const [startDate, setStartDate] = useState();
-    const [endDate, setEndDate] = useState();
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const [searchBy, setSearchBy] = useState("clientName");
+    const [searchString, setSearchString] = useState("");
 
     const search = () => {
         setReload(reload + 1);
@@ -50,6 +52,8 @@ const MyTasksList = () => {
             driverId: user.identity.id,
             pageSize: pageSize,
             pageNumber: pageNumber,
+            searchBy: searchBy,
+            searchString: searchString
         }
 
         if (startDate) {
@@ -63,14 +67,13 @@ const MyTasksList = () => {
         ApiService.getDriverTasks(request).then(({ data }) => {
             const { totalNumber, list } = data;
 
-            console.log(data);
             setTotalNumber(totalNumber);
             setOrders(list);
         });
 
         setLoading(false);
 
-    }, [sortBy, dir, pageSize, pageNumber, reload]);
+    }, [sortBy, dir, pageSize, pageNumber, searchBy, searchString, reload]);
 
     const columns = [
         {
@@ -79,16 +82,7 @@ const MyTasksList = () => {
             center: true,
         },
         {
-            name: "Дата назначения",
-            selector: (row, index) => new Date(row.dateCreated).toLocaleDateString('ru-Ru', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            }),
-            center: true,
-        },
-        {
-            name: "Дата выполнения",
+            name: "Дата",
             selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
                 day: '2-digit',
                 month: '2-digit',
@@ -170,13 +164,29 @@ const MyTasksList = () => {
                 <div className="col-md-7">
                     <div className="input-group mt-3">
                         <div className="mb-3 col-md-4 pl-1">
-                            <DatePicker className="form-control" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
+                            <DatePicker className="form-control" dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
                         </div>
                         <div className="mb-3 col-md-4 pl-1">
-                            <DatePicker className="form-control" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
+                            <DatePicker className="form-control" dateFormat="dd.MM.yyyy" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
                         </div>
                         <div className="input-group-append">
                             <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col-md-7">
+                    <div className="input-group mt-3">
+                        <div className="mb-3 col-md-4 pl-1">
+                            <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
+                                <option value="clientName">Заказчик</option>
+                                <option value="material">Тип груза</option>
+                            </select>
+                        </div>
+                        <div className="mb-3 col-md-4 pl-1">
+                            <input className="form-control" type="text" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />
                         </div>
                     </div>
                 </div>
