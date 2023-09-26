@@ -105,7 +105,9 @@ const DriverEditTask = () => {
     }
 
     const handleSubmit = () => {
-        formData = new FormData();
+        for (var key of formData.keys()) {
+            formData.delete(key)
+        };
 
         formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
         formData.append("UpdatedStatus", status + 1);
