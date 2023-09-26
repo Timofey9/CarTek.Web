@@ -11,6 +11,11 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import DatePicker, { registerLocale } from "react-datepicker";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import ViewTn from "./view-tn";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
@@ -33,8 +38,20 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [localUser, setLocalUser] = useState({});
     const [shift, setShift] = useState(0);
     const [startDate, setStartDate] = useState(new Date());
+    const [selectedDriverId, setSelectedDriverId] = useState(0);
+    const [open, setOpen] = useState(false);
+    const [reload, setReload] = useState(false);
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setReload(reload + 1);
+    };
 
     useEffect(() => {
         setLoading(true);
@@ -170,6 +187,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     {localUser.identity && !localUser.identity.isDispatcher &&
                         <div className="col-md-6">
                             <button onClick={() => deleteTask()} className="btn btn-danger mr-10">Удалить</button>
+                            <button onClick={() => handleClickOpen()} className="btn btn-success mr-10">ТН</button>
                             {isEdit
                                 ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success">Сохранить</button>
                                 : <button onClick={() => setIsEdit(true)} className="btn btn-warning">Редактировать</button>
@@ -184,22 +202,22 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
 
                     <dt className="col-sm-3">Водитель: </dt>
                     <dd className="col-sm-9">
-                        {isEdit ?
+                        {isEdit &&
                             <Autocomplete
+                                {...drivers}
                                 disablePortal
                                 onChange={(e, newvalue) => setDriver(newvalue)}
                                 id="combo-box-demo"
-                                options={drivers}
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.fullName}`}
-                                renderInput={(params) => <TextField {...params} label="Выберите водителя" />} />
-                            :
-                            <span>{driver.fullName}</span>}
+                                renderInput={(params) => <TextField {...params} label="Выберите водителя" />} />}
+                            
+                            <span>{driver.fullName}</span>
                     </dd>
 
                     <dt className="col-sm-3">Тягач: </dt>
                     <dd className="col-sm-9">
-                        {isEdit ?
+                        {isEdit &&
                             <Autocomplete
                                 disablePortal
                                 onChange={(e, newvalue) => setCar(newvalue)}
@@ -208,9 +226,9 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.brand}:${option.plate}`}
                                 renderInput={(params) => <TextField {...params} label="Выберите тягач" />}
-                            />
-                            :
-                            <span>{car.plate}</span>}</dd>
+                            />}                            
+                        <span>{car.plate}</span>
+                    </dd>
 
                     <dt className="col-sm-3">Материал: </dt>
                     <dd className="col-sm-9">{order.material && order.material.name}</dd>
@@ -230,10 +248,10 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                         </div> : <span>{intToShift(driverTask.shift)}</span>}                        
                     </dd>
 
-                    <dt className="col-sm-3">Точка А: </dt>
+                    <dt className="col-sm-3">Место погрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.textAddress}</a></dd>
 
-                    <dt className="col-sm-3">Точка Б: </dt>
+                    <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
             
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
@@ -325,6 +343,20 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                 </div>
             </>
         )}
+
+        <Dialog
+            fullScreen
+            open={open}
+            onClose={handleClose}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="outlined">
+                    <Button autoFocus color="inherit" onClick={handleClose}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <ViewTn driverTaskId={driverTaskId} handleClose={handleClose}></ViewTn>
+        </Dialog>
     </div>
 };
 

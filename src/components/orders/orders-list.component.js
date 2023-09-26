@@ -40,7 +40,8 @@ const OrdersList = () => {
     const [selectedOrderId, setSelectedOrderId] = useState(0);
     const [selectedTaskId, setSelectedTaskId] = useState(0);
     const [localUser, setLocalUser] = useState({});
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'На складе загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'На объекте выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
+
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const handleClickOpen = (orderId) => {
         setOpen(true);
@@ -204,7 +205,7 @@ const OrdersList = () => {
         },    
         {
             name: "Заказчик",
-            selector: (row, index) => <div>{row.service === '0' ? row.clientName : row.gp.clientName}</div>,
+            selector: (row, index) => <div>{row.service === 0 ? (row.client && row.client.clientName): (row.gp && row.gp.clientName)}</div>,
             center: true,
         },    
         {
@@ -273,7 +274,7 @@ const OrdersList = () => {
                     }
                 },
                 {
-                    when: row => row.status === 10,
+                    when: row => row.status === 11,
                     style: {
                         backgroundColor: '#d1ffbd',
                         '&:hover': {
@@ -282,7 +283,7 @@ const OrdersList = () => {
                     }
                 },
                 {
-                    when: row => row.status !== 0 && row.status !== 10,
+                    when: row => row.status !== 0 && row.status !== 11,
                     style: {
                         backgroundColor: '#ffefac',
                         '&:hover': {
@@ -304,7 +305,7 @@ const OrdersList = () => {
         },
         {
             name: "ТН",
-            selector: (row, index) => row.status === 10 ? <Button variant="contained" color="success" onClick={(event) => downloadTN(row.id)}><i className="fa fa-download" aria-hidden="true"></i></Button> : "-",
+            selector: (row, index) => row.status === 11 ? <Button variant="contained" color="success" onClick={(event) => downloadTN(row.id)}><i className="fa fa-download" aria-hidden="true"></i></Button> : "-",
             center: true,
             grow: 1
         },
@@ -385,14 +386,16 @@ const OrdersList = () => {
                             <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
                                 <option value="clientName">Заказчик</option>
                                 <option value="material">Тип груза</option>
+                                <option value="service">Услуга</option>
                             </select>
                         </div>
                         <div className="mb-3 col-md-4 pl-1">
-                            <input className="form-control" type="text" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />
+                            {searchBy === 'service' ?
+                                <select className="form-select" onChange={(e) => { setSearchString(e.target.value) }} value={searchString}>
+                                    <option value="0">Перевозка</option>
+                                    <option value="1">Поставка</option>
+                                </select> : <input className="form-control" type="text" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />}
                         </div>
-                        {/*<div className="input-group-append">*/}
-                        {/*    <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i className="fa fa-search"></i></button>*/}
-                        {/*</div>*/}
                     </div>
                 </div>
             </div>

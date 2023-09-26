@@ -25,6 +25,11 @@ const ClientsList = () => {
         setSelectedClient(client);
     };
 
+    const handleClickOpenCreate = (client) => {
+        setOpen(true);
+        setSelectedClient(undefined);
+    };
+
     const handleClose = () => {
         setOpen(false);
         setReload(reload + 1);
@@ -96,20 +101,24 @@ const ClientsList = () => {
                     <header>Нет адресов</header>
                 </section>
                 :
-                <DataTable
-                    columns={columns}
-                    responsive
-                    noHeader
-                    highlightOnHover
-                    defaultSortFieldId={1}
-                    defaultSortAsc
-                    progressPending={loading}
-                    customStyles={customStyles}
-                    onSort={(column, direction) => {
-                        !cancelled && setSortBy(column.sortBy);
-                        !cancelled && setDir(direction);
-                    }}
-                    data={list}/>
+                <div>
+                    <Button color="success" className="pull-right" onClick={(e) => handleClickOpenCreate()} variant="contained">Создать</Button>
+
+                    <DataTable
+                        columns={columns}
+                        responsive
+                        noHeader
+                        highlightOnHover
+                        defaultSortFieldId={1}
+                        defaultSortAsc
+                        progressPending={loading}
+                        customStyles={customStyles}
+                        onSort={(column, direction) => {
+                            !cancelled && setSortBy(column.sortBy);
+                            !cancelled && setDir(direction);
+                        }}
+                        data={list} />
+                </div>
         }
 
         <Dialog

@@ -46,7 +46,7 @@ const DriverEditTask = () => {
     const [hasSubTask, setHasSubTask] = useState(false); 
     const [continueWork, setContinueWork] = useState(false);
 
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Выписка документов 1', 'Погрузился', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
     const navigate = useNavigate();
 
@@ -105,6 +105,8 @@ const DriverEditTask = () => {
     }
 
     const handleSubmit = () => {
+        formData = new FormData();
+
         formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
@@ -142,13 +144,12 @@ const DriverEditTask = () => {
             return;
         }
 
-        if (status === 9) {
+        if (status === 8) {
 
             if (hasSubTask) {
                 formData.append("IsSubtask", true);
                 formData.append("SubTaskId", currentSubTask.id);
             }
-
             formData.append("UnloadVolume", loadVolume);
             formData.append("LocationBId", addressB.id);
             formData.append("DropOffArrivalDate", pickupArrivalDate.toUTCString());
@@ -207,9 +208,9 @@ const DriverEditTask = () => {
             case 2:
                 return "Прибыл на склад загрузки";
             case 3:
-                return "К выписке документов";
+                return "Погрузка";
             case 4:
-                return "Выписать документы(Погрузился)";
+                return "Выписать документы (ТН-первая часть)";
             case 5:
                 return "Выехал со склада";
             case 6:
@@ -217,10 +218,8 @@ const DriverEditTask = () => {
             case 7:
                 return "Выгрузка";
             case 8:
-                return "Выгрузка";
-            case 9:
                 return "Выписка документов";
-            case 10:
+            case 9:
                 return "Завершить";
             default:
                 return "Отправить";
@@ -236,7 +235,7 @@ const DriverEditTask = () => {
                     setDriver(data.driver);
                     setOrder(data.order);
                     setStatus(data.status);
-                    data.notes.unshift({ status: 0, dateCreated: new Date(data.dateCreated), s3Links: [] });
+                    data.notes.unshift({ status: 0, dateCreated: new Date(data.dateCreated), text: "назначена", s3Links: [] });
                     setNotes(data.notes);
                     setCar(data.car);
 
@@ -337,10 +336,10 @@ const DriverEditTask = () => {
                     <dt className="col-sm-3">Смена: </dt>
                     <dd className="col-sm-9">{intToShift(driverTask.shift)}</dd>
 
-                    <dt className="col-sm-3">Точка А: </dt>
+                    <dt className="col-sm-3">Место погрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.textAddress}</a></dd>
 
-                    <dt className="col-sm-3">Точка Б: </dt>
+                    <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
@@ -371,7 +370,7 @@ const DriverEditTask = () => {
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.clientName}`}
                                 renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                            {driverTask.order.clientName}
+                        {/*    {driverTask.order.clientName}*/}
                         </div>
 
                         <div className="form-group col-md-6">
@@ -383,7 +382,7 @@ const DriverEditTask = () => {
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.clientName}`}
                                 renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                            {driverTask.order.client.name}
+                        {/*    {driverTask.order.client.name}*/}
                         </div>
 
                         <div className="form-row">
@@ -459,7 +458,7 @@ const DriverEditTask = () => {
                         </div>
                     </div>}
 
-                {status === 9 &&
+                {status === 8 &&
                     <div className="form-row">
                         <div className="form-group col-md-6">
                             <label>Объем выгрузки</label>
@@ -513,7 +512,7 @@ const DriverEditTask = () => {
                         </div>
                     </div>}
                 <div>
-                    {status === 10 && 
+                    {status === 8 && 
                         <div className="row mt-3 mb-3">
                             <div className="col-md-9">
                                 <div className="alert alert-danger" role="alert">
@@ -580,7 +579,7 @@ const DriverEditTask = () => {
                     </div>
                 </div>
 
-                {status === 11 && driverTask.shift === 3 && 
+                {status === 10 && driverTask.shift === 3 && 
                     <>
                         <div className="row">
                             <div className="col-md-12">

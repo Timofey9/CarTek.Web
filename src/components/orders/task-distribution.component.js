@@ -1,3 +1,4 @@
+/// <reference path="orders-list.component.js" />
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import ApiService from "../../services/cartekApiService";
@@ -9,6 +10,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import AdminEditTask from "./admin-edittask.component";
 import DriverTaskCarForm from './add-drivertaskCar.component';
+import { saveAs } from 'file-saver';
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
@@ -30,7 +32,8 @@ const CarsWork = () => {
     const [selectedTaskId, setSelectedTaskId] = useState(0);
     const [openEditTask, setOpenEditTask] = useState(false);
     const [localUser, setLocalUser] = useState({});
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'На складе загрузки', 'Выписка документов', 'Погрузился', 'Выехал со склада', 'На объекте выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
+    const [filtered, setFiltered] = useState([]);
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const ExpandedComponent = ({ data }) => <pre>
         <DataTable
@@ -47,6 +50,16 @@ const CarsWork = () => {
     const handleClickOpen = (carId) => {
         setOpen(true);
         setSelectedCarId(carId);
+    };
+
+    const downloadFile = () => {
+        ApiService.downloadTasksReport({
+            startDate: startDate.toUTCString(),
+        }).then(response => {
+            let url = window.URL
+                .createObjectURL(new Blob([response.data]));
+            saveAs(url, `Задачи_${startDate.toLocaleDateString()}.xlsx`);
+        });
     };
 
     const intToShift = (shift) => {
@@ -82,8 +95,6 @@ const CarsWork = () => {
     };
 
 
-    const navigate = useNavigate();
-
     useEffect(() => {
         setLoading(true);
         let user = JSON.parse(localStorage.getItem("user"));
@@ -96,6 +107,7 @@ const CarsWork = () => {
             startDate: startDate.toISOString(),
         }).then(({ data }) => {
             setCars(data);
+            setFiltered(data);
         });
 
         setLoading(false);
@@ -230,6 +242,36 @@ const CarsWork = () => {
         }
     };
 
+    const filterData = (search) => {
+        var temp = JSON.parse(JSON.stringify(cars));
+        setSearchString(search);
+        switch (searchBy) {
+            case "plate": {
+                setFiltered(cars.filter((car) => car.plate.includes(search)));
+                break;
+            }
+            case "status": {
+                for (var i = 0; i < temp.length; i++) {
+                    var filteredTasks = temp[i].driverTasks.filter((dt) => dt.status === parseInt(search));
+                    temp[i].driverTasks = filteredTasks;
+                }
+                setFiltered(temp);
+                break;
+            }
+            case "driver": {
+                for (var i = 0; i < temp.length; i++) {
+                    var filteredTasks = temp[i].driverTasks.filter((dt) => dt.driver.fullName.includes(search));
+                    temp[i].driverTasks = filteredTasks;
+                }
+                setFiltered(temp);
+                break;
+            }
+            default: {
+                return;
+            }
+        }
+    }
+
     const conditionalRowStyles = [
         {
             when: row => row.driverTasks.length === 0,
@@ -253,6 +295,8 @@ const CarsWork = () => {
         }
     ];
 
+    const rowPreExpanded = row => row.driverTasks.length && row.driverTasks.length > 0
+
     if (loading) {
         return <div><h1>ЗАГРУЗКА...</h1></div>
     }
@@ -270,6 +314,42 @@ const CarsWork = () => {
                         </div>
                     </div>
                 </div>
+                <div className="col-md-5">
+                    <button className="btn btn-success pull-right" onClick={(e) => { e.preventDefault(); downloadFile() }}>Скачать</button>
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col-md-7">
+                    <div className="input-group mt-3">
+                        <div className="mb-3 col-md-4 pl-1">
+                            <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
+                                <option value="plate">Номер</option>
+                                <option value="status">Статус</option>
+                                <option value="driver">Водитель</option>
+                            </select>
+                        </div>
+
+                        <div className="mb-3 col-md-4 pl-1">
+                            {searchBy === 'status' ?
+                                <select className="form-select" onChange={(e) => { filterData(e.target.value) }} value={searchString}>
+                                    <option value="0">Назначена</option>
+                                    <option value="1">Принята</option>
+                                    <option value="2">На линии</option>
+                                    <option value="3">Прибыл на склад загрузки</option>
+                                    <option value="4">Погрузка</option>
+                                    <option value="5">Выписка ТН (первая часть)</option>
+                                    <option value="6">Выехал со склада</option>
+                                    <option value="7">Прибыл на объект выгрузки</option>
+                                    <option value="8">Выгрузка</option>
+                                    <option value="9">Выписка документов</option>
+                                    <option value="10">Завершена</option>
+                                </select>                                
+                                :
+                                <input className="form-control" type="text" value={searchString} onChange={(e) => { filterData(e.target.value) }} />}
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
 
@@ -284,10 +364,11 @@ const CarsWork = () => {
             noDataComponent="Машин не найдено"
             progressPending={loading}
             customStyles={customStyles}
-            data={cars}
+            data={filtered}
             expandableRows
             expandableRowDisabled={rowPreDisabled}
             expandableRowsComponent={ExpandedComponent}
+            expandableRowExpanded={rowPreExpanded}
         />
 
         <Dialog

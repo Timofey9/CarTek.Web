@@ -2,13 +2,12 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32776/api/";
+//const API_URL = "https://localhost:32768/api/";
 const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
 
     createSetAuthInterceptor = config => {
-
         const { identityToken } = authHeader();
 
         if (identityToken) {
@@ -82,6 +81,17 @@ class ApiService {
     downloadTN(params) {
         const query = new URLSearchParams(params).toString();
         var res = this._axiosXlsx.get(`order/gettn/?${query}`);
+        return res;
+    }
+
+    downloadTasksReport(params) {
+        const query = new URLSearchParams(params).toString();
+        var res = this._axiosXlsx.get(`order/gettasksreport/?${query}`);
+        return res;
+    }
+
+    viewTN(id) {
+        var res = this.get(`order/viewtn/${id}`);
         return res;
     }
 

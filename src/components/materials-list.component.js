@@ -25,6 +25,11 @@ const MaterialsList = () => {
         setSelectedMaterial(material);
     };
 
+    const handleClickOpenCreate = () => {
+        setOpen(true);
+        setSelectedMaterial(undefined);
+    };
+
     const handleClose = () => {
         setOpen(false);
         setReload(reload + 1);
@@ -79,20 +84,23 @@ const MaterialsList = () => {
                     <header>Нет материалов</header>
                 </section>
                 :
-                <DataTable
-                    columns={columns}
-                    responsive
-                    noHeader
-                    highlightOnHover
-                    defaultSortAsc
-                    progressPending={loading}
-                    customStyles={customStyles}
-                    onSort={(column, direction) => {
-                        !cancelled && setSortBy(column.sortBy);
-                        !cancelled && setDir(direction);
-                    }}
-                    data={list}
-                />
+                <div>
+                    <Button color="success" className="pull-right" onClick={(e) => handleClickOpenCreate()} variant="contained">Создать</Button>
+                    <DataTable
+                        columns={columns}
+                        responsive
+                        noHeader
+                        highlightOnHover
+                        defaultSortAsc
+                        progressPending={loading}
+                        customStyles={customStyles}
+                        onSort={(column, direction) => {
+                            !cancelled && setSortBy(column.sortBy);
+                            !cancelled && setDir(direction);
+                        }}
+                        data={list}
+                    />
+                </div>
         }
 
         <Dialog

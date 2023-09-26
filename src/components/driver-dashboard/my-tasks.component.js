@@ -8,6 +8,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
+const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
+
 const rowPreDisabled = row => row.driverTasks < 1;
 
 const MyTasksList = () => {
@@ -96,14 +98,20 @@ const MyTasksList = () => {
             center: true,
         },
         {
-            name: "Точка А",
+            name: "Место погрузки",
             selector: (row, index) => row.locationA && row.locationA.textAddress,
             center: true,
             wrap: true
         },
         {
-            name: "Точка B",
+            name: "Место выгрузки",
             selector: (row, index) => row.locationB && row.locationB.textAddress,
+            center: true,
+            wrap: true
+        },
+        {
+            name: "Статус",
+            selector: (row, index) => constStatuses[row.status],
             center: true,
             wrap: true
         }

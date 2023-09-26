@@ -221,6 +221,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             name: orderName,
             clientName: client.clientName,
             clientId: client.id,
+            gpId: gp.id,
             materialId: material.id,
             volume: volume,
             loadUnit: loadUnit,
@@ -379,7 +380,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             disablePortal
                             onChange={(e, newvalue) => { setAddressA(newvalue) }}
                             sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.name}`}
+                            getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
                         <label>{addressA && addressA.textAddress}</label>
@@ -394,7 +395,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             disablePortal
                             onChange={(e, newvalue) => { setAddressB(newvalue) }}
                             sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.name}`}
+                            getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
                         <label>{addressB && addressB.textAddress}</label>
