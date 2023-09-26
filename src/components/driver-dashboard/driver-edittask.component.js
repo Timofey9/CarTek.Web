@@ -707,7 +707,7 @@ const DriverEditTask = () => {
                                 <input type="file" id="files" accept=".jpg, .png, .jpeg" multiple onChange={(e) => selectFile(e)}></input>
                             </div>
                         </div>
-                        <div className="row mb-3">
+                        <div className="row mb-5">
                             <div className="col-md-12">
                                 <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
                                     {statusToButtonTxt(status)}
