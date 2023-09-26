@@ -70,6 +70,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     setCar(data.car);
                     setActiveStep(data.status);
                     setNotes(data.notes);
+                    data.notes.unshift({ status: 0, dateCreated: new Date(data.dateCreated), text: "назначена", s3Links: [] });
                     setStatuses(constStatuses);
                     setAdminComment(data.adminComment);
                     setSubTasks(data.subTasks);
@@ -233,8 +234,8 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     <dt className="col-sm-3">Материал: </dt>
                     <dd className="col-sm-9">{order.material && order.material.name}</dd>
 
-                    <dt className="col-sm-3">Количество: </dt>
-                    <dd className="col-sm-9">{driverTask.volume} {unitToString(driverTask.unit)}</dd>
+                    {/*<dt className="col-sm-3">Количество: </dt>*/}
+                    {/*<dd className="col-sm-9">{driverTask.volume} {unitToString(driverTask.unit)}</dd>*/}
 
                     <dt className="col-sm-3">Дата: </dt>
                     <dd className="col-sm-9">
@@ -279,7 +280,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                         <Step key={label} {...stepProps} expanded={true}>
                                             <StepLabel {...labelProps}>{label}</StepLabel>
                                             <StepContent>
-                                                {notes.filter((n) => n.status+1 === index).map((note, noteindex) => {
+                                                {notes.filter((n) => n.status === index).map((note, noteindex) => {
                                                     let showLinks = false;
                                                     let links;
                                                     if (note.s3Links.length > 0) {

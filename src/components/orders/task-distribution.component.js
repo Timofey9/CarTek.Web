@@ -158,12 +158,12 @@ const CarsWork = () => {
     const columnsDriverTask = [
         {
             name: "Заказчик",
-            selector: (row, index) => <div>{row.order.service === '0' ? row.order.clientName : row.order.gp.clientName}</div>,
+            selector: (row, index) => <div>{row.order.service === 0 ? row.order.clientName : row.order.gp.clientName}</div>,
             center: true,
         },
         {
             name: "Услуга",
-            selector: (row, index) => <div>{row.order.service === '0' ? "Поставка" : "Перевозка"}</div>,
+            selector: (row, index) => <div>{row.order.service === 0 ? "Поставка" : "Перевозка"}</div>,
             center: true,
         },    
         {

@@ -8,10 +8,20 @@ import StepLabel from '@mui/material/StepLabel';
 import StepContent from '@mui/material/StepContent';
 import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
+import Dialog from '@mui/material/Dialog';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ru from 'date-fns/locale/ru';
+import "./drivers.css";
+
+import ClientForm from '../orders/add-client.component'
+import AddressForm from '../orders/add-address.component'
+import MaterialForm from '../orders/add-material.component'
+
 registerLocale('ru', ru);
 
 const DriverEditTask = () => {
@@ -35,7 +45,7 @@ const DriverEditTask = () => {
     const [addressB, setAddressB] = useState({});
     const [message, setMessage] = useState("");
     const [tnNumber, setTnNumber] = useState("");
-    const [loadVolume, setLoadVolume] = useState(0);
+    const [loadVolume, setLoadVolume] = useState("");
     const [go, setGo] = useState({});
     const [gp, setGp] = useState({});
     const [pickupArrivalDate, setPickupArrivalDate] = useState(new Date());
@@ -45,12 +55,42 @@ const DriverEditTask = () => {
     const [currentSubTask, setCurrentSubTask] = useState({});
     const [hasSubTask, setHasSubTask] = useState(false); 
     const [continueWork, setContinueWork] = useState(false);
+    const [validated, setValidated] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [openAddress, setOpenAddress] = useState(false);
+    const [openMaterial, setOpenMaterial] = useState(false);
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
-    const navigate = useNavigate();
-
     let { driverTaskId } = useParams();
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleAddressOpen = () => {
+        setOpenAddress(true);
+    };
+
+    const handleMaterialOpen = () => {
+        setOpenMaterial(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setReload(reload + 1);
+    };
+
+    const handleAddressClose = () => {
+        setOpenAddress(false);
+        setReload(reload + 1);
+    };
+
+    const handleMaterialClose = () => {
+        setOpenMaterial(false);
+        setReload(reload + 1);
+    };
+
 
     const unitToString = (unit) => {
         switch (unit) {
@@ -104,16 +144,19 @@ const DriverEditTask = () => {
             });
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
         for (var key of formData.keys()) {
-            formData.delete(key)
+            if (key !== "Files")
+                formData.delete(key)
         };
 
         formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
 
-        if (status === 4) {
+        if (status === 4 && validate()) {
 
             if (hasSubTask) {
                 formData.set("DriverTaskId", driverTask.id);
@@ -146,7 +189,7 @@ const DriverEditTask = () => {
             return;
         }
 
-        if (status === 8) {
+        if (status === 8 && validate()) {
 
             if (hasSubTask) {
                 formData.append("IsSubtask", true);
@@ -187,19 +230,88 @@ const DriverEditTask = () => {
                     }
                 });
         } else {
-            ApiService.EditDriverTaskAsync(formData)
-                .then(({ data }) => {
-                    alert("Статус обновлен");
-                    setFormData(new FormData());
-                    setReload(reload + 1);
-                })
-                .catch((error) => {
-                    if (error.response.data.message) {
-                        setError(error.response.data.message);
-                    }
-                });
+            if (validate()) {
+                ApiService.EditDriverTaskAsync(formData)
+                    .then(({ data }) => {
+                        alert("Статус обновлен");
+                        setFormData(new FormData());
+                        setReload(reload + 1);
+                    })
+                    .catch((error) => {
+                        if (error.response.data.message) {
+                            setError(error.response.data.message);
+                        }
+                    });
+            }
         }
     };
+
+    const validate = () => {
+        setValidated(true);
+        var isValid = true;
+        if (status === 4) {
+            if (tnNumber.length === 0) {
+                isValid = false;
+            }
+
+            if (Object.keys(go).length === 0) {
+                isValid = false;
+            }
+
+            if (Object.keys(gp).length === 0) {
+                isValid = false;
+            }
+
+            if (Object.keys(material).length === 0) {
+                isValid = false;
+            }
+
+            if (loadVolume.length === 0) {
+                isValid = false;
+            }
+
+            if (unit === "none") {
+                isValid = false;
+            }
+
+            if (Object.keys(addressA).length === 0) {
+                isValid = false;
+            }
+
+            if (pickupArrivalTime.length === 0) {
+                isValid = false;
+            }
+
+            if (pickupDepartureTime.length === 0) {
+                isValid = false;
+            }
+        }
+
+        if (status === 8) {
+            if (pickupArrivalTime.length === 0) {
+                isValid = false;
+            }
+
+            if (pickupDepartureTime.length === 0) {
+                isValid = false;
+            }
+
+            if (Object.keys(addressB).length === 0) {
+                isValid = false;
+            }
+
+            if (loadVolume.length === 0) {
+                isValid = false;
+            }
+
+            if (Object.keys(addressB).length === 0) {
+                isValid = false;
+            }
+        }
+        console.log(isValid);
+        return isValid;
+    }
+
 
     const statusToButtonTxt = (status) => {
         switch (status) {
@@ -356,8 +468,8 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Номер ТН</label>
                             <input
+                                className={validated && tnNumber.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
-                                className="form-control"
                                 form="profile-form"
                                 onChange={(e) => setTnNumber(e.target.value)}
                                 value={tnNumber} />
@@ -366,18 +478,19 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Грузоотправитель (1)</label>
                             <Autocomplete
+                                className={validated && Object.keys(go).length === 0 ? "not-valid-input-border" : ""}
                                 options={clients}
                                 disablePortal
                                 onChange={(e, newvalue) => { setGo(newvalue) }}
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.clientName}`}
                                 renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                        {/*    {driverTask.order.clientName}*/}
                         </div>
 
                         <div className="form-group col-md-6">
                             <label>Грузополучатель (2)</label>
                             <Autocomplete
+                                className={validated && Object.keys(gp).length === 0 ? "not-valid-input-border" : ""}
                                 options={clients}
                                 disablePortal
                                 onChange={(e, newvalue) => { setGp(newvalue) }}
@@ -387,22 +500,34 @@ const DriverEditTask = () => {
                         {/*    {driverTask.order.client.name}*/}
                         </div>
 
+                        <div className="form-group col-md-6">
+                            <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
+                                Добавить юр.лицо
+                            </button>
+                        </div>
+
                         <div className="form-row">
                             <label>Тип груза (3)</label>
                             <Autocomplete
+                                className={validated && Object.keys(material).length === 0 ? "not-valid-input-border" : ""}
                                 options={materialsList}
                                 disablePortal
                                 onChange={(e, newvalue) => { setMaterial(newvalue) }}
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.name}`}
                                 renderInput={(params) => <TextField {...params} label="Список материалов" />} />
+
+
+                            <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
+                                Добавить тип груза
+                            </button>
                         </div>
 
                         <div className="form-group col-md-6">
                             <label>Объем загрузки</label>
                             <input
+                                className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
-                                className="form-control"
                                 form="profile-form"
                                 onChange={(e) => setLoadVolume(e.target.value)}
                                 value={loadVolume} />
@@ -410,7 +535,8 @@ const DriverEditTask = () => {
 
                         <div className="form-group col-md-6">
                             <label>Единица измерения</label>
-                            <select className="form-select" value={unit} aria-label="Единица измерения" onChange={(e) => setUnit(e.target.value)}>
+                            <select className={validated && unit === "none" ? "form-select not-valid-input-border" : "form-select"}
+                                value={unit} aria-label="Единица измерения" onChange={(e) => setUnit(e.target.value)}>
                                 <option value="none">Единица измерения</option>
                                 <option value="0">М3</option>
                                 <option value="1">шт.</option>
@@ -421,13 +547,20 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Прием груза (8)</label>
                             <Autocomplete
+                                className={validated && Object.keys(addressA).length === 0 ? "not-valid-input-border" : ""}
                                 options={addresses}
                                 disablePortal
                                 onChange={(e, newvalue) => { setAddressA(newvalue) }}
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.textAddress}`}
                                 renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+
+                            <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                                Добавить адрес
+                            </button>
                         </div>
+
+
 
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата прибытия на склад погрузки</label>
@@ -437,8 +570,8 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Время прибытия на склад погрузки</label>
                             <input
+                                className={validated && pickupArrivalTime.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
-                                className="form-control"
                                 form="profile-form"
                                 onChange={(e) => setPickupArrivalTime(e.target.value)}
                                 value={pickupArrivalTime} />
@@ -452,8 +585,8 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Время выезда со склада погрузки</label>
                             <input
+                                className={validated && pickupDepartureTime.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
-                                className="form-control"
                                 form="profile-form"
                                 onChange={(e) => setPickupDepartureTime(e.target.value)}
                                 value={pickupDepartureTime} />
@@ -465,8 +598,8 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Объем выгрузки</label>
                             <input
+                                className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
-                                className="form-control"
                                 form="profile-form"
                                 onChange={(e) => setLoadVolume(e.target.value)}
                                 value={loadVolume} />
@@ -475,6 +608,7 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Выдача груза (8)</label>
                             <Autocomplete
+                                className={validated && Object.keys(addressB).length === 0 ? "not-valid-input-border" : ""}
                                 options={addresses}
                                 disablePortal
                                 onChange={(e, newvalue) => { setAddressB(newvalue) }}
@@ -485,14 +619,15 @@ const DriverEditTask = () => {
 
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата прибытия на склад выгрузки</label>
-                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy"
+                                selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
                         </div>
 
                         <div className="form-group col-md-6">
                             <label>Время прибытия на склад выгрузки</label>
                             <input
+                                className={validated && pickupArrivalTime.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
-                                className="form-control"
                                 form="profile-form"
                                 onChange={(e) => setPickupArrivalTime(e.target.value)}
                                 value={pickupArrivalTime} />
@@ -506,8 +641,8 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Время выезда со склада выгрузки</label>
                             <input
+                                className={validated && pickupDepartureTime.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
-                                className="form-control"
                                 form="profile-form"
                                 onChange={(e) => setPickupDepartureTime(e.target.value)}
                                 value={pickupDepartureTime} />
@@ -523,7 +658,7 @@ const DriverEditTask = () => {
                             </div>
                         </div>}
                 </div>
-                <div className="row">
+                <div className="row mt-3">
                     <div className="col-md-3">
                         <Box sx={{ width: '100%' }}>
                             <Stepper orientation="vertical" activeStep={status}>
@@ -559,6 +694,7 @@ const DriverEditTask = () => {
                             </Stepper>
                         </Box>
                     </div>
+                    {status <= 9 &&
                     <div className="col-md-9">
                         <div className="row">
                             <div className="col-md-12">
@@ -571,14 +707,14 @@ const DriverEditTask = () => {
                                 <input type="file" id="files" accept=".jpg, .png, .jpeg" multiple onChange={(e) => selectFile(e)}></input>
                             </div>
                         </div>
-                        <div className="row">
+                        <div className="row mb-3">
                             <div className="col-md-12">
                                 <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
                                     {statusToButtonTxt(status)}
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div>}
                 </div>
 
                 {status === 10 && driverTask.shift === 3 && 
@@ -590,7 +726,7 @@ const DriverEditTask = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="row mt-3">
+                        <div className="row mt-3 mb-3">
                                 <div className="col-md-12">
                             <button type="submit" onClick={createSubTask} className="btn btn-success mt-3">
                                         Продолжить
@@ -601,6 +737,48 @@ const DriverEditTask = () => {
                 }
             </>
         )}
+
+        <Dialog
+            fullScreen
+            open={open}
+            onClose={handleClose}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="dense">
+                    <Button autoFocus color="inherit" onClick={handleClose}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <ClientForm handleClose={handleClose}></ClientForm>
+        </Dialog>
+
+        <Dialog
+            fullScreen
+            open={openAddress}
+            onClose={handleAddressClose}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="dense">
+                    <Button autoFocus color="inherit" onClick={handleAddressClose}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <AddressForm handleClose={handleAddressClose}></AddressForm>
+        </Dialog>
+
+        <Dialog
+            fullScreen
+            open={openMaterial}
+            onClose={handleMaterialClose}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="dense">
+                    <Button autoFocus color="inherit" onClick={handleMaterialClose}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <MaterialForm handleClose={handleMaterialClose}></MaterialForm>
+        </Dialog>
     </div>
 };
 

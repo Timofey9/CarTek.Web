@@ -41,7 +41,7 @@ const OrdersList = () => {
     const [selectedTaskId, setSelectedTaskId] = useState(0);
     const [localUser, setLocalUser] = useState({});
 
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена','Завершена'];
 
     const handleClickOpen = (orderId) => {
         setOpen(true);
@@ -274,7 +274,7 @@ const OrdersList = () => {
                     }
                 },
                 {
-                    when: row => row.status === 11,
+                    when: row => row.status === 10,
                     style: {
                         backgroundColor: '#d1ffbd',
                         '&:hover': {
@@ -283,7 +283,7 @@ const OrdersList = () => {
                     }
                 },
                 {
-                    when: row => row.status !== 0 && row.status !== 11,
+                    when: row => row.status !== 0 && row.status !== 10,
                     style: {
                         backgroundColor: '#ffefac',
                         '&:hover': {
@@ -305,7 +305,7 @@ const OrdersList = () => {
         },
         {
             name: "ТН",
-            selector: (row, index) => row.status === 11 ? <Button variant="contained" color="success" onClick={(event) => downloadTN(row.id)}><i className="fa fa-download" aria-hidden="true"></i></Button> : "-",
+            selector: (row, index) => row.status === 10 ? <Button variant="contained" color="success" onClick={(event) => downloadTN(row.id)}><i className="fa fa-download" aria-hidden="true"></i></Button> : "-",
             center: true,
             grow: 1
         },

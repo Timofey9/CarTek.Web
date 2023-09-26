@@ -285,6 +285,21 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                 <div className="form-row">
                     <div className="form-group col-md-6">
+                        <label className="bold-label">Название</label>
+                        <input
+                            disabled={!isEdit}
+                            type="text"
+                            className="form-control"
+                            form="profile-form"
+                            onChange={(e) => setOrderName(e.target.value)}
+                            value={orderName}
+                        />
+                    </div>
+
+
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <div className="form-group col-md-6">
                         <label className="bold-label">Услуга</label>
                         <select disabled={!isEdit} className="form-select" value={serviceType} aria-label="Услуга" onChange={(e) => setServiceType(e.target.value)}>
                             <option value="none">Услуга</option>
@@ -326,6 +341,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             Добавить юр.лицо
                         </button>}
                     </div>
+
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-row">
                         <label className="bold-label">Груз (3)</label>

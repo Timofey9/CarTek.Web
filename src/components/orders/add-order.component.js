@@ -48,7 +48,6 @@ function OrderForm({ handleCloseOrderForm }) {
     const [cars, setCars] = useState([]);
     const [drivers, setDrivers] = useState([]);
     const [orderId, setOrderId] = useState(0);
-    const [isValid, setIsValid] = useState(false);
     const [validated, setValidated] = useState(false);
     const [isOrderCreated, setIsOrderCreated] = useState(false);
 
@@ -114,7 +113,6 @@ function OrderForm({ handleCloseOrderForm }) {
             setMessage("Не все обязательные поля заполнены")
         }
 
-        setIsValid(valid);
         return valid;
     }
 
