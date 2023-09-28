@@ -304,6 +304,50 @@ function OrderForm({ handleCloseOrderForm }) {
                         </select>
                     </div>
 
+                    <div className="form-row">
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата начала</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={startDate} onChange={(date) => { setStartDate(date); let date2 = new Date(date); date2.setDate(date.getDate() + 1); setEndDate(date2) }} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Срок выполнения</label>
+                            <DatePicker disabled locale="ru" dateFormat="dd.MM.yyyy" selected={endDate} onChange={(date) => setEndDate(date)} />
+                        </div>
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <label>Прием груза (8)</label>
+                        <Autocomplete
+                            className={validated && Object.keys(addressA).length === 0 ? "not-valid-input-border" : ""}
+                            options={addresses}
+                            disablePortal
+                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.textAddress}`}
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                        <label>{addressA && addressA.textAddress}</label>
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <label>Выдача груза (10)</label>
+
+                        <Autocomplete
+                            className={validated && Object.keys(addressB).length === 0 ? "not-valid-input-border" : ""}
+                            options={addresses}
+                            disablePortal
+                            onChange={(e, newvalue) => { setAddressB(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.textAddress}`}
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+
+                        <label>{addressB && addressB.textAddress}</label>
+
+                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                            Добавить адрес
+                        </button>
+                    </div>
+
                     <div className="form-group col-md-6">
                         <label>Грузоотправитель (1)</label>
                         <Autocomplete
@@ -372,49 +416,6 @@ function OrderForm({ handleCloseOrderForm }) {
                         </select>
                     </div>
 
-                    <div className="form-group col-md-6">
-                        <label>Прием груза (8)</label>
-                        <Autocomplete
-                            className={validated && Object.keys(addressA).length === 0 ? "not-valid-input-border" : ""}
-                            options={addresses}
-                            disablePortal
-                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
-                        <label>{addressA && addressA.textAddress}</label>
-                    </div>
-
-                    <div className="form-group col-md-6">
-                        <label>Выдача груза (10)</label>
-
-                        <Autocomplete
-                            className={validated && Object.keys(addressB).length === 0 ? "not-valid-input-border" : ""}
-                            options={addresses}
-                            disablePortal
-                            onChange={(e, newvalue) => { setAddressB(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
-
-                        <label>{addressB && addressB.textAddress}</label>
-
-                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
-                            Добавить адрес
-                        </button>
-                    </div>
-                </div>
-
-                <div className="form-row">
-                    <div className="input-group mb-3 col-md-6 pl-1">
-                        <label>Дата начала</label>
-                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={startDate} onChange={(date) => { setStartDate(date); let date2 = new Date(date); date2.setDate(date.getDate() + 1); setEndDate(date2) }} />
-                    </div>
-
-                    <div className="input-group mb-3 col-md-6 pl-1">
-                        <label>Срок выполнения</label>
-                        <DatePicker disabled locale="ru" dateFormat="dd.MM.yyyy" selected={endDate} onChange={(date) => setEndDate(date)} />
-                    </div>
                 </div>
 
                 <div className="form-row">

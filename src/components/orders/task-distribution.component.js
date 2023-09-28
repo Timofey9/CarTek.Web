@@ -20,7 +20,7 @@ const rowPreDisabled = row => row.driverTasks < 1;
 const CarsWork = () => {
     let cancelled = false;
     const [loading, setLoading] = useState(true);
-    const [searchBy, setSearchBy] = useState("name");
+    const [searchBy, setSearchBy] = useState("none");
     const [sortBy, setSortBy] = useState("");
     const [searchString, setSearchString] = useState("");
     const [dir, setDir] = useState("desc");
@@ -251,23 +251,34 @@ const CarsWork = () => {
                 break;
             }
             case "status": {
+                var filteredArr = [];
                 for (var i = 0; i < temp.length; i++) {
                     var filteredTasks = temp[i].driverTasks.filter((dt) => dt.status === parseInt(search));
                     temp[i].driverTasks = filteredTasks;
+
+                    if (temp[i].driverTasks.length > 0) {
+                        filteredArr.push(temp[i]);
+                    }
                 }
-                setFiltered(temp);
+                setFiltered(filteredArr);
                 break;
             }
             case "driver": {
+                var filteredArr = [];
                 for (var i = 0; i < temp.length; i++) {
                     var filteredTasks = temp[i].driverTasks.filter((dt) => dt.driver.fullName.includes(search));
                     temp[i].driverTasks = filteredTasks;
+
+                    if (temp[i].driverTasks.length > 0) {
+                        filteredArr.push(temp[i]);
+                    }
                 }
-                setFiltered(temp);
+                setFiltered(filteredArr);
                 break;
             }
             default: {
-                return;
+                setSearchString("");
+                setFiltered(temp);
             }
         }
     }
@@ -324,6 +335,7 @@ const CarsWork = () => {
                     <div className="input-group mt-3">
                         <div className="mb-3 col-md-4 pl-1">
                             <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
+                                <option value="none">Поиск по</option>
                                 <option value="plate">Номер</option>
                                 <option value="status">Статус</option>
                                 <option value="driver">Водитель</option>

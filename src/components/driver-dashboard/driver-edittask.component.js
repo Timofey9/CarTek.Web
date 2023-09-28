@@ -704,7 +704,7 @@ const DriverEditTask = () => {
                         <div className="row">
                             <div className="col-md-12">
                                 <label htmlFor="files">Прикрепить фотографии</label>
-                                <input type="file" id="files" accept=".jpg, .png, .jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                                <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
                             </div>
                         </div>
                         <div className="row mb-5">

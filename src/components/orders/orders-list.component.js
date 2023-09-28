@@ -204,23 +204,33 @@ const OrdersList = () => {
             center: true,
         },    
         {
-            name: "Заказчик",
-            selector: (row, index) => <div>{row.service === 0 ? (row.client && row.client.clientName): (row.gp && row.gp.clientName)}</div>,
+            name: "Дата",
+            selector: (row, index) => buildDates(new Date(row.startDate), new Date(row.dueDate)),
+            wrap: true,
             center: true,
         },    
         {
-            name: "Дата",
-            selector: (row, index) => buildDates(new Date(row.startDate), new Date(row.dueDate)),
-
-            center: true,
-        },        
+            name: "Погрузка",
+            selector: (row, index) => row.locationA,
+            wrap: true,
+        },    
+        {
+            name: "Выгрузка",
+            selector: (row, index) => row.locationB,
+            wrap: true,
+        },    
+        //{
+        //    name: "Заказчик",
+        //    selector: (row, index) => <div>{row.service === 0 ? (row.client && row.client.clientName): (row.gp && row.gp.clientName)}</div>,
+        //    center: true,
+        //},        
         {
             name: "Материал",
             selector: (row, index) => <div>{row.material.name}</div>,
-            center: true,
+            wrap: true
         },    
         {
-            name: "Задач",
+            name: "Задачи",
             selector: (row, index) => <div>{row.driverTasks.length}/{row.carCount}</div>,
             center: true,
             compact: true

@@ -14,6 +14,10 @@ const rowPreDisabled = row => row.driverTasks < 1;
 
 const MyTasksList = () => {
     let cancelled = false;
+    var date = new Date();
+    var yesterday = date - 1000 * 60 * 60 * 24 * 2;   // current date's milliseconds - 1,000 ms * 60 s * 60 mins * 24 hrs * (# of days beyond one to go back)
+    yesterday = new Date(yesterday);
+
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState("");
     const [dir, setDir] = useState("desc");
@@ -22,7 +26,7 @@ const MyTasksList = () => {
     const [pageNumber, setPageNumber] = useState(1);
     const [orders, setOrders] = useState([]);
     const [reload, setReload] = useState(0);
-    const [startDate, setStartDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(yesterday);
     const [endDate, setEndDate] = useState(new Date());
     const [searchBy, setSearchBy] = useState("clientName");
     const [searchString, setSearchString] = useState("");
