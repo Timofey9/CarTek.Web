@@ -60,7 +60,7 @@ const DriverEditTask = () => {
     const [openAddress, setOpenAddress] = useState(false);
     const [openMaterial, setOpenMaterial] = useState(false);
 
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
     let { driverTaskId } = useParams();
 
@@ -180,16 +180,19 @@ const DriverEditTask = () => {
                     alert("Статус обновлен");
                     setReload(reload + 1);
                     setFormData(new FormData());
+                    setPickupArrivalTime("");
+                    setPickupDepartureTime("");
+                    setLoadVolume("");
                 })
                 .catch((error) => {
-                    if (error.response.data.message) {
-                        setError(error.response.data.message);
+                    if (error.response.data) {
+                        setError(error.response.data);
                     }
                 });
             return;
         }
 
-        if (status === 8 && validate()) {
+        if (status === 7 && validate()) {
 
             if (hasSubTask) {
                 formData.append("IsSubtask", true);
@@ -209,8 +212,8 @@ const DriverEditTask = () => {
                     setReload(reload + 1);
                 })
                 .catch((error) => {
-                    if (error.response.data.message) {
-                        setError(error.response.data.message);
+                    if (error.response.data) {
+                        setError(error.response.data);
                     }
                 });
 
@@ -226,7 +229,7 @@ const DriverEditTask = () => {
                 })
                 .catch((error) => {
                     if (error.response.data.message) {
-                        setError(error.response.data.message);
+                        setError(error.response.data);
                     }
                 });
         } else {
@@ -239,7 +242,7 @@ const DriverEditTask = () => {
                     })
                     .catch((error) => {
                         if (error.response.data.message) {
-                            setError(error.response.data.message);
+                            setError(error.response.data);
                         }
                     });
             }
@@ -287,7 +290,7 @@ const DriverEditTask = () => {
             }
         }
 
-        if (status === 8) {
+        if (status === 7) {
             if (pickupArrivalTime.length === 0) {
                 isValid = false;
             }
@@ -324,16 +327,14 @@ const DriverEditTask = () => {
             case 3:
                 return "Погрузка";
             case 4:
-                return "Выписать документы (ТН-первая часть)";
+                return "Выписать (ТН-первая часть) и выехать со склада";
             case 5:
-                return "Выехал со склада";
-            case 6:
                 return "Прибыл на объект выгрузки";
-            case 7:
+            case 6:
                 return "Выгрузка";
-            case 8:
+            case 7:
                 return "Выписка документов";
-            case 9:
+            case 8:
                 return "Завершить";
             default:
                 return "Отправить";
@@ -593,7 +594,7 @@ const DriverEditTask = () => {
                         </div>
                     </div>}
 
-                {status === 8 &&
+                {status === 7 &&
                     <div className="form-row">
                         <div className="form-group col-md-6">
                             <label>Объем выгрузки</label>
@@ -649,7 +650,7 @@ const DriverEditTask = () => {
                         </div>
                     </div>}
                 <div>
-                    {status === 8 && 
+                    {status === 7 && 
                         <div className="row mt-3 mb-3">
                             <div className="col-md-9">
                                 <div className="alert alert-danger" role="alert">
@@ -694,7 +695,7 @@ const DriverEditTask = () => {
                             </Stepper>
                         </Box>
                     </div>
-                    {status <= 9 &&
+                    {status <= 8 &&
                     <div className="col-md-9">
                         <div className="row">
                             <div className="col-md-12">
@@ -713,11 +714,19 @@ const DriverEditTask = () => {
                                     {statusToButtonTxt(status)}
                                 </button>
                             </div>
-                        </div>
+                            </div>
+
+                            {error &&
+                                <div className="row d-flex justify-content-center mt-3">
+                                    <div className="alert alert-danger mt-2" role="alert">
+                                        {error}
+                                    </div>
+                                </div>
+                            }
                     </div>}
                 </div>
 
-                {status === 10 && driverTask.shift === 3 && 
+                {status === 9 && driverTask.shift === 3 && 
                     <>
                         <div className="row">
                             <div className="col-md-12">

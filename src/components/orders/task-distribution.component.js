@@ -33,7 +33,7 @@ const CarsWork = () => {
     const [openEditTask, setOpenEditTask] = useState(false);
     const [localUser, setLocalUser] = useState({});
     const [filtered, setFiltered] = useState([]);
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const ExpandedComponent = ({ data }) => <pre>
         <DataTable
@@ -203,7 +203,7 @@ const CarsWork = () => {
                     }
                 },
                 {
-                    when: row => row.status === 10,
+                    when: row => row.status === 9,
                     style: {
                         backgroundColor: '#d1ffbd',
                         '&:hover': {

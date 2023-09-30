@@ -4,6 +4,7 @@ import ApiService from "../../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 import DatePicker, { registerLocale } from "react-datepicker";
 import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -40,8 +41,9 @@ const OrdersList = () => {
     const [selectedOrderId, setSelectedOrderId] = useState(0);
     const [selectedTaskId, setSelectedTaskId] = useState(0);
     const [localUser, setLocalUser] = useState({});
+    const [cloningOrder, setCloningOrder] = useState({});
 
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена','Завершена'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const handleClickOpen = (orderId) => {
         setOpen(true);
@@ -53,12 +55,14 @@ const OrdersList = () => {
         setReload(reload + 1);
     };
 
-    const handleClickOpenOrder = () => {
+    const handleClickOpenOrder = (order) => {
+        setCloningOrder(order);
         setOpenOrder(true);
     };
 
     const handleCloseOrderForm = () => {
         setOpenOrder(false);
+        setCloningOrder({});
         setReload(reload + 1);
     };
 
@@ -236,15 +240,16 @@ const OrdersList = () => {
             compact: true
         },    
         {
-            name: "Создать задачу",
-            selector: (row, index) => <Button disabled={row.driverTasks.length >= row.carCount} variant="outlined" onClick={e => handleClickOpen(row.id)}>+</Button>,
+            name: "Действия",
+            selector: (row, index) => 
+                <ButtonGroup orientation="vertical" size="medium" variant="contained" aria-label="small button group">
+                    <Button disabled={row.driverTasks.length >= row.carCount} onClick={e => handleClickOpen(row.id)}><i className="fa fa-plus" aria-hidden="true"></i></Button>
+                    <Button onClick={e => handleClickOpenEditOrder(row.id)}><i className="fa fa-external-link" aria-hidden="true"></i></Button>
+                    <Button onClick={e => handleClickOpenOrder(row)}><i className="fa fa-clone" aria-hidden="true"></i></Button>
+                </ButtonGroup>,
             center: true,
+            wrap: true,
             omit: localUser.identity && localUser.identity.isDispatcher
-        },
-        {
-            name: "Просмотр",
-            selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpenEditOrder(row.id)}><i className="fa fa-external-link" aria-hidden="true"></i></Button>,
-            center: true
         }
     ];
 
@@ -284,7 +289,7 @@ const OrdersList = () => {
                     }
                 },
                 {
-                    when: row => row.status === 10,
+                    when: row => row.status === 9,
                     style: {
                         backgroundColor: '#d1ffbd',
                         '&:hover': {
@@ -293,7 +298,7 @@ const OrdersList = () => {
                     }
                 },
                 {
-                    when: row => row.status !== 0 && row.status !== 10,
+                    when: row => row.status !== 0 && row.status !== 9,
                     style: {
                         backgroundColor: '#ffefac',
                         '&:hover': {
@@ -315,7 +320,7 @@ const OrdersList = () => {
         },
         {
             name: "ТН",
-            selector: (row, index) => row.status === 10 ? <Button variant="contained" color="success" onClick={(event) => downloadTN(row.id)}><i className="fa fa-download" aria-hidden="true"></i></Button> : "-",
+            selector: (row, index) => row.status === 9 ? <Button variant="contained" color="success" onClick={(event) => downloadTN(row.id)}><i className="fa fa-download" aria-hidden="true"></i></Button> : "-",
             center: true,
             grow: 1
         },
@@ -474,7 +479,7 @@ const OrdersList = () => {
                     </Button>
                 </Toolbar>
             </AppBar>
-            <OrderForm handleCloseOrderForm={handleCloseOrderForm}></OrderForm>
+            <OrderForm clonedOrder={cloningOrder} handleCloseOrderForm={handleCloseOrderForm}></OrderForm>
         </Dialog>
 
         <Dialog

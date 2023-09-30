@@ -18,7 +18,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
-function OrderForm({ handleCloseOrderForm }) {
+function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [clients, setClients] = useState([]);
     const [client, setClient] = useState({});
     const [gp, setGp] = useState({});
@@ -118,6 +118,44 @@ function OrderForm({ handleCloseOrderForm }) {
 
     useEffect(() => {
         setLoading(true);
+        ApiService.getAddresses()
+            .then(({ data }) => {
+                setAddresses(data);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+
+        setLoading(false);
+    }, [reload]);
+
+    useEffect(() => {
+        if (clonedOrder !== undefined) {
+            setOrderName(clonedOrder.name);
+            setServiceType(clonedOrder.service);
+            if (addresses.length > 0) {
+                var locA = addresses.find(t => t.id == clonedOrder.locationAId);
+                setAddressA(locA);
+
+                var locB = addresses.find(t => t.id == clonedOrder.locationBId);
+                setAddressB(locB);
+            }
+
+            setClient(clonedOrder.client);
+            setGp(clonedOrder.gp);
+            setMaterial(clonedOrder.material);
+            setCarCount(clonedOrder.carCount);
+            setNote(clonedOrder.note);
+            setMileage(clonedOrder.mileage ?? 0);
+            setPrice(clonedOrder.price ?? 0);
+            setVolume(clonedOrder.volume ?? 0);
+        }
+    }, [addresses]);
+
+    useEffect(() => {
+        setLoading(true);
         ApiService.getAllDrivers()
             .then(({ data }) => {
                 setDrivers(data);
@@ -165,21 +203,6 @@ function OrderForm({ handleCloseOrderForm }) {
         ApiService.getClients()
             .then(({ data }) => {
                 setClients(data);
-            }).
-            catch((error) => {
-                if (error.response.data.message) {
-                    setMessage(error.response.data.message);
-                }
-            });
-
-        setLoading(false);
-    }, [reload]);
-
-    useEffect(() => {
-        setLoading(true);
-        ApiService.getAddresses()
-            .then(({ data }) => {
-                setAddresses(data);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -359,6 +382,7 @@ function OrderForm({ handleCloseOrderForm }) {
                             getOptionLabel={(option) => `${option.clientName}`}
                             isOptionEqualToValue={(o,v) => o === v.clientName} 
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                        {client.clientName}
                     </div>
 
                     <div className="form-group col-md-6">
@@ -371,6 +395,7 @@ function OrderForm({ handleCloseOrderForm }) {
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                        {gp.clientName}
                     </div>
 
                     <div className="form-group col-md-6">
@@ -389,6 +414,7 @@ function OrderForm({ handleCloseOrderForm }) {
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.name}`}
                             renderInput={(params) => <TextField {...params} label="Список материалов" />} />
+                        <div>{material.name}</div>
 
                         <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
                             Добавить тип груза

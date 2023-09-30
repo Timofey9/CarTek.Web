@@ -8,7 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
-const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
+const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
 const rowPreDisabled = row => row.driverTasks < 1;
 
@@ -133,7 +133,7 @@ const MyTasksList = () => {
             }
         },
         {
-            when: row => row.status === 10,
+            when: row => row.status === 9,
             style: {
                 backgroundColor: '#d1ffbd',
                 '&:hover': {
@@ -142,7 +142,7 @@ const MyTasksList = () => {
             }
         },
         {
-            when: row => row.status !== 0 && row.status !== 10,
+            when: row => row.status !== 0 && row.status !== 9,
             style: {
                 backgroundColor: '#ffefac',
                 '&:hover': {

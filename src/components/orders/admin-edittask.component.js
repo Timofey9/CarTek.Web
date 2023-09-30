@@ -41,7 +41,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [selectedDriverId, setSelectedDriverId] = useState(0);
     const [open, setOpen] = useState(false);
     const [reload, setReload] = useState(false);
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Выехал со склада', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
 
     const handleClickOpen = () => {

@@ -72,7 +72,7 @@ function DriverTaskCarForm({carId, handleClose}) {
 
         const newTask = {
             orderId: order.id,
-            shift: shift ? 0 : 1,
+            shift: shift,
             driverId: driver.id,
             carId: carId,
             taskDate: startDate,
@@ -124,7 +124,7 @@ function DriverTaskCarForm({carId, handleClose}) {
                         disablePortal
                         onChange={(e, newvalue) => { setOrder(newvalue) }}
                         sx={{ width: 300 }}
-                        getOptionLabel={(option) => `от ${new Date(option.startDate).toLocaleDateString('ru-Ru', { day: '2-digit', month: '2-digit', year: 'numeric' })} для ${option.service === '0' ? option.clientName : option.gp.clientName}`}
+                        getOptionLabel={(option) => option.name}
                         renderInput={(params) => <TextField {...params} label="Список заявок" />} />
                 </div>
 
