@@ -212,7 +212,7 @@ const CarsWork = () => {
                     }
                 },
                 {
-                    when: row => row.status !== 0 && row.status !== 10,
+                    when: row => row.status !== 0 && row.status !== 9,
                     style: {
                         backgroundColor: '#ffefac',
                         '&:hover': {
