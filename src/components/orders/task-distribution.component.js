@@ -107,7 +107,7 @@ const CarsWork = () => {
             startDate: startDate.toISOString(),
         }).then(({ data }) => {
             setCars(data);
-            setFiltered(data);
+            filterData(searchString, JSON.parse(JSON.stringify(data)));
         });
 
         setLoading(false);
@@ -119,21 +119,7 @@ const CarsWork = () => {
             name: "Номер",
             sortBy: "plate",
             selector: (row, index) => row.plate,
-            sortable: true
-        },
-        {
-            name: "Марка",
-            sortBy: "brand",
-            selector: (row, index) => row.brand,
-            sortable: false,
-            maxWidth: '1em'
-        },
-        {
-            name: "Модель",
-            sortBy: "model",
-            selector: (row, index) => row.model,
-            sortable: false,
-            minWidth: '1em',
+            sortable: false
         },
         {
             name: "Статус",
@@ -163,7 +149,7 @@ const CarsWork = () => {
         },
         {
             name: "Услуга",
-            selector: (row, index) => <div>{row.order.service === 0 ? "Поставка" : "Перевозка"}</div>,
+            selector: (row, index) => <div>{row.order.service === 0 ? "Перевозка" : "Поставка"}</div>,
             center: true,
         },    
         {
@@ -242,12 +228,13 @@ const CarsWork = () => {
         }
     };
 
-    const filterData = (search) => {
-        var temp = JSON.parse(JSON.stringify(cars));
+    const filterData = (search, temp) => {
         setSearchString(search);
+        console.log(temp);
+
         switch (searchBy) {
             case "plate": {
-                setFiltered(cars.filter((car) => car.plate.includes(search)));
+                setFiltered(temp.filter((car) => car.plate.includes(search)));
                 break;
             }
             case "status": {
@@ -306,7 +293,17 @@ const CarsWork = () => {
         }
     ];
 
-    const rowPreExpanded = row => row.driverTasks.length && row.driverTasks.length > 0
+    const updateSearchBy = (value) => {
+        console.log(value);
+        if (value === 'none') {
+            setSearchBy(value);
+            setSearchString("");
+            filterData("", JSON.parse(JSON.stringify(cars)));
+        } else {
+            setSearchBy(value);
+            filterData(searchString, JSON.parse(JSON.stringify(cars)));
+        }
+    }
 
     if (loading) {
         return <div><h1>ЗАГРУЗКА...</h1></div>
@@ -334,7 +331,7 @@ const CarsWork = () => {
                 <div className="col-md-7">
                     <div className="input-group mt-3">
                         <div className="mb-3 col-md-4 pl-1">
-                            <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
+                            <select className="form-select" onChange={(e) => { updateSearchBy(e.target.value) }} value={searchBy}>
                                 <option value="none">Поиск по</option>
                                 <option value="plate">Номер</option>
                                 <option value="status">Статус</option>
@@ -344,7 +341,7 @@ const CarsWork = () => {
 
                         <div className="mb-3 col-md-4 pl-1">
                             {searchBy === 'status' ?
-                                <select className="form-select" onChange={(e) => { filterData(e.target.value) }} value={searchString}>
+                                <select className="form-select" onChange={(e) => { filterData(e.target.value, JSON.parse(JSON.stringify(cars)))}} value={searchString}>
                                     <option value="0">Назначена</option>
                                     <option value="1">Принята</option>
                                     <option value="2">На линии</option>
@@ -358,7 +355,7 @@ const CarsWork = () => {
                                     <option value="10">Завершена</option>
                                 </select>                                
                                 :
-                                <input className="form-control" type="text" value={searchString} onChange={(e) => { filterData(e.target.value) }} />}
+                                <input className="form-control" type="text" value={searchString} onChange={(e) => { filterData(e.target.value, JSON.parse(JSON.stringify(cars)))}} />}
                         </div>
                     </div>
                 </div>
@@ -371,8 +368,6 @@ const CarsWork = () => {
             noHeader
             conditionalRowStyles={conditionalRowStyles}
             highlightOnHover
-            defaultSortFieldId={1}
-            defaultSortAsc
             noDataComponent="Машин не найдено"
             progressPending={loading}
             customStyles={customStyles}
@@ -380,7 +375,6 @@ const CarsWork = () => {
             expandableRows
             expandableRowDisabled={rowPreDisabled}
             expandableRowsComponent={ExpandedComponent}
-            expandableRowExpanded={rowPreExpanded}
         />
 
         <Dialog

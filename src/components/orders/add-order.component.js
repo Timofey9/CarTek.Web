@@ -28,12 +28,12 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [orderName, setOrderName] = useState("");
     const [materialsList, setMaterialsList] = useState([]);
     const [material, setMaterial] = useState({});
-    const [volume, setVolume] = useState(0);
+    const [volume, setVolume] = useState("");
     const [loadUnit, setLoadUnit] = useState("none");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [note, setNote] = useState("");
-    const [carCount, setCarCount] = useState(0);
+    const [carCount, setCarCount] = useState("");
     const [serviceType, setServiceType] = useState("none");
     const [reload, setReload] = useState(0);
     const [error, setError] = useState("");

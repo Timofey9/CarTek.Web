@@ -13,14 +13,19 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import CircularProgress from '@mui/material/CircularProgress';
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ru from 'date-fns/locale/ru';
 import "./drivers.css";
-
 import ClientForm from '../orders/add-client.component'
 import AddressForm from '../orders/add-address.component'
 import MaterialForm from '../orders/add-material.component'
+import Backdrop from '@mui/material/Backdrop';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 
 registerLocale('ru', ru);
 
@@ -53,12 +58,13 @@ const DriverEditTask = () => {
     const [pickupDepartureDate, setPickupDepartureDate] = useState(new Date());
     const [pickupDepartureTime, setPickupDepartureTime] = useState("");
     const [currentSubTask, setCurrentSubTask] = useState({});
-    const [hasSubTask, setHasSubTask] = useState(false); 
+    const [hasSubTask, setHasSubTask] = useState(false);
     const [continueWork, setContinueWork] = useState(false);
-    const [validated, setValidated] = useState(false);
+    const [validated, setValidated] = useState(true);
     const [open, setOpen] = useState(false);
     const [openAddress, setOpenAddress] = useState(false);
     const [openMaterial, setOpenMaterial] = useState(false);
+    const [showSpinner, setShowSpinner] = useState(false);
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
@@ -91,7 +97,6 @@ const DriverEditTask = () => {
         setReload(reload + 1);
     };
 
-
     const unitToString = (unit) => {
         switch (unit) {
             case 0:
@@ -116,13 +121,22 @@ const DriverEditTask = () => {
             case 3:
                 return "Сутки (не ограничено)";
         }
-    } 
+    }
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    };
 
     const selectFile = (e) => {
-        formData.delete("Files");
-
-        for (let file of e.target.files) {
-            formData.append("Files", file);
+        try {
+            formData.delete("Files");
+            for (var file of e.target.files) {
+                formData.append("Files", file);
+            }
+        }
+        catch (e) {
+            console.log(e);
+            alert("Прикрепите фото еще раз");
         }
     };
 
@@ -142,10 +156,43 @@ const DriverEditTask = () => {
                     setError(error.response.data.message);
                 }
             });
+
     }
+
+    const handleSubmitNote = (event) => {
+        event.preventDefault();
+        setShowSpinner(true);
+
+        for (var key of formData.keys()) {
+            if (key !== "Files")
+                formData.delete(key)
+        };
+
+        formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
+        formData.append("UpdatedStatus", status + 1);
+        formData.append("Note", note);
+
+        ApiService.SubmitNoteAsync(formData)
+            .then(({ data }) => {
+                alert("Статус обновлен");
+                setFormData(new FormData());
+                setNote("");
+                setReload(reload + 1);
+                setShowSpinner(false);
+            })
+            .catch((error) => {
+                if (error.response.data.message) {
+                    setError(error.response.data);
+                }
+            });
+
+        setShowSpinner(false);
+    }
+
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        setShowSpinner(true);
 
         for (var key of formData.keys()) {
             if (key !== "Files")
@@ -157,7 +204,6 @@ const DriverEditTask = () => {
         formData.append("Note", note);
 
         if (status === 4 && validate()) {
-
             if (hasSubTask) {
                 formData.set("DriverTaskId", driverTask.id);
                 formData.append("IsSubtask", true);
@@ -183,6 +229,8 @@ const DriverEditTask = () => {
                     setPickupArrivalTime("");
                     setPickupDepartureTime("");
                     setLoadVolume("");
+                    setNote("");
+                    setShowSpinner(false);
                 })
                 .catch((error) => {
                     if (error.response.data) {
@@ -209,7 +257,9 @@ const DriverEditTask = () => {
                 .then(({ data }) => {
                     alert("Статус обновлен");
                     setFormData(new FormData());
+                    setNote("");
                     setReload(reload + 1);
+                    setShowSpinner(false);
                 })
                 .catch((error) => {
                     if (error.response.data) {
@@ -225,7 +275,9 @@ const DriverEditTask = () => {
                 .then(({ data }) => {
                     alert("Статус обновлен");
                     setFormData(new FormData());
+                    setNote("");
                     setReload(reload + 1);
+                    setShowSpinner(false);
                 })
                 .catch((error) => {
                     if (error.response.data.message) {
@@ -238,7 +290,10 @@ const DriverEditTask = () => {
                     .then(({ data }) => {
                         alert("Статус обновлен");
                         setFormData(new FormData());
+                        setNote("");
                         setReload(reload + 1);
+                        setShowSpinner(false);
+                        scrollToTop();
                     })
                     .catch((error) => {
                         if (error.response.data.message) {
@@ -247,6 +302,7 @@ const DriverEditTask = () => {
                     });
             }
         }
+        setShowSpinner(false);
     };
 
     const validate = () => {
@@ -414,10 +470,19 @@ const DriverEditTask = () => {
         setLoading(false);
     }, [reload]);
 
+    const checkObjectKeys = (obj) => {
+        if (obj !== null && obj !== undefined) {
+            return validated && Object.keys(obj).length === 0;
+        }
+
+        return validated;
+    }
+
 
     return <div className="container">
         {!loading && (
-            <>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+
                 <div className="row">
                     <h1>Задача по заявке на {new Date(order.startDate).toLocaleDateString('ru-Ru', {
                         day: '2-digit',
@@ -425,7 +490,7 @@ const DriverEditTask = () => {
                         year: 'numeric',
                     })}{hasSubTask &&
                         <span>,рейс #{currentSubTask.sequenceNumber + 1}</span>}
-                    </h1>                    
+                    </h1>
                 </div>
 
                 <dl className="row">
@@ -479,7 +544,7 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Грузоотправитель (1)</label>
                             <Autocomplete
-                                className={validated && Object.keys(go).length === 0 ? "not-valid-input-border" : ""}
+                                className={checkObjectKeys(go) ? "not-valid-input-border" : ""}
                                 options={clients}
                                 disablePortal
                                 onChange={(e, newvalue) => { setGo(newvalue) }}
@@ -491,14 +556,14 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Грузополучатель (2)</label>
                             <Autocomplete
-                                className={validated && Object.keys(gp).length === 0 ? "not-valid-input-border" : ""}
+                                className={checkObjectKeys(gp) ? "not-valid-input-border" : ""}
                                 options={clients}
                                 disablePortal
                                 onChange={(e, newvalue) => { setGp(newvalue) }}
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.clientName}`}
                                 renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                        {/*    {driverTask.order.client.name}*/}
+                            {/*    {driverTask.order.client.name}*/}
                         </div>
 
                         <div className="form-group col-md-6">
@@ -510,14 +575,13 @@ const DriverEditTask = () => {
                         <div className="form-row">
                             <label>Тип груза (3)</label>
                             <Autocomplete
-                                className={validated && Object.keys(material).length === 0 ? "not-valid-input-border" : ""}
+                                className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
                                 options={materialsList}
                                 disablePortal
                                 onChange={(e, newvalue) => { setMaterial(newvalue) }}
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.name}`}
                                 renderInput={(params) => <TextField {...params} label="Список материалов" />} />
-
 
                             <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
                                 Добавить тип груза
@@ -548,7 +612,7 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Прием груза (8)</label>
                             <Autocomplete
-                                className={validated && Object.keys(addressA).length === 0 ? "not-valid-input-border" : ""}
+                                className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
                                 options={addresses}
                                 disablePortal
                                 onChange={(e, newvalue) => { setAddressA(newvalue) }}
@@ -561,8 +625,6 @@ const DriverEditTask = () => {
                             </button>
                         </div>
 
-
-
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата прибытия на склад погрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
@@ -570,12 +632,13 @@ const DriverEditTask = () => {
 
                         <div className="form-group col-md-6">
                             <label>Время прибытия на склад погрузки</label>
-                            <input
-                                className={validated && pickupArrivalTime.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
-                                form="profile-form"
-                                onChange={(e) => setPickupArrivalTime(e.target.value)}
-                                value={pickupArrivalTime} />
+                            <TimePicker required={true}
+                                className={validated && pickupArrivalTime.length === 0 ? "not-valid-input-border" : ""}
+                                size='medium'
+                                minutesStep={1}
+                                ampm={false}
+                                label="Время"
+                                onChange={(newValue) => setPickupArrivalTime(`${newValue.$H}:${newValue.$m}`)} />
                         </div>
 
                         <div className="input-group mb-3 col-md-6 pl-1">
@@ -585,12 +648,14 @@ const DriverEditTask = () => {
 
                         <div className="form-group col-md-6">
                             <label>Время выезда со склада погрузки</label>
-                            <input
-                                className={validated && pickupDepartureTime.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
-                                form="profile-form"
-                                onChange={(e) => setPickupDepartureTime(e.target.value)}
-                                value={pickupDepartureTime} />
+                            <TimePicker
+                                className={validated && pickupDepartureTime.length === 0 ? "not-valid-input-border" : ""}
+                                size='medium'
+                                minutesStep={1}
+                                ampm={false}
+                                label="Время"
+                                onChange={(newValue) => setPickupDepartureTime(`${newValue.$H}:${newValue.$m}`)} />
+                            {pickupDepartureTime.length === 0}
                         </div>
                     </div>}
 
@@ -609,7 +674,7 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Выдача груза (8)</label>
                             <Autocomplete
-                                className={validated && Object.keys(addressB).length === 0 ? "not-valid-input-border" : ""}
+                                className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
                                 options={addresses}
                                 disablePortal
                                 onChange={(e, newvalue) => { setAddressB(newvalue) }}
@@ -626,12 +691,13 @@ const DriverEditTask = () => {
 
                         <div className="form-group col-md-6">
                             <label>Время прибытия на склад выгрузки</label>
-                            <input
-                                className={validated && pickupArrivalTime.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
-                                form="profile-form"
-                                onChange={(e) => setPickupArrivalTime(e.target.value)}
-                                value={pickupArrivalTime} />
+                            <TimePicker required={true}
+                                className={validated && pickupArrivalTime.length === 0 ? "not-valid-input-border" : ""}
+                                size='medium'
+                                minutesStep={1}
+                                ampm={false}
+                                label="Время"
+                                onChange={(newValue) => setPickupArrivalTime(`${newValue.$H}:${newValue.$m}`)} />
                         </div>
 
                         <div className="input-group mb-3 col-md-6 pl-1">
@@ -641,21 +707,33 @@ const DriverEditTask = () => {
 
                         <div className="form-group col-md-6">
                             <label>Время выезда со склада выгрузки</label>
-                            <input
-                                className={validated && pickupDepartureTime.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
-                                form="profile-form"
-                                onChange={(e) => setPickupDepartureTime(e.target.value)}
-                                value={pickupDepartureTime} />
+                            <TimePicker required={true}
+                                className={validated && pickupDepartureTime.length === 0 ? "not-valid-input-border" : ""}
+                                size='medium'
+                                minutesStep={1}
+                                ampm={false}
+                                label="Время"
+                                onChange={(newValue) => setPickupDepartureTime(`${newValue.$H}:${newValue.$m}`)} />
                         </div>
                     </div>}
                 <div>
-                    {status === 7 && 
+                    {status === 7 ?
                         <div className="row mt-3 mb-3">
                             <div className="col-md-9">
                                 <div className="alert alert-danger" role="alert">
                                     ПРИКРЕПИТЬ ФОТО ТН!
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                        </div> :
+                        <div className="row">
+                            <div className="col-md-12">
+                                <label htmlFor="files">Прикрепить фотографии</label>
+                                <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
                             </div>
                         </div>}
                 </div>
@@ -696,26 +774,29 @@ const DriverEditTask = () => {
                         </Box>
                     </div>
                     {status <= 8 &&
-                    <div className="col-md-9">
-                        <div className="row">
-                            <div className="col-md-12">
-                                <textarea id="acceptanceComment" onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
+                        <div className="col-md-9">
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <textarea id="acceptanceComment" value={note} onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
+                                </div>
                             </div>
-                        </div>
-                        <div className="row">
-                            <div className="col-md-12">
-                                <label htmlFor="files">Прикрепить фотографии</label>
-                                <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                            <div className="row mb-5">
+                                <div className="col-md-12">
+                                    <div className="col-md-3">
+                                        <button type="submit" onClick={handleSubmitNote} className="btn btn-primary mt-3">
+                                            Отправить комментарий
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div className="row mb-5">
-                            <div className="col-md-12">
-                                <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
-                                    {statusToButtonTxt(status)}
-                                </button>
+                            <div className="row mb-5">
+                                <div className="col-md-12">
+                                    <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
+                                        {statusToButtonTxt(status)}
+                                    </button>
+                                </div>
                             </div>
-                            </div>
-
+ 
                             {error &&
                                 <div className="row d-flex justify-content-center mt-3">
                                     <div className="alert alert-danger mt-2" role="alert">
@@ -723,10 +804,10 @@ const DriverEditTask = () => {
                                     </div>
                                 </div>
                             }
-                    </div>}
+                        </div>}
                 </div>
 
-                {status === 9 && driverTask.shift === 3 && 
+                {status === 9 && driverTask.shift === 3 &&
                     <>
                         <div className="row">
                             <div className="col-md-12">
@@ -736,16 +817,22 @@ const DriverEditTask = () => {
                             </div>
                         </div>
                         <div className="row mt-3 mb-3">
-                                <div className="col-md-12">
-                            <button type="submit" onClick={createSubTask} className="btn btn-success mt-3">
-                                        Продолжить
-                                    </button>
-                                </div>
+                            <div className="col-md-12">
+                                <button type="submit" onClick={createSubTask} className="btn btn-success mt-3">
+                                    Продолжить
+                                </button>
+                            </div>
                         </div>
                     </>
                 }
-            </>
+            </LocalizationProvider>
         )}
+        <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={showSpinner}
+        >
+            <CircularProgress color="inherit" />
+        </Backdrop>
 
         <Dialog
             fullScreen

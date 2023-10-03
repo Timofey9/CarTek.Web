@@ -56,6 +56,7 @@ function DriverTaskCarForm({carId, handleClose}) {
         ApiService.getAllActiveOrders(req)
             .then(({ data }) => {
                 setOrders(data);
+                console.log(data);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -124,7 +125,7 @@ function DriverTaskCarForm({carId, handleClose}) {
                         disablePortal
                         onChange={(e, newvalue) => { setOrder(newvalue) }}
                         sx={{ width: 300 }}
-                        getOptionLabel={(option) => option.name}
+                        getOptionLabel={(option) => option.addressA}
                         renderInput={(params) => <TextField {...params} label="Список заявок" />} />
                 </div>
 

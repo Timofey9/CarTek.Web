@@ -11,6 +11,6 @@
 }
 
 .not-valid-input-border {
-    border: solid 2px red;
+    border: solid 2px red !important;
     border-radius: 3px;
 }
