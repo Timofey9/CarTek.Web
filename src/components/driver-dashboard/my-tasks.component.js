@@ -18,6 +18,9 @@ const MyTasksList = () => {
     var yesterday = date - 1000 * 60 * 60 * 24 * 2;   // current date's milliseconds - 1,000 ms * 60 s * 60 mins * 24 hrs * (# of days beyond one to go back)
     yesterday = new Date(yesterday);
 
+    let date2 = new Date(date);
+    date2.setDate(date.getDate() + 2);
+
     const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState("");
     const [dir, setDir] = useState("desc");
@@ -27,7 +30,7 @@ const MyTasksList = () => {
     const [orders, setOrders] = useState([]);
     const [reload, setReload] = useState(0);
     const [startDate, setStartDate] = useState(yesterday);
-    const [endDate, setEndDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(date2);
     const [searchBy, setSearchBy] = useState("clientName");
     const [searchString, setSearchString] = useState("");
 
@@ -38,9 +41,9 @@ const MyTasksList = () => {
     const intToShift = (shift) => {
         switch (shift) {
             case 0:
-                return "Дневная (08:00 - 20:00)";
-            case 1:
                 return "Ночная (20:00 - 08:00)";
+            case 1:
+                return "Дневная (08:00 - 20:00)";
             case 2:
                 return "Сутки";
             case 3:

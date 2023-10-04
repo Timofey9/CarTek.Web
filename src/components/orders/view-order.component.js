@@ -12,6 +12,7 @@ import ClientForm from './add-client.component'
 import AddressForm from './add-address.component'
 import MaterialForm from './add-material.component'
 import Divider from '@mui/material/Divider';
+import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import "react-datepicker/dist/react-datepicker.css";
 import "./orders.css";
 import ru from 'date-fns/locale/ru';
@@ -52,6 +53,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [localUser, setLocalUser] = useState({});
     const [startDateChanged, setStartDateChanged] = useState(false);
     const [applyChanges, setApplyChanges] = useState(true);
+    const [orderShift, setOrderShift] = useState(0);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -105,6 +107,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setCarCount(data.carCount);
                 setMileage(data.mileage);
                 setGp(data.gp);
+                setOrderShift(data.shift);
                 console.log(data);
             }).
             catch((error) => {
@@ -222,6 +225,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             clientName: client.clientName,
             clientId: client.id,
             gpId: gp.id,
+            shift: orderShift,
             materialId: material.id,
             volume: volume,
             loadUnit: loadUnit,
@@ -296,6 +300,11 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         />
                     </div>
 
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <div className="form-group col-md-6">
+                        <ShiftRadioButtonGroup value={orderShift} onChange={(event) => { setOrderShift(event.target.value); setReload(reload + 1); }} />
+                    </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 

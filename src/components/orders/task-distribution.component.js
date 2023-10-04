@@ -62,12 +62,22 @@ const CarsWork = () => {
         });
     };
 
+    const downloadFileShort = () => {
+        ApiService.downloadTasksReportShort({
+            startDate: startDate.toUTCString(),
+        }).then(response => {
+            let url = window.URL
+                .createObjectURL(new Blob([response.data]));
+            saveAs(url, `Разнарядка_${startDate.toLocaleDateString()}.xlsx`);
+        });
+    };
+
     const intToShift = (shift) => {
         switch (shift) {
             case 0:
-                return "Дневная (08:00 - 20:00)";
-            case 1:
                 return "Ночная (20:00 - 08:00)";
+            case 1:
+                return "Дневная (08:00 - 20:00)";
             case 2:
                 return "Сутки";
             case 3:
@@ -116,8 +126,13 @@ const CarsWork = () => {
 
     const columns = [
         {
+            name: "П/П",
+            selector: (row, index) => index + 1,
+            sortable: false,
+            maxWidth: '0.2em',
+        },
+        {
             name: "Номер",
-            sortBy: "plate",
             selector: (row, index) => row.plate,
             sortable: false
         },
@@ -324,6 +339,7 @@ const CarsWork = () => {
                 </div>
                 <div className="col-md-5">
                     <button className="btn btn-success pull-right" onClick={(e) => { e.preventDefault(); downloadFile() }}>Скачать</button>
+                    <button className="btn btn-success pull-right" onClick={(e) => { e.preventDefault(); downloadFileShort() }}>Сводная табл.</button>
                 </div>
             </div>
 

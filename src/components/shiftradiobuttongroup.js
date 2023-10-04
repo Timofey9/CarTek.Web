@@ -14,8 +14,8 @@ function ShiftRadioButtonGroup({value, onChange}) {
                 name="radio-buttons-group"
                 value={value}
                 onChange={onChange}>
-                <FormControlLabel value="0" control={<Radio />} label="День (08:00 - 20:00)" />
-                <FormControlLabel value="1" control={<Radio />} label="Ночь (20:00 - 08:00)" />
+                <FormControlLabel value="0" control={<Radio />} label="Ночь (20:00 - 08:00)" />
+                <FormControlLabel value="1" control={<Radio />} label="День (08:00 - 20:00)" />
                 <FormControlLabel value="2" control={<Radio />} label="Сутки" />
                 <FormControlLabel value="3" control={<Radio />} label="Сутки (не ограничено)" />
             </RadioGroup>

@@ -113,9 +113,9 @@ const DriverEditTask = () => {
     const intToShift = (shift) => {
         switch (shift) {
             case 0:
-                return "Дневная (08:00 - 20:00)";
-            case 1:
                 return "Ночная (20:00 - 08:00)";
+            case 1:
+                return "Дневная (08:00 - 20:00)";
             case 2:
                 return "Сутки";
             case 3:
@@ -526,7 +526,7 @@ const DriverEditTask = () => {
                     <dd className="col-sm-9">{order.note}</dd>
 
                     <dt className="col-sm-3">Комментарий по задаче:</dt>
-                    <dd className="col-sm-9">{driverTask.adminComment}</dd>
+                    <dd className="col-sm-5">{driverTask.adminComment}</dd>
                 </dl>
 
                 {status === 4 &&
@@ -733,7 +733,7 @@ const DriverEditTask = () => {
                         <div className="row">
                             <div className="col-md-12">
                                 <label htmlFor="files">Прикрепить фотографии</label>
-                                <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                                <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
                             </div>
                         </div>}
                 </div>

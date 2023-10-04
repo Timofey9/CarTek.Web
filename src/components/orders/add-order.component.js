@@ -50,6 +50,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [orderId, setOrderId] = useState(0);
     const [validated, setValidated] = useState(false);
     const [isOrderCreated, setIsOrderCreated] = useState(false);
+    const [orderShift, setOrderShift] = useState(0);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -151,6 +152,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             setMileage(clonedOrder.mileage ?? 0);
             setPrice(clonedOrder.price ?? 0);
             setVolume(clonedOrder.volume ?? 0);
+            setOrderShift(clonedOrder.shift ?? 0);
         }
     }, [addresses]);
 
@@ -256,6 +258,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             gpId: gp.id,
             clientId: client.id,
             materialId: material.id,
+            shift: orderShift,
             volume: volume,
             loadUnit: loadUnit === "none" ? 3 : loadUnit,
             isComplete: false,
@@ -273,10 +276,10 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
         if (validate()) {
             ApiService.createOrder(newOrder)
                 .then(({ data }) => {
-                    alert(`Заявка создана, номер: ${data.message}`);
+                    alert(`Заявка создана`);
                     let array = [];
                     for (let i = 0; i < carCount; i++) {
-                        array.push({ car: {}, driver: {}, taskDate: new Date(), shift: 0 });
+                        array.push({ car: {}, driver: {}, taskDate: new Date(), shift: orderShift });
                     }
                     setOrderId(data.message);
                     setIsOrderCreated(true);
@@ -314,6 +317,10 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             onChange={(e) => setOrderName(e.target.value)}
                             value={orderName}
                         />
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <ShiftRadioButtonGroup value={orderShift} onChange={(event) => {setOrderShift(event.target.value);}} />
                     </div>
 
                     <div className="form-group col-md-6">

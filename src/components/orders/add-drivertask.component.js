@@ -10,11 +10,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
-function DriverTaskForm({orderId, handleClose}) {
-    const [order, setOrder] = useState({});
+function DriverTaskForm({order, handleClose}) {
     const [cars, setCars] = useState([]);
     const [car, setCar] = useState({});
-    const [shift, setShift] = useState(0);
+    const [shift, setShift] = useState(order.shift);
     const [drivers, setDrivers] = useState([]);
     const [driver, setDriver] = useState({});
     const [forceChange, setForceChange] = useState(false);
@@ -22,10 +21,8 @@ function DriverTaskForm({orderId, handleClose}) {
     const [comment, setComment] = useState("");
     const [volume, setVolume] = useState(0);
     const [unit, setUnit] = useState(0);
-
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
-
     const [loading, setLoading] = useState(true);
     const [notificationShown, setNotificationShown] = useState(false);
 
@@ -68,7 +65,7 @@ function DriverTaskForm({orderId, handleClose}) {
         setMessage("");
 
         const newTask = {
-            orderId: orderId,
+            orderId: order.id,
             shift: shift,
             driverId: driver.id,
             carId: car.id,

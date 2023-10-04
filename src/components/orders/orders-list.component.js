@@ -38,7 +38,7 @@ const OrdersList = () => {
     const [openOrder, setOpenOrder] = useState(false);
     const [openEditOrder, setOpenEditOrder] = useState(false);
     const [openEditTask, setOpenEditTask] = useState(false);
-    const [selectedOrderId, setSelectedOrderId] = useState(0);
+    const [selectedOrderId, setSelectedOrderId] = useState({});
     const [selectedTaskId, setSelectedTaskId] = useState(0);
     const [localUser, setLocalUser] = useState({});
     const [cloningOrder, setCloningOrder] = useState({});
@@ -46,8 +46,8 @@ const OrdersList = () => {
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
     const handleClickOpen = (orderId) => {
-        setOpen(true);
         setSelectedOrderId(orderId);
+        setOpen(true);
     };
 
     const handleClose = () => {
@@ -96,9 +96,9 @@ const OrdersList = () => {
     const intToShift = (shift) => {
         switch (shift) {
             case 0:
-                return "Дневная (08:00 - 20:00)";
-            case 1:
                 return "Ночная (20:00 - 08:00)";
+            case 1:
+                return "Дневная (08:00 - 20:00)";
             case 2:
                 return "Сутки";
             case 3:
@@ -243,7 +243,7 @@ const OrdersList = () => {
             name: "Действия",
             selector: (row, index) => 
                 <ButtonGroup orientation="vertical" size="medium" variant="contained" aria-label="small button group">
-                    <Button disabled={row.driverTasks.length >= row.carCount} onClick={e => handleClickOpen(row.id)}><i className="fa fa-plus" aria-hidden="true"></i></Button>
+                    <Button disabled={row.driverTasks.length >= row.carCount} onClick={e => handleClickOpen(row)}><i className="fa fa-plus" aria-hidden="true"></i></Button>
                     <Button onClick={e => handleClickOpenEditOrder(row.id)}><i className="fa fa-external-link" aria-hidden="true"></i></Button>
                     <Button onClick={e => handleClickOpenOrder(row)}><i className="fa fa-clone" aria-hidden="true"></i></Button>
                 </ButtonGroup>,
@@ -465,7 +465,7 @@ const OrdersList = () => {
                     </Button>
                 </Toolbar>
             </AppBar>
-            <DriverTaskForm handleClose={handleClose} orderId={selectedOrderId}></DriverTaskForm>
+            <DriverTaskForm handleClose={handleClose} order={selectedOrderId}></DriverTaskForm>
         </Dialog>
 
         <Dialog

@@ -123,9 +123,9 @@ function DriverTaskCarForm({carId, handleClose}) {
                     <Autocomplete
                         options={orders}
                         disablePortal
-                        onChange={(e, newvalue) => { setOrder(newvalue) }}
+                        onChange={(e, newvalue) => { setOrder(newvalue); setShift(newvalue.shift); }}
                         sx={{ width: 300 }}
-                        getOptionLabel={(option) => option.addressA}
+                        getOptionLabel={(option) => option.name}
                         renderInput={(params) => <TextField {...params} label="Список заявок" />} />
                 </div>
 

@@ -115,9 +115,9 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const intToShift = (shift) => {
         switch (shift) {
             case 0:
-                return "Дневная (08:00 - 20:00)";
-            case 1:
                 return "Ночная (20:00 - 08:00)";
+            case 1:
+                return "Дневная (08:00 - 20:00)";
             case 2:
                 return "Сутки";
             case 3:
