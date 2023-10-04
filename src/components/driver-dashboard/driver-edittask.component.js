@@ -347,13 +347,13 @@ const DriverEditTask = () => {
         }
 
         if (status === 7) {
-            if (pickupArrivalTime.length === 0) {
-                isValid = false;
-            }
+            //if (pickupArrivalTime.length === 0) {
+            //    isValid = false;
+            //}
 
-            if (pickupDepartureTime.length === 0) {
-                isValid = false;
-            }
+            //if (pickupDepartureTime.length === 0) {
+            //    isValid = false;
+            //}
 
             if (Object.keys(addressB).length === 0) {
                 isValid = false;
