@@ -217,9 +217,9 @@ const DriverEditTask = () => {
             formData.append("Unit", unit);
             formData.append("LocationAId", addressA.id);
             formData.append("PickUpArrivalDate", pickupArrivalDate.toUTCString());
-            formData.append("PickUpArrivalTime", pickupArrivalTime);
+            //formData.append("PickUpArrivalTime", pickupArrivalTime);
             formData.append("PickUpDepartureDate", pickupDepartureDate.toUTCString());
-            formData.append("PickUpDepartureTime", pickupDepartureTime);
+            //formData.append("PickUpDepartureTime", pickupDepartureTime);
 
             ApiService.startTn(formData)
                 .then(({ data }) => {
@@ -249,9 +249,9 @@ const DriverEditTask = () => {
             formData.append("UnloadVolume", loadVolume);
             formData.append("LocationBId", addressB.id);
             formData.append("DropOffArrivalDate", pickupArrivalDate.toUTCString());
-            formData.append("DropOffArrivalTime", pickupArrivalTime);
+            //formData.append("DropOffArrivalTime", pickupArrivalTime);
             formData.append("DropOffDepartureDate", pickupDepartureDate.toUTCString());
-            formData.append("DropOffDepartureTime", pickupDepartureTime);
+            //formData.append("DropOffDepartureTime", pickupDepartureTime);
 
             ApiService.finalizeTn(formData)
                 .then(({ data }) => {
@@ -630,33 +630,33 @@ const DriverEditTask = () => {
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
                         </div>
 
-                        <div className="form-group col-md-6">
-                            <label>Время прибытия на склад погрузки</label>
-                            <TimePicker required={true}
-                                className={validated && pickupArrivalTime.length === 0 ? "not-valid-input-border" : ""}
-                                size='medium'
-                                minutesStep={1}
-                                ampm={false}
-                                label="Время"
-                                onChange={(newValue) => setPickupArrivalTime(`${newValue.$H}:${newValue.$m}`)} />
-                        </div>
+                        {/*<div className="form-group col-md-6">*/}
+                        {/*    <label>Время прибытия на склад погрузки</label>*/}
+                        {/*    <TimePicker required={true}*/}
+                        {/*        className={validated && pickupArrivalTime.length === 0 ? "not-valid-input-border" : ""}*/}
+                        {/*        size='medium'*/}
+                        {/*        minutesStep={1}*/}
+                        {/*        ampm={false}*/}
+                        {/*        label="Время"*/}
+                        {/*        onChange={(newValue) => setPickupArrivalTime(`${newValue.$H}:${newValue.$m}`)} />*/}
+                        {/*</div>*/}
 
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата выезда со склада погрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
                         </div>
 
-                        <div className="form-group col-md-6">
-                            <label>Время выезда со склада погрузки</label>
-                            <TimePicker
-                                className={validated && pickupDepartureTime.length === 0 ? "not-valid-input-border" : ""}
-                                size='medium'
-                                minutesStep={1}
-                                ampm={false}
-                                label="Время"
-                                onChange={(newValue) => setPickupDepartureTime(`${newValue.$H}:${newValue.$m}`)} />
-                            {pickupDepartureTime.length === 0}
-                        </div>
+                        {/*<div className="form-group col-md-6">*/}
+                        {/*    <label>Время выезда со склада погрузки</label>*/}
+                        {/*    <TimePicker*/}
+                        {/*        className={validated && pickupDepartureTime.length === 0 ? "not-valid-input-border" : ""}*/}
+                        {/*        size='medium'*/}
+                        {/*        minutesStep={1}*/}
+                        {/*        ampm={false}*/}
+                        {/*        label="Время"*/}
+                        {/*        onChange={(newValue) => setPickupDepartureTime(`${newValue.$H}:${newValue.$m}`)} />*/}
+                        {/*    {pickupDepartureTime.length === 0}*/}
+                        {/*</div>*/}
                     </div>}
 
                 {status === 7 &&
@@ -689,32 +689,32 @@ const DriverEditTask = () => {
                                 selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
                         </div>
 
-                        <div className="form-group col-md-6">
-                            <label>Время прибытия на склад выгрузки</label>
-                            <TimePicker required={true}
-                                className={validated && pickupArrivalTime.length === 0 ? "not-valid-input-border" : ""}
-                                size='medium'
-                                minutesStep={1}
-                                ampm={false}
-                                label="Время"
-                                onChange={(newValue) => setPickupArrivalTime(`${newValue.$H}:${newValue.$m}`)} />
-                        </div>
+                        {/*<div className="form-group col-md-6">*/}
+                        {/*    <label>Время прибытия на склад выгрузки</label>*/}
+                        {/*    <TimePicker required={true}*/}
+                        {/*        className={validated && pickupArrivalTime.length === 0 ? "not-valid-input-border" : ""}*/}
+                        {/*        size='medium'*/}
+                        {/*        minutesStep={1}*/}
+                        {/*        ampm={false}*/}
+                        {/*        label="Время"*/}
+                        {/*        onChange={(newValue) => setPickupArrivalTime(`${newValue.$H}:${newValue.$m}`)} />*/}
+                        {/*</div>*/}
 
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата выезда со склада выгрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
                         </div>
 
-                        <div className="form-group col-md-6">
-                            <label>Время выезда со склада выгрузки</label>
-                            <TimePicker required={true}
-                                className={validated && pickupDepartureTime.length === 0 ? "not-valid-input-border" : ""}
-                                size='medium'
-                                minutesStep={1}
-                                ampm={false}
-                                label="Время"
-                                onChange={(newValue) => setPickupDepartureTime(`${newValue.$H}:${newValue.$m}`)} />
-                        </div>
+                        {/*<div className="form-group col-md-6">*/}
+                        {/*    <label>Время выезда со склада выгрузки</label>*/}
+                        {/*    <TimePicker required={true}*/}
+                        {/*        className={validated && pickupDepartureTime.length === 0 ? "not-valid-input-border" : ""}*/}
+                        {/*        size='medium'*/}
+                        {/*        minutesStep={1}*/}
+                        {/*        ampm={false}*/}
+                        {/*        label="Время"*/}
+                        {/*        onChange={(newValue) => setPickupDepartureTime(`${newValue.$H}:${newValue.$m}`)} />*/}
+                        {/*</div>*/}
                     </div>}
                 <div>
                     {status === 7 ?
