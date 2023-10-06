@@ -17,6 +17,14 @@ function AddressForm({ address, handleClose }) {
         }
     }, [])
 
+    const validate = () => {
+        if (textAddress.length === 0) {
+            alert("Нужно заполнить адрес!");
+            return false;
+        } else
+            return true;
+    }
+
     function handleSubmit(event) {
         event.preventDefault();
         setMessage("");
@@ -37,14 +45,16 @@ function AddressForm({ address, handleClose }) {
                     setMessage(error.response.data.message);
                 });
         } else {
-            ApiService.createAddress(newAddress)
-                .then(({ data }) => {
-                    alert(data.message);
-                    handleClose();
-                }).
-                catch((error) => {
-                    setMessage(error.response.data.message);
-                });
+            if (validate()) {
+                ApiService.createAddress(newAddress)
+                    .then(({ data }) => {
+                        alert(data.message);
+                        handleClose();
+                    }).
+                    catch((error) => {
+                        setMessage(error.response.data.message);
+                    });
+            }
         }
     }
 

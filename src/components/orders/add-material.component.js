@@ -15,6 +15,14 @@ function MaterialForm({ material, handleClose }) {
         }
     }, [])
 
+    const validate = () => {
+        if (name.length === 0) {
+            alert("Нужно заполнить название!");
+            return false;
+        } else
+            return true;
+    }
+
     function handleSubmit(event) {
         event.preventDefault();
         setMessage("");
@@ -34,13 +42,15 @@ function MaterialForm({ material, handleClose }) {
                 });
 
         } else {
-            ApiService.creatematerial(newMaterial)
-                .then(({ data }) => {
-                    alert(data.message);
-                }).
-                catch((error) => {
-                    setMessage(error.response.data.message);
-                });
+            if (validate()) {
+                ApiService.creatematerial(newMaterial)
+                    .then(({ data }) => {
+                        alert(data.message);
+                    }).
+                    catch((error) => {
+                        setMessage(error.response.data.message);
+                    });
+            }
         }
     }
 

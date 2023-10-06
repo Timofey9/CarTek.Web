@@ -13,6 +13,7 @@ import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import DatePicker, { registerLocale } from "react-datepicker";
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import Divider from '@mui/material/Divider';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import ViewTn from "./view-tn";
@@ -23,6 +24,7 @@ registerLocale('ru', ru);
 const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [driver, setDriver] = useState({});
     const [drivers, setDrivers] = useState([]);
+    const [orders, setOrders] = useState([]);
     const [cars, setCars] = useState([]);
     const [car, setCar] = useState({});
     const [isEdit, setIsEdit] = useState(false);
@@ -52,6 +54,26 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         setOpen(false);
         setReload(reload + 1);
     };
+
+    useEffect(() => {
+        setLoading(true);
+        let req = {
+            startDate: startDate.toUTCString()
+        };
+        ApiService.getAllActiveOrders(req)
+            .then(({ data }) => {
+                setOrders(data);
+                console.log(data);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setError(error.response.data.message);
+                }
+            });
+
+        setLoading(false);
+    }, []);
+
 
     useEffect(() => {
         setLoading(true);
@@ -162,6 +184,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
             "DriverId" : driver.id,
             "CarId": car.id,
             "AdminComment": adminComment,
+            "OrderId": order.id,
             startDate: startDate,
             shift: shift
         };
@@ -197,15 +220,33 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     }
                 </div>
 
-                <dl className="row">
+                <dl className="row mt-3">
+                    <dt className="col-sm-3">Заявка: </dt>
+                    <dd className="col-sm-9">
+                        {isEdit &&
+                            <Autocomplete
+                            options={orders}
+                                disablePortal
+                                onChange={(e, newvalue) => setOrder(newvalue)}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.name}`}
+                                renderInput={(params) => <TextField {...params} label="Выберите заявку" />} />}
+
+                        <span>{order.name}</span>
+                    </dd>
+
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
                     <dt className="col-sm-3">Заказчик: </dt>
                     <dd className="col-sm-9">{order.clientName}</dd>
+
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <dt className="col-sm-3">Водитель: </dt>
                     <dd className="col-sm-9">
                         {isEdit &&
                             <Autocomplete
-                                {...drivers}
+                                options={drivers}
                                 disablePortal
                                 onChange={(e, newvalue) => setDriver(newvalue)}
                                 id="combo-box-demo"
@@ -215,6 +256,8 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                             
                             <span>{driver.fullName}</span>
                     </dd>
+
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <dt className="col-sm-3">Тягач: </dt>
                     <dd className="col-sm-9">
@@ -231,8 +274,12 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                         <span>{car.plate}</span>
                     </dd>
 
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
                     <dt className="col-sm-3">Материал: </dt>
                     <dd className="col-sm-9">{order.material && order.material.name}</dd>
+
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     {/*<dt className="col-sm-3">Количество: </dt>*/}
                     {/*<dd className="col-sm-9">{driverTask.volume} {unitToString(driverTask.unit)}</dd>*/}
@@ -242,6 +289,8 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                         <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
                     </dd>
 
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
                     <dt className="col-sm-3">Смена: </dt>
                     <dd className="col-sm-9">{
                         isEdit ? <div className="form-group col-md-6">
@@ -249,14 +298,22 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                         </div> : <span>{intToShift(driverTask.shift)}</span>}                        
                     </dd>
 
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
                     <dt className="col-sm-3">Место погрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.textAddress}</a></dd>
+
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
             
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
+
+                    <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <dt className="col-sm-3">Комментарий по задаче:</dt>
                     <dd className="col-sm-9">
@@ -317,7 +374,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                             <Step key={label} {...stepProps} expanded={true}>
                                                 <StepLabel {...labelProps}>{label}</StepLabel>
                                                 <StepContent>
-                                                    {task.notes.filter((n) => n.status+1 === index).map((note, noteindex) => {
+                                                    {task.notes && task.notes.filter((n) => n.status+1 === index).map((note, noteindex) => {
                                                         let showLinks = false;
                                                         let links;
                                                         if (note.s3Links.length > 0) {

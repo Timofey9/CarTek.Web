@@ -18,6 +18,14 @@ function ClientForm({client, handleClose }) {
         }
     }, [])
 
+    const validate = () => {
+        if (name.length === 0) {
+            alert("Нужно заполнить название!");
+            return false;
+        } else
+            return true;
+    }
+
     function handleSubmit(event) {
         event.preventDefault();
         setMessage("");
@@ -40,14 +48,16 @@ function ClientForm({client, handleClose }) {
                     setMessage(error.response.data.message);
                 });
         } else {
-            ApiService.createClient(newClient)
-                .then(({ data }) => {
-                    alert(data.message);
-                    handleClose();
-                }).
-                catch((error) => {
-                    setMessage(error.response.data.message);
-                });
+            if (validate()) {
+                ApiService.createClient(newClient)
+                    .then(({ data }) => {
+                        alert(data.message);
+                        handleClose();
+                    }).
+                    catch((error) => {
+                        setMessage(error.response.data.message);
+                    });
+            }
         }
     }
 

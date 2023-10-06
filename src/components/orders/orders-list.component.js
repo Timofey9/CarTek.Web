@@ -200,8 +200,13 @@ const OrdersList = () => {
         {
             name: "Название",
             selector: (row, index) => <div>{row.name}</div>,
-            center: true,
+            wrap:true
         },    
+        {
+            name: "Заказчик",
+            selector: (row, index) => <div>{row.service === 0 ? (row.client && row.client.clientName) : (row.gp && row.gp.clientName)}</div>,
+            wrap:true
+        },   
         {
             name: "Услуга",
             selector: (row, index) => <div>{row.service === 0 ? "Перевозка" : "Поставка"}</div>,
@@ -222,15 +227,10 @@ const OrdersList = () => {
             name: "Выгрузка",
             selector: (row, index) => row.locationB,
             wrap: true,
-        },    
-        //{
-        //    name: "Заказчик",
-        //    selector: (row, index) => <div>{row.service === 0 ? (row.client && row.client.clientName): (row.gp && row.gp.clientName)}</div>,
-        //    center: true,
-        //},        
+        },         
         {
             name: "Материал",
-            selector: (row, index) => <div>{row.material.name}</div>,
+            selector: (row, index) => <div>{row.material && row.material.name}</div>,
             wrap: true
         },    
         {

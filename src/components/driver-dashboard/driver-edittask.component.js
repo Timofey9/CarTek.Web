@@ -182,7 +182,7 @@ const DriverEditTask = () => {
             })
             .catch((error) => {
                 if (error.response.data.message) {
-                    setError(error.response.data);
+                    setError(error.response.data.message);
                 }
             });
 
@@ -234,7 +234,7 @@ const DriverEditTask = () => {
                 })
                 .catch((error) => {
                     if (error.response.data) {
-                        setError(error.response.data);
+                        setError(error.response.data.message);
                     }
                 });
             return;
@@ -263,7 +263,7 @@ const DriverEditTask = () => {
                 })
                 .catch((error) => {
                     if (error.response.data) {
-                        setError(error.response.data);
+                        setError(error.response.data.message);
                     }
                 });
 
@@ -280,8 +280,9 @@ const DriverEditTask = () => {
                     setShowSpinner(false);
                 })
                 .catch((error) => {
+                    console.log(error);
                     if (error.response.data.message) {
-                        setError(error.response.data);
+                        setError(error.response.data.message);
                     }
                 });
         } else {
@@ -297,7 +298,7 @@ const DriverEditTask = () => {
                     })
                     .catch((error) => {
                         if (error.response.data.message) {
-                            setError(error.response.data);
+                            setError(error.response.data.message);
                         }
                     });
             }
@@ -717,7 +718,7 @@ const DriverEditTask = () => {
                         {/*</div>*/}
                     </div>}
                 <div>
-                    {status === 7 ?
+                    {status === 7 &&
                         <div className="row mt-3 mb-3">
                             <div className="col-md-9">
                                 <div className="alert alert-danger" role="alert">
@@ -729,13 +730,7 @@ const DriverEditTask = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div> :
-                        <div className="row">
-                            <div className="col-md-12">
-                                <label htmlFor="files">Прикрепить фотографии</label>
-                                <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
-                            </div>
-                        </div>}
+                        </div> }
                 </div>
                 <div className="row mt-3">
                     <div className="col-md-3">
@@ -780,7 +775,16 @@ const DriverEditTask = () => {
                                     <textarea id="acceptanceComment" value={note} onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
                                 </div>
                             </div>
-                            <div className="row mb-5">
+                            {status !== 7 &&
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <label htmlFor="files">Прикрепить фотографии</label>
+                                        <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
+                                    </div>
+                                </div>}
+  
+
+                            <div className="row">
                                 <div className="col-md-12">
                                     <div className="col-md-3">
                                         <button type="submit" onClick={handleSubmitNote} className="btn btn-primary mt-3">

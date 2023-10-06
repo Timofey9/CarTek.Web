@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -103,9 +102,9 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             valid = false;
         }
 
-        if (Object.keys(material).length === 0) {
-            valid = false;
-        }
+        //if (Object.keys(material).length === 0) {
+        //    valid = false;
+        //}
 
         if (carCount === 0) {
             valid = false;
@@ -293,6 +292,14 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
         }
     }
 
+    const checkObjectKeys = (obj) => {
+        if (obj !== null && obj !== undefined) {
+            return validated && Object.keys(obj).length === 0;
+        }
+
+        return validated;
+    }
+
     if (loading) {
         return <div><h1>ЗАГРУЗКА...</h1></div>
     }
@@ -349,7 +356,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Прием груза (8)</label>
                         <Autocomplete
-                            className={validated && Object.keys(addressA).length === 0 ? "not-valid-input-border" : ""}
+                            className={checkObjectKeys(addressA) === 0 ? "not-valid-input-border" : ""}
                             options={addresses}
                             disablePortal
                             onChange={(e, newvalue) => { setAddressA(newvalue) }}
@@ -363,10 +370,10 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                         <label>Выдача груза (10)</label>
 
                         <Autocomplete
-                            className={validated && Object.keys(addressB).length === 0 ? "not-valid-input-border" : ""}
+                            className={checkObjectKeys(addressB) === 0 ? "not-valid-input-border" : ""}
                             options={addresses}
                             disablePortal
-                            onChange={(e, newvalue) => { setAddressB(newvalue) }}
+                            onChange={(e, newvalue) => { setAddressB(newvalue); setOrderName(orderName + " " + newvalue.textAddress) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
@@ -381,7 +388,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Грузоотправитель (1)</label>
                         <Autocomplete
-                            className={validated && Object.keys(client).length === 0 ? "not-valid-input-border" : ""}
+                            className={checkObjectKeys(client) === 0 ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setClient(newvalue) }}
@@ -395,7 +402,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Грузополучатель (2)</label>
                         <Autocomplete
-                            className={validated && Object.keys(gp).length === 0 ? "not-valid-input-border" : ""}
+                            className={checkObjectKeys(gp) === 0 ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setGp(newvalue) }}
@@ -414,7 +421,6 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     <div className="form-row">
                         <label>Тип груза (3)</label>
                         <Autocomplete
-                            className={validated && Object.keys(material).length === 0 ? "not-valid-input-border" : ""}
                             options={materialsList}
                             disablePortal
                             onChange={(e, newvalue) => { setMaterial(newvalue) }}

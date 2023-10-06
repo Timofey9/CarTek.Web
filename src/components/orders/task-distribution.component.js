@@ -163,6 +163,16 @@ const CarsWork = () => {
             center: true,
         },
         {
+            name: "Погрузка",
+            selector: (row, index) => row.locationA && row.locationA.textAddress,
+            wrap: true
+        },
+        {
+            name: "Выгрузка",
+            selector: (row, index) => row.locationB && row.locationB.textAddress,
+            wrap: true
+        },
+        {
             name: "Услуга",
             selector: (row, index) => <div>{row.order.service === 0 ? "Перевозка" : "Поставка"}</div>,
             center: true,
@@ -309,7 +319,6 @@ const CarsWork = () => {
     ];
 
     const updateSearchBy = (value) => {
-        console.log(value);
         if (value === 'none') {
             setSearchBy(value);
             setSearchString("");
