@@ -355,7 +355,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                     <div className="form-row">
                         <label className="bold-label">Груз (3)</label>
-                        <label>{material.name}</label>
+                        <label>{material && material.name}</label>
                         {isEdit &&
                             <><Autocomplete
                                 options={materialsList}

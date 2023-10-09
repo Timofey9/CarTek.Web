@@ -25,7 +25,15 @@ import Backdrop from '@mui/material/Backdrop';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
+import { useDebouncedCallback } from 'use-debounce';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
 
 registerLocale('ru', ru);
 
@@ -42,6 +50,7 @@ const DriverEditTask = () => {
     const [notes, setNotes] = useState([]);
     const [reload, setReload] = useState(0);
     const [unit, setUnit] = useState("none");
+    const [unit2, setUnit2] = useState("none");
     const [materialsList, setMaterialsList] = useState([]);
     const [addresses, setAddresses] = useState([]);
     const [clients, setClients] = useState([]);
@@ -51,6 +60,12 @@ const DriverEditTask = () => {
     const [message, setMessage] = useState("");
     const [tnNumber, setTnNumber] = useState("");
     const [loadVolume, setLoadVolume] = useState("");
+    const [loadVolume2, setLoadVolume2] = useState("");
+
+    const [unloadVolume, setUnloadVolume] = useState("");
+    const [unloadVolume2, setUnloadVolume2] = useState("");
+    const [unloadUnit, setUnloadUnit] = useState("none");
+    const [unloadUnit2, setUnloadUnit2] = useState("none");
     const [go, setGo] = useState({});
     const [gp, setGp] = useState({});
     const [pickupArrivalDate, setPickupArrivalDate] = useState(new Date());
@@ -159,7 +174,7 @@ const DriverEditTask = () => {
 
     }
 
-    const handleSubmitNote = (event) => {
+    const handleSubmitNote = useDebouncedCallback((event) => {
         event.preventDefault();
         setShowSpinner(true);
 
@@ -187,11 +202,10 @@ const DriverEditTask = () => {
             });
 
         setShowSpinner(false);
-    }
+    }, 500);
 
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const handleSubmit = useDebouncedCallback((event) => {
         setShowSpinner(true);
 
         for (var key of formData.keys()) {
@@ -210,16 +224,17 @@ const DriverEditTask = () => {
                 formData.append("SubTaskId", currentSubTask.id);
             }
 
+            formData.append("MaterialId", material.id);
             formData.append("Number", tnNumber);
             formData.append("GoId", go.id);
             formData.append("GpId", gp.id);
             formData.append("LoadVolume", loadVolume);
             formData.append("Unit", unit);
+            formData.append("LoadVolume2", loadVolume2);
+            formData.append("Unit2", unit2);
             formData.append("LocationAId", addressA.id);
             formData.append("PickUpArrivalDate", pickupArrivalDate.toUTCString());
-            //formData.append("PickUpArrivalTime", pickupArrivalTime);
             formData.append("PickUpDepartureDate", pickupDepartureDate.toUTCString());
-            //formData.append("PickUpDepartureTime", pickupDepartureTime);
 
             ApiService.startTn(formData)
                 .then(({ data }) => {
@@ -246,12 +261,13 @@ const DriverEditTask = () => {
                 formData.append("IsSubtask", true);
                 formData.append("SubTaskId", currentSubTask.id);
             }
-            formData.append("UnloadVolume", loadVolume);
+            formData.append("UnloadVolume", unloadVolume);
+            formData.append("UnloadVolume2", unloadVolume2);
+            formData.append("UnloadUnit", unloadUnit);
+            formData.append("UnloadUnit2", unloadUnit2);
             formData.append("LocationBId", addressB.id);
             formData.append("DropOffArrivalDate", pickupArrivalDate.toUTCString());
-            //formData.append("DropOffArrivalTime", pickupArrivalTime);
             formData.append("DropOffDepartureDate", pickupDepartureDate.toUTCString());
-            //formData.append("DropOffDepartureTime", pickupDepartureTime);
 
             ApiService.finalizeTn(formData)
                 .then(({ data }) => {
@@ -304,7 +320,7 @@ const DriverEditTask = () => {
             }
         }
         setShowSpinner(false);
-    };
+    }, 500);
 
     const validate = () => {
         setValidated(true);
@@ -337,32 +353,21 @@ const DriverEditTask = () => {
             if (Object.keys(addressA).length === 0) {
                 isValid = false;
             }
-
-            //if (pickupArrivalTime.length === 0) {
-            //    isValid = false;
-            //}
-
-            //if (pickupDepartureTime.length === 0) {
-            //    isValid = false;
-            //}
         }
 
         if (status === 7) {
-            //if (pickupArrivalTime.length === 0) {
-            //    isValid = false;
-            //}
-
-            //if (pickupDepartureTime.length === 0) {
-            //    isValid = false;
-            //}
-
             if (Object.keys(addressB).length === 0) {
                 isValid = false;
             }
 
-            if (loadVolume.length === 0) {
+            if (unloadVolume.length === 0) {
                 isValid = false;
             }
+
+            if (unloadUnit === "none") {
+                isValid = false;
+            }
+
 
             if (Object.keys(addressB).length === 0) {
                 isValid = false;
@@ -495,17 +500,11 @@ const DriverEditTask = () => {
                 </div>
 
                 <dl className="row">
-                    {/*<dt className="col-sm-3">Заказчик: </dt>*/}
-                    {/*<dd className="col-sm-9">{order.clientName}</dd>*/}
-
                     <dt className="col-sm-3">Тягач: </dt>
                     <dd className="col-sm-9">{car.brand} {car.model}: {car.plate}</dd>
 
                     <dt className="col-sm-3">Материал: </dt>
                     <dd className="col-sm-9">{order.material && order.material.name}</dd>
-
-                    {/*<dt className="col-sm-3">Количество: </dt>*/}
-                    {/*<dd className="col-sm-9">{driverTask.volume} {unitToString(driverTask.unit)}</dd>*/}
 
                     <dt className="col-sm-3">Дата: </dt>
                     <dd className="col-sm-9">{new Date(driverTask.startDate).toLocaleDateString('ru-Ru', {
@@ -600,14 +599,54 @@ const DriverEditTask = () => {
                         </div>
 
                         <div className="form-group col-md-6">
-                            <label>Единица измерения</label>
-                            <select className={validated && unit === "none" ? "form-select not-valid-input-border" : "form-select"}
-                                value={unit} aria-label="Единица измерения" onChange={(e) => setUnit(e.target.value)}>
-                                <option value="none">Единица измерения</option>
-                                <option value="0">М3</option>
-                                <option value="1">шт.</option>
-                                <option value="2">тонны</option>
-                            </select>
+                            <FormControl>
+                                <FormLabel id="radio-buttons-group-label">Ед. измерения</FormLabel>
+                                <RadioGroup row
+                                    className={validated && unit === "none" ? "not-valid-input-border" : ""}
+                                    aria-labelledby="radio-buttons-group-label"
+                                    name="radio-buttons-group"
+                                    value={unit}
+                                    onChange={(e) => setUnit(e.target.value)}>
+                                    <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                    <FormControlLabel value="2" control={<Radio />} label="Тонны" />
+                                </RadioGroup>
+                            </FormControl>
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <Accordion>
+                                <AccordionSummary
+                                    aria-controls="panel1a-content"
+                                    id="panel1a-header">
+                                    <Typography>В другой ед. измерения</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <div className="form-group col-md-6">
+                                        <label>Объем загрузки</label>
+                                        <input
+                                            className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                            type="text"
+                                            form="profile-form"
+                                            onChange={(e) => setLoadVolume2(e.target.value)}
+                                            value={loadVolume2} />
+                                    </div>
+
+                                    <div className="form-group col-md-6">
+                                        <FormControl>
+                                            <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
+                                            <RadioGroup row
+                                                className={validated && unit2 === "none" ? "not-valid-input-border" : ""}
+                                                aria-labelledby="buttons-group-label"
+                                                name="buttons-group"
+                                                value={unit2}
+                                                onChange={(e) => setUnit2(e.target.value)}>
+                                                <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                                <FormControlLabel value="2" control={<Radio />} label="Тонны" />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </div>
+                                </AccordionDetails>
+                            </Accordion>
                         </div>
 
                         <div className="form-group col-md-6">
@@ -631,33 +670,11 @@ const DriverEditTask = () => {
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
                         </div>
 
-                        {/*<div className="form-group col-md-6">*/}
-                        {/*    <label>Время прибытия на склад погрузки</label>*/}
-                        {/*    <TimePicker required={true}*/}
-                        {/*        className={validated && pickupArrivalTime.length === 0 ? "not-valid-input-border" : ""}*/}
-                        {/*        size='medium'*/}
-                        {/*        minutesStep={1}*/}
-                        {/*        ampm={false}*/}
-                        {/*        label="Время"*/}
-                        {/*        onChange={(newValue) => setPickupArrivalTime(`${newValue.$H}:${newValue.$m}`)} />*/}
-                        {/*</div>*/}
-
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата выезда со склада погрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
                         </div>
 
-                        {/*<div className="form-group col-md-6">*/}
-                        {/*    <label>Время выезда со склада погрузки</label>*/}
-                        {/*    <TimePicker*/}
-                        {/*        className={validated && pickupDepartureTime.length === 0 ? "not-valid-input-border" : ""}*/}
-                        {/*        size='medium'*/}
-                        {/*        minutesStep={1}*/}
-                        {/*        ampm={false}*/}
-                        {/*        label="Время"*/}
-                        {/*        onChange={(newValue) => setPickupDepartureTime(`${newValue.$H}:${newValue.$m}`)} />*/}
-                        {/*    {pickupDepartureTime.length === 0}*/}
-                        {/*</div>*/}
                     </div>}
 
                 {status === 7 &&
@@ -665,11 +682,62 @@ const DriverEditTask = () => {
                         <div className="form-group col-md-6">
                             <label>Объем выгрузки</label>
                             <input
-                                className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
                                 form="profile-form"
-                                onChange={(e) => setLoadVolume(e.target.value)}
-                                value={loadVolume} />
+                                onChange={(e) => setUnloadVolume(e.target.value)}
+                                value={unloadVolume} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <FormControl>
+                                <FormLabel id="radio-label">Ед. измерения</FormLabel>
+                                <RadioGroup row
+                                    className={validated && unloadUnit === "none" ? "not-valid-input-border" : ""}
+                                    aria-labelledby="radio-label"
+                                    name="radio-buttons"
+                                    value={unloadUnit}
+                                    onChange={(e) => setUnloadUnit(e.target.value)}>
+                                    <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                    <FormControlLabel value="2" control={<Radio />} label="Тонны" />
+                                </RadioGroup>
+                            </FormControl>
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <Accordion>
+                                <AccordionSummary
+                                    aria-controls="panel2a-content"
+                                    id="panel2a-header">
+                                    <Typography>В другой ед. измерения</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <div className="form-group col-md-6">
+                                        <label>Объем выгрузки</label>
+                                        <input
+                                            className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                            type="text"
+                                            form="profile-form"
+                                            onChange={(e) => setUnloadVolume2(e.target.value)}
+                                            value={unloadVolume2} />
+                                    </div>
+
+                                    <div className="form-group col-md-6">
+                                        <FormControl>
+                                            <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
+                                            <RadioGroup row
+                                                className={validated && unloadUnit2 === "none" ? "not-valid-input-border" : ""}
+                                                aria-labelledby="buttons-group-label"
+                                                name="buttons-group"
+                                                value={unloadUnit2}
+                                                onChange={(e) => setUnloadUnit2(e.target.value)}>
+                                                <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                                <FormControlLabel value="2" control={<Radio />} label="Тонны" />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </div>
+                                </AccordionDetails>
+                            </Accordion>
                         </div>
 
                         <div className="form-group col-md-6">
@@ -690,32 +758,11 @@ const DriverEditTask = () => {
                                 selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
                         </div>
 
-                        {/*<div className="form-group col-md-6">*/}
-                        {/*    <label>Время прибытия на склад выгрузки</label>*/}
-                        {/*    <TimePicker required={true}*/}
-                        {/*        className={validated && pickupArrivalTime.length === 0 ? "not-valid-input-border" : ""}*/}
-                        {/*        size='medium'*/}
-                        {/*        minutesStep={1}*/}
-                        {/*        ampm={false}*/}
-                        {/*        label="Время"*/}
-                        {/*        onChange={(newValue) => setPickupArrivalTime(`${newValue.$H}:${newValue.$m}`)} />*/}
-                        {/*</div>*/}
-
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата выезда со склада выгрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
                         </div>
 
-                        {/*<div className="form-group col-md-6">*/}
-                        {/*    <label>Время выезда со склада выгрузки</label>*/}
-                        {/*    <TimePicker required={true}*/}
-                        {/*        className={validated && pickupDepartureTime.length === 0 ? "not-valid-input-border" : ""}*/}
-                        {/*        size='medium'*/}
-                        {/*        minutesStep={1}*/}
-                        {/*        ampm={false}*/}
-                        {/*        label="Время"*/}
-                        {/*        onChange={(newValue) => setPickupDepartureTime(`${newValue.$H}:${newValue.$m}`)} />*/}
-                        {/*</div>*/}
                     </div>}
                 <div>
                     {status === 7 &&

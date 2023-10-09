@@ -278,7 +278,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     alert(`Заявка создана`);
                     let array = [];
                     for (let i = 0; i < carCount; i++) {
-                        array.push({ car: {}, driver: {}, taskDate: new Date(), shift: orderShift });
+                        array.push({ car: {}, driver: {}, taskDate: startDate, shift: orderShift });
                     }
                     setOrderId(data.message);
                     setIsOrderCreated(true);
