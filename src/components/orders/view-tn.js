@@ -5,13 +5,19 @@ function ViewTn({ driverTaskId, handleClose }) {
     const [error, setError] = useState("");
     const [reload, setReload] = useState(0);
     const [unit, setUnit] = useState("none");
+    const [unit2, setUnit2] = useState("none");
+    const [unloadUnit, setUnloadUnit] = useState("none");
+    const [unloadUnit2, setUnloadUnit2] = useState("none");
+
     const [material, setMaterial] = useState();
     const [addressA, setAddressA] = useState("");
     const [addressB, setAddressB] = useState("");
     const [message, setMessage] = useState("");
     const [tnNumber, setTnNumber] = useState("");
     const [loadVolume, setLoadVolume] = useState(0);
+    const [loadVolume2, setLoadVolume2] = useState(0);
     const [unloadVolume, setUnloadVolume] = useState(0);
+    const [unloadVolume2, setUnloadVolume2] = useState(0);
     const [goInfo, setGoInfo] = useState("");
     const [gpInfo, setGpInfo] = useState("");
     const [pickupArrivalTime, setPickupArrivalTime] = useState("");
@@ -30,7 +36,9 @@ function ViewTn({ driverTaskId, handleClose }) {
                     setMaterial(data.material);
                     setLoadVolume(data.loadVolume);
                     setUnloadVolume(data.loadVolume);
+                    setUnloadVolume2(data.loadVolume2);
                     setUnit(data.unit);
+                    setUnit2(data.unit2);
                     setAddressA(data.locationA);
                     setAddressB(data.locationB);
                     setPickupArrivalTime(data.pickUpArrivalTime);
@@ -87,7 +95,7 @@ function ViewTn({ driverTaskId, handleClose }) {
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Объем загрузки</label>
-                    <label>{loadVolume} {unit}</label>
+                    <label>{loadVolume} {unit} {loadVolume2} {unit2}</label>
                 </div>
 
                 <div className="form-group col-md-6">
@@ -96,7 +104,7 @@ function ViewTn({ driverTaskId, handleClose }) {
                 </div>
 
                 <div className="form-group col-md-6">
-                    <label className="bold-label">Выдача груза (8)</label>
+                    <label className="bold-label">Выдача груза (10)</label>
                     <label>{addressB}</label>
                 </div>
 
@@ -113,7 +121,7 @@ function ViewTn({ driverTaskId, handleClose }) {
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Объем выгрузки</label>
-                    <label>{unloadVolume} {unit}</label>
+                    <label>{unloadVolume} {unloadUnit} {unloadVolume2} {unloadUnit2}</label>
                 </div>
 
                 <div className="form-group mb-3 col-md-6 pl-1">

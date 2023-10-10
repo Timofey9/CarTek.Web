@@ -117,8 +117,6 @@ const DriverEditTask = () => {
             case 0:
                 return "m3";
             case 1:
-                return "шт.";
-            case 2:
                 return "т";
             default:
                 return "";
@@ -608,7 +606,7 @@ const DriverEditTask = () => {
                                     value={unit}
                                     onChange={(e) => setUnit(e.target.value)}>
                                     <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                    <FormControlLabel value="2" control={<Radio />} label="Тонны" />
+                                    <FormControlLabel value="1" control={<Radio />} label="Тонны" />
                                 </RadioGroup>
                             </FormControl>
                         </div>
@@ -641,7 +639,7 @@ const DriverEditTask = () => {
                                                 value={unit2}
                                                 onChange={(e) => setUnit2(e.target.value)}>
                                                 <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                                <FormControlLabel value="2" control={<Radio />} label="Тонны" />
+                                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
                                             </RadioGroup>
                                         </FormControl>
                                     </div>
@@ -650,7 +648,7 @@ const DriverEditTask = () => {
                         </div>
 
                         <div className="form-group col-md-6">
-                            <label>Прием груза (8)</label>
+                            <label>Склад погрузки (8)</label>
                             <Autocomplete
                                 className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
                                 options={addresses}
@@ -699,7 +697,7 @@ const DriverEditTask = () => {
                                     value={unloadUnit}
                                     onChange={(e) => setUnloadUnit(e.target.value)}>
                                     <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                    <FormControlLabel value="2" control={<Radio />} label="Тонны" />
+                                    <FormControlLabel value="1" control={<Radio />} label="Тонны" />
                                 </RadioGroup>
                             </FormControl>
                         </div>
@@ -732,7 +730,7 @@ const DriverEditTask = () => {
                                                 value={unloadUnit2}
                                                 onChange={(e) => setUnloadUnit2(e.target.value)}>
                                                 <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                                <FormControlLabel value="2" control={<Radio />} label="Тонны" />
+                                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
                                             </RadioGroup>
                                         </FormControl>
                                     </div>
@@ -741,7 +739,7 @@ const DriverEditTask = () => {
                         </div>
 
                         <div className="form-group col-md-6">
-                            <label>Выдача груза (8)</label>
+                            <label>Склад выгрузки (10)</label>
                             <Autocomplete
                                 className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
                                 options={addresses}

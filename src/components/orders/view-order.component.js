@@ -392,8 +392,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         <select disabled={!isEdit} className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => setLoadUnit(e.target.value)}>
                             <option value="none">Единица измерения</option>
                             <option value="0">М3</option>
-                            <option value="1">шт.</option>
-                            <option value="2">тонны</option>
+                            <option value="1">тонны</option>
                         </select>
                     </div>
 
@@ -401,7 +400,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Прием груза (8)</label>
-                        {isEdit && <Autocomplete
+                        {isEdit && <Autocomplete 
                             options={addresses}
                             disablePortal
                             onChange={(e, newvalue) => { setAddressA(newvalue) }}
