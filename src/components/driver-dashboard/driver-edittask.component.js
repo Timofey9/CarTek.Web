@@ -9,6 +9,10 @@ import StepContent from '@mui/material/StepContent';
 import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
@@ -61,7 +65,6 @@ const DriverEditTask = () => {
     const [tnNumber, setTnNumber] = useState("");
     const [loadVolume, setLoadVolume] = useState("");
     const [loadVolume2, setLoadVolume2] = useState("");
-
     const [unloadVolume, setUnloadVolume] = useState("");
     const [unloadVolume2, setUnloadVolume2] = useState("");
     const [unloadUnit, setUnloadUnit] = useState("none");
@@ -76,6 +79,8 @@ const DriverEditTask = () => {
     const [hasSubTask, setHasSubTask] = useState(false);
     const [continueWork, setContinueWork] = useState(false);
     const [validated, setValidated] = useState(true);
+
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [openAddress, setOpenAddress] = useState(false);
     const [openMaterial, setOpenMaterial] = useState(false);
@@ -84,6 +89,21 @@ const DriverEditTask = () => {
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
     let { driverTaskId } = useParams();
+
+    const handleConfirmationOpen = () => {
+        setConfirmationOpen(true);
+    };
+
+    const handleConfirmationClose = () => {
+        setConfirmationOpen(false);
+        setReload(reload + 1);
+    };
+
+    const handleConfirmationCloseSuccess = () => {
+        getBack();
+        setConfirmationOpen(false);
+        setReload(reload + 1);
+    };
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -171,6 +191,26 @@ const DriverEditTask = () => {
             });
 
     }
+
+
+    const getBack = useDebouncedCallback((event) => {
+        setShowSpinner(true);
+        ApiService.TaskGetBack({ driverTaskId: driverTaskId })
+            .then(({ data }) => {
+                alert("Статус обновлен");
+                setFormData(new FormData());
+                setNote("");
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                if (error.response.data.message) {
+                    setError(error.response.data.message);
+                }
+            });
+
+        setShowSpinner(false);
+    }, 500);
+
 
     const handleSubmitNote = useDebouncedCallback((event) => {
         event.preventDefault();
@@ -838,6 +878,17 @@ const DriverEditTask = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <div className="col-md-3">
+                                        <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
+                                            На шаг назад
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="row mb-5">
                                 <div className="col-md-12">
                                     <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
@@ -923,6 +974,27 @@ const DriverEditTask = () => {
                 </Toolbar>
             </AppBar>
             <MaterialForm handleClose={handleMaterialClose}></MaterialForm>
+        </Dialog>
+
+        <Dialog
+            open={confirmationOpen}
+            onClose={handleConfirmationClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description">
+            <DialogTitle id="alert-dialog-title">
+                {"Подтвердите действие"}
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    Вы хотите вернуться на предыдущий шаг. Нажмите "Продолжить" 
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleConfirmationClose}>Отмена</Button>
+                <Button onClick={handleConfirmationCloseSuccess} autoFocus>
+                    Продолжить
+                </Button>
+            </DialogActions>
         </Dialog>
     </div>
 };
