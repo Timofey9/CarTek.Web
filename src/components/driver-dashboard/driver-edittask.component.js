@@ -688,7 +688,7 @@ const DriverEditTask = () => {
                         </div>
 
                         <div className="form-group col-md-6">
-                            <label>Склад погрузки (8)</label>
+                            <label>Адрес погрузки (8)</label>
                             <Autocomplete
                                 className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
                                 options={addresses}
@@ -704,12 +704,12 @@ const DriverEditTask = () => {
                         </div>
 
                         <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата прибытия на склад погрузки</label>
+                            <label>Дата прибытия на адрес погрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
                         </div>
 
                         <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата выезда со склада погрузки</label>
+                            <label>Дата выезда с адреса погрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
                         </div>
 
@@ -779,7 +779,7 @@ const DriverEditTask = () => {
                         </div>
 
                         <div className="form-group col-md-6">
-                            <label>Склад выгрузки (10)</label>
+                            <label>Адрес выгрузки (10)</label>
                             <Autocomplete
                                 className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
                                 options={addresses}
@@ -791,13 +791,13 @@ const DriverEditTask = () => {
                         </div>
 
                         <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата прибытия на склад выгрузки</label>
+                            <label>Дата прибытия на адрес выгрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy"
                                 selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
                         </div>
 
                         <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата выезда со склада выгрузки</label>
+                            <label>Дата выезда с адреса выгрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
                         </div>
 
