@@ -365,7 +365,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     {subTasks.map((task, taskIndex) => {
                         return (
                             <div className="col-md-2">
-                                <label>Рейс #{task.sequenceNumber}</label>
+                                <label>Рейс #{task.sequenceNumber+1}</label>
                                 <Stepper orientation="vertical" activeStep={task.status}>
                                     {constStatuses.map((label, index) => {
                                         const stepProps = {};

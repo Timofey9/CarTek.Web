@@ -121,6 +121,17 @@ const OrdersList = () => {
             });
     };
 
+    const downloadTnsFile = () => {
+        ApiService.getTnsList({
+            startDate: startDate.toUTCString(),
+            endDate: endDate.toUTCString()
+        }).then(response => {
+            let url = window.URL
+                .createObjectURL(new Blob([response.data]));
+            saveAs(url, "реестр.xlsx");    
+            });
+    };
+
 
     const downloadTN = (id) => {
         ApiService.downloadTN({
@@ -371,7 +382,7 @@ const OrdersList = () => {
     return (<>
         <form>
             <div className="row">
-                <div className="col-md-7">
+                <div className="col-md-8">
                     <div className="input-group mt-3">
                         <div className="mb-3 col-md-4 pl-1">
                             <DatePicker className="form-control" dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
@@ -383,12 +394,15 @@ const OrdersList = () => {
                             <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i class="fa fa-search"></i></button>
                         </div>
                         <div className="input-group-append">
-                            <button className="btn btn-default" onClick={(e) => { e.preventDefault(); downloadFile() }}>СКАЧАТЬ</button>
+                            <button className="btn btn-default" onClick={(e) => { e.preventDefault(); downloadFile() }}>Скачать список</button>
+                        </div>
+                        <div className="input-group-append pl-2">
+                            <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); downloadTnsFile() }}>Реестр ТН</button>
                         </div>
                     </div>
                 </div>
                 {localUser.identity && !localUser.identity.isDispatcher &&
-                    <div className="form-group col-md-5">
+                    <div className="form-group col-md-4">
                         <Button variant="contained" color="success" onClick={() => handleClickOpenOrder()} className="pull-right mb-2">Создать заявку</Button>
                     </div>
                 }

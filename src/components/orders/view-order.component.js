@@ -41,6 +41,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [price, setPrice] = useState("");
+    const [materialPrice, setMaterialPrice] = useState("");
     const [mileage, setMileage] = useState("");
     const [open, setOpen] = useState(false);
     const [openAddress, setOpenAddress] = useState(false);
@@ -104,6 +105,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setEndDate(new Date(data.dueDate));
                 setNote(data.note);
                 setPrice(data.price);
+                setMaterialPrice(data.materialPrice);
                 setCarCount(data.carCount);
                 setMileage(data.mileage);
                 setGp(data.gp);
@@ -238,7 +240,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             note: note,
             service: serviceType,
             mileage: mileage,
-            price: price
+            price: price,
+            materialPrice: materialPrice
         };
 
         if (startDateChanged && !applyChanges) {
@@ -450,8 +453,9 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 <div className="form-row">
                     <div className="form-group col-md-6">
                         <label className="bold-label">Комментарий по заявке (общий)</label>
-                        <input
+                        <textarea
                             disabled={!isEdit}
+                            rows="5" 
                             type="text"
                             className="form-control"
                             form="profile-form"
@@ -475,7 +479,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Стоимость рейса</label>
+                        <label className="bold-label">Себестоимость перевозки</label>
                         <input
                             disabled={!isEdit}
                             type="text"
@@ -483,6 +487,19 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             form="profile-form"
                             onChange={(e) => setPrice(e.target.value)}
                             value={price} />
+                    </div>
+
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <div className="form-group col-md-6">
+                        <label className="bold-label">Себестоимость материала</label>
+                        <input
+                            disabled={!isEdit}
+                            type="text"
+                            className="form-control"
+                            form="profile-form"
+                            onChange={(e) => setMaterialPrice(e.target.value)}
+                            value={materialPrice} />
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>

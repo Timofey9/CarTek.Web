@@ -35,17 +35,19 @@ function ViewTn({ driverTaskId, handleClose }) {
                     setGpInfo(data.gpInfo);
                     setMaterial(data.material);
                     setLoadVolume(data.loadVolume);
-                    setUnloadVolume(data.loadVolume);
-                    setUnloadVolume2(data.loadVolume2);
+                    setLoadVolume2(data.loadVolume2);
+                    setUnloadVolume(data.unloadVolume);
+                    setUnloadVolume2(data.unloadVolume2);
                     setUnit(data.unit);
                     setUnit2(data.unit2);
+                    setUnloadUnit(data.unloadUnit);
+                    setUnloadUnit2(data.unloadUnit2);
                     setAddressA(data.locationA);
                     setAddressB(data.locationB);
                     setPickupArrivalTime(data.pickUpArrivalTime);
                     setPickupDepartureTime(data.pickUpDepartureTime);
                     setDropOffArrivalTime(data.dropOffArrivalTime);
                     setDropOffDepartureTime(data.dropOffDepartureTime);
-                    console.log(data);                    
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -74,8 +76,7 @@ function ViewTn({ driverTaskId, handleClose }) {
                         type="text"
                         className="form-control"
                         form="profile-form"
-                        value={tnNumber}                        
-                    />
+                        value={tnNumber}/>
                 </div>
 
                 <div className="form-group col-md-6">

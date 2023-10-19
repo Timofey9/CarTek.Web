@@ -38,6 +38,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [price, setPrice] = useState("");
+    const [materialPrice, setMaterialPrice] = useState("");
     const [mileage, setMileage] = useState("");
     const [open, setOpen] = useState(false);
     const [openAddress, setOpenAddress] = useState(false);
@@ -150,6 +151,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             setNote(clonedOrder.note);
             setMileage(clonedOrder.mileage ?? 0);
             setPrice(clonedOrder.price ?? 0);
+            setMaterialPrice(clonedOrder.materialPrice  ?? 0);
             setVolume(clonedOrder.volume ?? 0);
             setOrderShift(clonedOrder.shift ?? 0);
         }
@@ -269,7 +271,8 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             note: note,
             service: serviceType,
             mileage: mileage,
-            price: price
+            price: price,
+            materialPrice: materialPrice
         };
 
         if (validate()) {
@@ -477,13 +480,23 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Стоимость рейса</label>
+                        <label>Себестоимость перевозки</label>
                         <input
                             type="text"
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setPrice(e.target.value)}
                             value={price} />
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <label>Себестоимость материала</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            form="profile-form"
+                            onChange={(e) => setMaterialPrice(e.target.value)}
+                            value={materialPrice} />
                     </div>
 
                     <div className="form-group col-md-6">
