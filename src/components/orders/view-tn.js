@@ -96,7 +96,7 @@ function ViewTn({ driverTaskId, handleClose }) {
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Объем загрузки</label>
-                    <label>{loadVolume} {unit} {loadVolume2} {unit2}</label>
+                    <label>{loadVolume} {unit} {loadVolume2 > 0 ? loadVolume2 : ""} {loadVolume2 > 0 ? unit2 : ""}</label>
                 </div>
 
                 <div className="form-group col-md-6">
@@ -122,7 +122,7 @@ function ViewTn({ driverTaskId, handleClose }) {
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Объем выгрузки</label>
-                    <label>{unloadVolume} {unloadUnit} {unloadVolume2} {unloadUnit2}</label>
+                    <label>{unloadVolume} {unloadUnit} {unloadVolume2 > 0 ? unloadVolume2 : ""} {unloadVolume2 > 0 ? unloadUnit2 : ""}</label>
                 </div>
 
                 <div className="form-group mb-3 col-md-6 pl-1">

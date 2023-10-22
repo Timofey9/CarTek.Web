@@ -29,7 +29,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [material, setMaterial] = useState({});
     const [volume, setVolume] = useState("");
     const [loadUnit, setLoadUnit] = useState("none");
-    const [startDate, setStartDate] = useState("");
+    const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState("");
     const [note, setNote] = useState("");
     const [carCount, setCarCount] = useState("");
@@ -55,6 +55,21 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const handleClickOpen = () => {
         setOpen(true);
     };
+
+    const shiftToShortString = (shift) => {
+        switch (shift) {
+            case '0':
+                return "Ночь";
+            case '1':
+                return "День";
+            case '2':
+                return "Сутки";
+            case '3':
+                return "Сутки неограниченно";
+            default:
+                return shift;
+        }
+    } 
 
     const handleClose = () => {
         setOpen(false);
@@ -330,7 +345,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <ShiftRadioButtonGroup value={orderShift} onChange={(event) => {setOrderShift(event.target.value);}} />
+                        <ShiftRadioButtonGroup value={orderShift} onChange={(event) => { setOrderShift(event.target.value); setOrderName(orderName + " " + shiftToShortString(event.target.value)) }} />
                     </div>
 
                     <div className="form-group col-md-6">
@@ -359,7 +374,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Прием груза (8)</label>
                         <Autocomplete
-                            className={checkObjectKeys(addressA) === 0 ? "not-valid-input-border" : ""}
+                            className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
                             options={addresses}
                             disablePortal
                             onChange={(e, newvalue) => { setAddressA(newvalue) }}
@@ -373,7 +388,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                         <label>Выдача груза (10)</label>
 
                         <Autocomplete
-                            className={checkObjectKeys(addressB) === 0 ? "not-valid-input-border" : ""}
+                            className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
                             options={addresses}
                             disablePortal
                             onChange={(e, newvalue) => { setAddressB(newvalue); setOrderName(orderName + " " + newvalue.textAddress) }}
@@ -391,7 +406,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Грузоотправитель (1)</label>
                         <Autocomplete
-                            className={checkObjectKeys(client) === 0 ? "not-valid-input-border" : ""}
+                            className={checkObjectKeys(client) ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setClient(newvalue) }}
@@ -399,20 +414,20 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             getOptionLabel={(option) => `${option.clientName}`}
                             isOptionEqualToValue={(o,v) => o === v.clientName} 
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                        {client.clientName}
+                        {client && client.clientName}
                     </div>
 
                     <div className="form-group col-md-6">
                         <label>Грузополучатель (2)</label>
                         <Autocomplete
-                            className={checkObjectKeys(gp) === 0 ? "not-valid-input-border" : ""}
+                            className={checkObjectKeys(gp) ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
                             onChange={(e, newvalue) => { setGp(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                        {gp.clientName}
+                        {gp && gp.clientName}
                     </div>
 
                     <div className="form-group col-md-6">
@@ -430,7 +445,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.name}`}
                             renderInput={(params) => <TextField {...params} label="Список материалов" />} />
-                        <div>{material.name}</div>
+                        <div>{material && material.name}</div>
 
                         <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
                             Добавить тип груза
@@ -462,7 +477,9 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                 <div className="form-row">
                     <div className="form-group col-md-6">
                         <label>Комментарий по заявке (общий)</label>
-                        <input
+                        <textarea
+                            col="40"
+                            rows="3"
                             type="text"
                             className="form-control"
                             onChange={(e) => setNote(e.target.value)}
@@ -568,7 +585,9 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
 
                                     <div className="col-md-6">
                                         <label>Комментарий для водителя</label>
-                                        <input
+                                        <textarea
+                                            col="40"
+                                            rows="5"
                                             type="text"
                                             className="form-control"
                                             onChange={(e) => task.comment = e.target.value}

@@ -81,7 +81,7 @@ const CarsWork = () => {
             case 2:
                 return "Сутки";
             case 3:
-                return "Сутки (не ограничено)";
+                return "Сутки (неограниченно)";
         }
     } 
 

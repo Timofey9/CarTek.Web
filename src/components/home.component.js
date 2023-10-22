@@ -53,7 +53,7 @@ function Home() {
                     <div className="col d-flex justify-content-center mt-3">
                         {(cachedQuestionary.submitted && cachedQuestionary.uniqueId.length > 0) ?
                             <Link id="goToQuestionary" to={`/cars/acceptCar/${cachedQuestionary.uniqueId}`} className="btn btn-warning">Передать водителю</Link> :
-                            <Link id="goToQuestionary" to={`/questionary/car/${cachedQuestionary.car.plate}`} className="btn btn-warning">Завершить осмотр</Link>
+                            <Link id="goToQuestionary" to={`/questionary/car/${cachedQuestionary.car.id}`} className="btn btn-warning">Завершить осмотр</Link>
                         }
                     </div>
                 </div>

@@ -29,7 +29,7 @@ function CarComponent() {
             setUser(localUser);
         }
 
-        ApiService.getCarByPlate(plate)
+        ApiService.getCar(plate)
             .then(({ data }) => {
                 setCar(data);
                 setLoading(false);
@@ -137,10 +137,10 @@ function CarComponent() {
                 <div className="col-md-4">
                     <div className="row">
                         <div className="col-md-6">
-                            {user.identity.isAdmin && <Link to={`/admin/cars/edit/${car.plate}`} className="btn btn-warning pull-right">Редактировать</Link>}
+                            {user.identity.isAdmin && <Link to={`/admin/cars/edit/${car.id}`} className="btn btn-warning pull-right">Редактировать</Link>}
                         </div>
                         <div className="col-md-6">
-                            <Link id="goToQuestionary" to={`/questionary/car/${car.plate}`} onClick={(e) => clearStorage(e)} className="btn btn-success">Перейти к осмотру</Link>
+                            <Link id="goToQuestionary" to={`/questionary/car/${car.id}`} onClick={(e) => clearStorage(e)} className="btn btn-success">Перейти к осмотру</Link>
                         </div>
                     </div>
                 </div>

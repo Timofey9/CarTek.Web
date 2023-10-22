@@ -1076,7 +1076,7 @@ class Questionary extends Component {
         if (plate) {
             this.setState({ loading: true });
 
-            ApiService.getCarByPlate(plate)
+            ApiService.getCar(plate)
                 .then(({ data }) =>
                 {
                     this.setState({

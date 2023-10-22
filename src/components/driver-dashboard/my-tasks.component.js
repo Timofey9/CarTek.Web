@@ -47,7 +47,7 @@ const MyTasksList = () => {
             case 2:
                 return "Сутки";
             case 3:
-                return "Сутки (не ограничено)";
+                return "Сутки (неограниченно)";
         }
     } 
 
@@ -102,6 +102,11 @@ const MyTasksList = () => {
         {
             name: "Смена",
             selector: (row, index) => intToShift(row.shift),
+            center: true,
+        },
+        {
+            name: "Тип груза",
+            selector: (row, index) => row.material,
             center: true,
         },
         {

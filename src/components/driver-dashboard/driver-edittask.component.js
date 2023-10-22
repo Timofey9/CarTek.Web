@@ -38,6 +38,7 @@ import FormLabel from '@mui/material/FormLabel';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+import EditTn from '../orders/edit-tn.component'
 
 registerLocale('ru', ru);
 
@@ -85,6 +86,7 @@ const DriverEditTask = () => {
     const [openAddress, setOpenAddress] = useState(false);
     const [openMaterial, setOpenMaterial] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
+    const [openEditTn, setOpenEditTn] = useState(false);
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
@@ -93,6 +95,14 @@ const DriverEditTask = () => {
     const handleConfirmationOpen = () => {
         setConfirmationOpen(true);
     };
+
+    const handleEditTnClose = () => {
+        setOpenEditTn(false);
+    }
+
+    const handleEditTnOpen = () => {
+        setOpenEditTn(true);
+    }
 
     const handleConfirmationClose = () => {
         setConfirmationOpen(false);
@@ -132,16 +142,6 @@ const DriverEditTask = () => {
         setReload(reload + 1);
     };
 
-    const unitToString = (unit) => {
-        switch (unit) {
-            case 0:
-                return "m3";
-            case 1:
-                return "т";
-            default:
-                return "";
-        }
-    }
 
     const intToShift = (shift) => {
         switch (shift) {
@@ -152,7 +152,7 @@ const DriverEditTask = () => {
             case 2:
                 return "Сутки";
             case 3:
-                return "Сутки (не ограничено)";
+                return "Сутки (неограниченно)";
         }
     }
 
@@ -189,9 +189,7 @@ const DriverEditTask = () => {
                     setError(error.response.data.message);
                 }
             });
-
     }
-
 
     const getBack = useDebouncedCallback((event) => {
         setShowSpinner(true);
@@ -334,7 +332,6 @@ const DriverEditTask = () => {
                     setShowSpinner(false);
                 })
                 .catch((error) => {
-                    console.log(error);
                     if (error.response.data.message) {
                         setError(error.response.data.message);
                     }
@@ -348,7 +345,6 @@ const DriverEditTask = () => {
                         setNote("");
                         setReload(reload + 1);
                         setShowSpinner(false);
-                        scrollToTop();
                     })
                     .catch((error) => {
                         if (error.response.data.message) {
@@ -411,7 +407,6 @@ const DriverEditTask = () => {
                 isValid = false;
             }
         }
-        console.log(isValid);
         return isValid;
     }
 
@@ -460,6 +455,10 @@ const DriverEditTask = () => {
                         setHasSubTask(true);
                         setNotes(subTask.notes);
                         setStatus(subTask.status);
+                    }
+
+                    if (data.status === 4 || data.status === 7) {
+                        scrollToTop();
                     }
 
                 }).
@@ -526,15 +525,21 @@ const DriverEditTask = () => {
     return <div className="container">
         {!loading && (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-
                 <div className="row">
-                    <h1>Задача по заявке на {new Date(order.startDate).toLocaleDateString('ru-Ru', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                    })}{hasSubTask &&
-                        <span>,рейс #{currentSubTask.sequenceNumber + 1}</span>}
-                    </h1>
+                    <div className="col-md-10">
+                        <h1>Задача по заявке на {new Date(order.startDate).toLocaleDateString('ru-Ru', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                        })}{hasSubTask &&
+                            <span>,рейс #{currentSubTask.sequenceNumber + 1}</span>}
+                        </h1>
+                    </div>
+                    <div className="col-md-2">
+                        <button disabled={status < 4} form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleEditTnOpen(e) }}>
+                            ТН
+                        </button>
+                    </div>
                 </div>
 
                 <dl className="row">
@@ -879,15 +884,17 @@ const DriverEditTask = () => {
                                 </div>
                             </div>
 
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="col-md-3">
-                                        <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
-                                            На шаг назад
-                                        </button>
+                            {status > 0 &&
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <div className="col-md-3">
+                                            <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
+                                                На шаг назад
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                </div>}
+
 
                             <div className="row mb-5">
                                 <div className="col-md-12">
@@ -995,6 +1002,20 @@ const DriverEditTask = () => {
                     Продолжить
                 </Button>
             </DialogActions>
+        </Dialog>
+
+        <Dialog
+            fullScreen
+            open={openEditTn}
+            onClose={handleEditTnClose}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="dense">
+                    <Button autoFocus color="inherit" onClick={handleEditTnClose}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <EditTn driverTaskId={driverTaskId} handleClose={handleEditTnClose}></EditTn>
         </Dialog>
     </div>
 };

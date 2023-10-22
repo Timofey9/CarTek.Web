@@ -107,6 +107,11 @@ class ApiService {
         return res;
     }
 
+    viewEditTN(id) {
+        var res = this.get(`order/viewedittn/${id}`);
+        return res;
+    }
+
     getDriverTasks(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`drivers/getdrivertasks/?${query}`);
@@ -161,6 +166,11 @@ class ApiService {
     async finalizeTn(data) {
         var res = await this.post(`drivers/finalizetn`, data, { 'Content-Type': 'multipart/form-data' });
         return await res;
+    }
+
+    updateTn(data) {
+        var res = this.post(`drivers/updatetn`, data, { 'Content-Type': 'multipart/form-data' });
+        return res;
     }
 
     async AdminEditDriverTaskAsync(data) {

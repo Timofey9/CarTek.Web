@@ -54,7 +54,7 @@ const CarsList = () => {
         {
             name: "Номер",
             sortBy: "plate",
-            selector: (row, index) => <Link to={`/cars/car/${row.plate}`} className={"btn btn-default"}>{row.plate}</Link>,
+            selector: (row, index) => <Link to={`/cars/car/${row.id}`} className={"btn btn-default"}>{row.plate}</Link>,
             sortable: true
         },
         {
@@ -156,7 +156,7 @@ const CarsList = () => {
                         !cancelled && setPageNumber(page);
                     }}
                     onRowClicked={(row, event) => {
-                        navigate(`/cars/car/${row.plate}`);
+                        navigate(`/cars/car/${row.id}`);
                     }}
                     onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
                         !cancelled && setPageSize(currentRowsPerPage);

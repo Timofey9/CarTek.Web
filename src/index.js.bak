@@ -17,12 +17,8 @@ function Fallback({ error, resetErrorBoundary }) {
 	console.log(error);
 	return (
 		<div role="alert">
-			<p>Р§С‚Рѕ-С‚Рѕ РїРѕС€Р»Рѕ РЅРµ С‚Р°Рє! РЎРґРµР»Р°Р№С‚Рµ СЃРєСЂРёРЅС€РѕС‚ РѕС€РёР±РєРё Рё РѕС‚РїСЂР°РІСЊС‚Рµ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂСѓ</p>
-			<pre style={{ color: "red" }}>{error.stack}</pre>
-
-			<div>
-				<button onClick={() => resetErrorBoundary()} className="btn btn-success">Р’РµСЂРЅСѓС‚СЊСЃСЏ</button>
-			</div>
+			<p>Что-то пошло не так! Сделайте скриншот ошибки и отправьте администратору</p>
+			<pre style={{ color: "red" }}>{error.message}</pre>
 		</div>
 	);
 }

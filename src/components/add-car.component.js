@@ -40,7 +40,7 @@ function CarForm() {
         setLoading(true);
 
         if (carPlate) {
-            ApiService.getCarByPlate(carPlate)
+            ApiService.getCar(carPlate)
                 .then(({ data }) => {
                     setCar(data);
                     setPlate(data.plate);
