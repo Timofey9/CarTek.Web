@@ -30,7 +30,9 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [volume, setVolume] = useState("");
     const [loadUnit, setLoadUnit] = useState("none");
     const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState("");
+    let datee = new Date();
+    datee.setDate(datee.getDate() + 1);
+    const [endDate, setEndDate] = useState(datee);
     const [note, setNote] = useState("");
     const [carCount, setCarCount] = useState("");
     const [serviceType, setServiceType] = useState("none");
@@ -70,6 +72,35 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                 return shift;
         }
     } 
+
+    const updateShiftInName = (newShift) => {
+        var newS = shiftToShortString(newShift);
+        var oldS = shiftToShortString(orderShift);
+
+        if (orderName.includes(oldS)) {
+            var newName = orderName.replace(oldS, newS);
+            setOrderName(newName);
+        } else {
+            setOrderName(orderName + " " + shiftToShortString(newShift))
+        }
+    }   
+
+    const updateAddressInName = (newAddress) => {
+
+        if (newAddress === null) {
+            var newName = orderName.replace(addressB.textAddress, "");
+            setOrderName(newName);
+
+            return;
+        }
+
+        if (addressB && orderName.includes(addressB.textAddress)) {
+            var newName = orderName.replace(addressB.textAddress, newAddress.textAddress);
+            setOrderName(newName);
+        } else {
+            setOrderName(orderName + " " + newAddress.textAddress)
+        }
+    }
 
     const handleClose = () => {
         setOpen(false);
@@ -117,6 +148,11 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
         if (Object.keys(addressB).length === 0) {
             valid = false;
         }
+
+        if (price.length === 0) {
+            valid = false;
+        }
+
 
         //if (Object.keys(material).length === 0) {
         //    valid = false;
@@ -345,7 +381,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <ShiftRadioButtonGroup value={orderShift} onChange={(event) => { setOrderShift(event.target.value); setOrderName(orderName + " " + shiftToShortString(event.target.value)) }} />
+                        <ShiftRadioButtonGroup value={orderShift} onChange={(event) => { updateShiftInName(event.target.value); setOrderShift(event.target.value) }} />
                     </div>
 
                     <div className="form-group col-md-6">
@@ -391,7 +427,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
                             options={addresses}
                             disablePortal
-                            onChange={(e, newvalue) => { setAddressB(newvalue); setOrderName(orderName + " " + newvalue.textAddress) }}
+                            onChange={(e, newvalue) => { updateAddressInName(newvalue); setAddressB(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
@@ -500,7 +536,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                         <label>Себестоимость перевозки</label>
                         <input
                             type="text"
-                            className="form-control"
+                            className={validated && price.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                             form="profile-form"
                             onChange={(e) => setPrice(e.target.value)}
                             value={price} />

@@ -6,6 +6,8 @@ import StateRadioButtonGroup from "../radiobuttongroup";
 import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import TextField from '@mui/material/TextField';
 import DatePicker, { registerLocale } from "react-datepicker";
+import Divider from '@mui/material/Divider';
+import "./orders.css";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
@@ -24,13 +26,29 @@ function DriverTaskForm({order, handleClose}) {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(true);
+    const [tasksCount, setTasksCount] = useState(1);
+    const [tasksToCreate, setTasksToCreate] = useState([]);
     const [notificationShown, setNotificationShown] = useState(false);
+    const [reload, setReload] = useState(0);
 
     const handleShiftChange = (event) => {
         setShift(event.target.value);
     };
 
     useEffect(() => {
+        var count = order.carCount - order.driverTasks.length;
+        setLoading(true);
+        setTasksCount(count);
+        let array = [];
+        for (let i = 0; i < count; i++) {
+            array.push({ car: {}, driver: {}, taskDate: new Date(order.startDate), shift: order.shift, orderId: order.id });
+        }
+        setTasksToCreate(array);
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        console.log(order.carCount - order.driverTasks.length);
         setLoading(true);
         ApiService.getAllDrivers()
             .then(({ data }) => {
@@ -83,7 +101,39 @@ function DriverTaskForm({order, handleClose}) {
             catch((error) => {
                 setMessage(error.response.data.message);
                 setForceChange(true);
-                console.log(forceChange);
+            });
+    }
+
+    function handleCreateDriverTasks(event) {
+        event.preventDefault();
+        setMessage("");
+        var formattedTasks = [];
+        for (var i = 0; i < tasksToCreate.length; i++) {
+            formattedTasks.push(
+                {
+                    driverId: tasksToCreate[i].driver.id,
+                    orderId: order.id,
+                    carId: tasksToCreate[i].car.id,
+                    shift: tasksToCreate[i].shift,
+                    taskDate: tasksToCreate[i].taskDate,
+                    comment: tasksToCreate[i].comment,
+                    forceChange: true
+                });
+        }
+
+        const data = {
+            orderId: order.id,
+            tasks: formattedTasks
+        };
+
+        ApiService.createDriverTasksMultiple(data)
+            .then(({ data }) => {
+                alert(data.message);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
             });
     }
 
@@ -99,51 +149,66 @@ function DriverTaskForm({order, handleClose}) {
                 </div>
             </div>
 
-            <h1 className="mt-3">Создание задачи </h1>
-            <div className="form-row">
-                <div className="form-row">
-                    <label>Выберите водителя</label>
-                    <Autocomplete
-                        options={drivers}
-                        disablePortal
-                        onChange={(e, newvalue) => { setDriver(newvalue) }}
-                        sx={{ width: 300 }}
-                        getOptionLabel={(option) => `${option.fullName}`}
-                        renderInput={(params) => <TextField {...params} label="Список водителей" />} />
-                </div>
+            <h1 className="mt-3">Создание задач</h1>
 
-                <div className="form-row">
-                    <label>Выберите тягач</label>
-                    <Autocomplete
-                        options={cars}
-                        disablePortal
-                        onChange={(e, newvalue) => { setCar(newvalue) }}
-                        sx={{ width: 300 }}
-                        getOptionLabel={(option) => `${option.plate}`}
-                        renderInput={(params) => <TextField {...params} label="Список тягачей" />} />
-                </div>
+            {tasksToCreate.length > 0 &&
+                tasksToCreate.map((task, index) => {
+                    return (<div className="form-row">
+                        <div className="row">
+                            <div className="col-md-6">
+                                <label>Выберите водителя</label>
+                                <Autocomplete
+                                    options={drivers}
+                                    disablePortal
+                                    onChange={(e, newvalue) => { task.driver = newvalue }}
+                                    sx={{ width: 300 }}
+                                    isOptionEqualToValue={(option, value) => option.fullName === value.fullName}
+                                    getOptionLabel={(option) => `${option.fullName}`}
+                                    renderInput={(params) => <TextField {...params} label="Список водителей" />} />
+                            </div>
 
-                <div className="form-group col-md-6">
-                    <ShiftRadioButtonGroup value={shift} onChange={handleShiftChange}></ShiftRadioButtonGroup>
-                </div>
+                            <div className="col-md-6">
+                                <label>Выберите тягач</label>
+                                <Autocomplete
+                                    options={cars}
+                                    disablePortal
+                                    onChange={(e, newvalue) => { task.car = newvalue }}
+                                    sx={{ width: 300 }}
+                                    getOptionLabel={(option) => `${option.plate}`}
+                                    isOptionEqualToValue={(option, value) => option.plate === value.plate}
+                                    renderInput={(params) => <TextField {...params} label="Список тягачей" />} />
+                            </div>
 
-                <div className="col-md-6">
-                    <label>Комментарий для водителя</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        onChange={(e) => setComment(e.target.value)}
-                        value={comment} />
-                </div>
-            </div>
+                            <div className="col-md-6">
+                                <label>Комментарий для водителя</label>
+                                <textarea
+                                    col="40"
+                                    rows="5"
+                                    type="text"
+                                    className="form-control"
+                                    onChange={(e) => task.comment = e.target.value}
+                                    value={task.comment} />
+                            </div>
 
+                            <div key={"shift" + index} className="col-md-6">
+                                <ShiftRadioButtonGroup value={task.shift} onChange={(event) => {
+                                    task.shift = event.target.value; setReload(reload + 1);
+                                }} />
+                            </div>
+                        </div>
 
-            <div className="form-row">
-                <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата начала</label>
-                    <DatePicker dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => setStartDate(date)} />
-                </div>
-            </div>
+                        <div key={"task" + index} className="form-row">
+                            <div className="input-group mb-3 col-md-6 pl-1">
+                                <label>Дата начала</label>
+                                <DatePicker dateFormat="dd.MM.yyyy" locale="ru" selected={task.taskDate} onChange={(date) => {
+                                    task.taskDate = date; setReload(reload + 1);
+                                }} />
+                            </div>
+                        </div>
+
+                        <Divider sx={{ borderBottomWidth: 5 }}></Divider>
+                    </div>)
+                })}
 
 
             {message && (
@@ -164,8 +229,8 @@ function DriverTaskForm({order, handleClose}) {
                             </button>
                         </div>
                         <div className="col-md-2">
-                            <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
-                                Сохранить
+                            <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleCreateDriverTasks(e) }}>
+                                Создать
                             </button>
                         </div>
                     </div>

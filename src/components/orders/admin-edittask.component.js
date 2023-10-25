@@ -350,7 +350,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                                             <Typography>{note.text}</Typography>
                                                             {showLinks && links.map((link, linkindex) => {
                                                                 const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                return (<div><a target="_blank" href={fullLink}>Изображение {linkindex}</a></div>);
+                                                                return (<div><a target="_blank" href={fullLink}>Изображение {linkindex+1}</a></div>);
                                                             })}
                                                         </div>
                                                     )
@@ -387,7 +387,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                                                 <Typography>{note.text}</Typography>
                                                                 {showLinks && links.map((link, linkindex) => {
                                                                     const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                    return (<div><a target="_blank" href={fullLink}>Изображение {linkindex}</a></div>);
+                                                                    return (<div><a target="_blank" href={fullLink}>Изображение {linkindex+1}</a></div>);
                                                                 })}
                                                             </div>
                                                         )

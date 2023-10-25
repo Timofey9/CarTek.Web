@@ -168,7 +168,6 @@ const DriverEditTask = () => {
             }
         }
         catch (e) {
-            console.log(e);
             alert("Прикрепите фото еще раз");
         }
     };
@@ -256,6 +255,7 @@ const DriverEditTask = () => {
         if (status === 4 && validate()) {
             if (hasSubTask) {
                 formData.set("DriverTaskId", driverTask.id);
+                formData.set("UpdatedStatus", currentSubTask.status + 1);
                 formData.append("IsSubtask", true);
                 formData.append("SubTaskId", currentSubTask.id);
             }
@@ -294,6 +294,7 @@ const DriverEditTask = () => {
         if (status === 7 && validate()) {
 
             if (hasSubTask) {
+                formData.set("UpdatedStatus", currentSubTask.status + 1);
                 formData.append("IsSubtask", true);
                 formData.append("SubTaskId", currentSubTask.id);
             }
@@ -323,19 +324,22 @@ const DriverEditTask = () => {
         }
 
         if (hasSubTask) {
-            ApiService.EditDriverSubTaskAsync(formData)
-                .then(({ data }) => {
-                    alert("Статус обновлен");
-                    setFormData(new FormData());
-                    setNote("");
-                    setReload(reload + 1);
-                    setShowSpinner(false);
-                })
-                .catch((error) => {
-                    if (error.response.data.message) {
-                        setError(error.response.data.message);
-                    }
-                });
+            formData.set("UpdatedStatus", currentSubTask.status + 1);
+            if (validate()) {
+                ApiService.EditDriverSubTaskAsync(formData)
+                    .then(({ data }) => {
+                        alert("Статус обновлен");
+                        setFormData(new FormData());
+                        setNote("");
+                        setReload(reload + 1);
+                        setShowSpinner(false);
+                    })
+                    .catch((error) => {
+                        if (error.response.data.message) {
+                            setError(error.response.data.message);
+                        }
+                    });
+            }
         } else {
             if (validate()) {
                 ApiService.EditDriverTaskAsync(formData)
@@ -450,6 +454,7 @@ const DriverEditTask = () => {
                     setCar(data.car);
 
                     if (data.subTasks && data.subTasks.length > 0) {
+                        console.log(data.subTasks);
                         let subTask = data.subTasks.reduce((max, task) => max.sequenceNumber > task.sequenceNumber ? max : task);
                         setCurrentSubTask(subTask);
                         setHasSubTask(true);
@@ -463,6 +468,7 @@ const DriverEditTask = () => {
 
                 }).
                 catch((error) => {
+                    console.log(error);
                     setError(error.response.data);
                 });
         }
@@ -618,6 +624,7 @@ const DriverEditTask = () => {
                         <div className="form-row">
                             <label>Тип груза (3)</label>
                             <Autocomplete
+                                renderOption={(props, item) => ( <li {...props} key={item.id}>{item.name}</li>)}
                                 className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
                                 options={materialsList}
                                 disablePortal
@@ -846,7 +853,7 @@ const DriverEditTask = () => {
                                                             <Typography>{note.text}</Typography>
                                                             {showLinks && links.map((link, linkindex) => {
                                                                 const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                return (<div key={linkindex}><a target="_blank" href={fullLink}>Изображение {linkindex}</a></div>);
+                                                                return (<div key={linkindex}><a target="_blank" href={fullLink}>Изображение {linkindex+1}</a></div>);
                                                             })}
                                                         </div>
                                                     )

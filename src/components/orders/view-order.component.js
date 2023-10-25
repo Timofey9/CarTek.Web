@@ -110,7 +110,6 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setMileage(data.mileage);
                 setGp(data.gp);
                 setOrderShift(data.shift);
-                console.log(data);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -306,7 +305,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <ShiftRadioButtonGroup value={orderShift} onChange={(event) => { setOrderShift(event.target.value); setReload(reload + 1); }} />
+                        <ShiftRadioButtonGroup disabled={!isEdit} value={orderShift} onChange={(event) => { setOrderShift(event.target.value); setReload(reload + 1); }} />
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -331,7 +330,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
-                        <label>{client.clientName}</label>
+                        <label>{client && client.clientName}</label>
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -345,7 +344,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
-                        <label>{gp.clientName}</label>
+                        <label>{gp && gp.clientName}</label>
                     </div>
 
                     <div className="form-group col-md-6">

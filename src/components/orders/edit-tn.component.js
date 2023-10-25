@@ -52,7 +52,7 @@ function EditTn({ driverTaskId, handleClose }) {
             case 'тн':
                 return '1';
             default:
-                return "";
+                return "m3";
         }
     }
 
@@ -62,15 +62,15 @@ function EditTn({ driverTaskId, handleClose }) {
             formData.append("Number", tnNumber);
             formData.append("GoId", go.id);
             formData.append("GpId", gp.id);
-            formData.append("LoadVolume", loadVolume);
+            formData.append("LoadVolume", loadVolume.replace(',', '.'));
             formData.append("Unit", unit);
-            formData.append("LoadVolume2", loadVolume2);
+            formData.append("LoadVolume2", loadVolume2.replace(',', '.'));
             formData.append("Unit2", unit2);
             formData.append("LocationAId", addressA.id);
             formData.append("PickUpArrivalDate", pickupArrivalTime.toUTCString());
             formData.append("PickUpDepartureDate", pickupDepartureTime.toUTCString());
-            formData.append("UnloadVolume", unloadVolume);
-            formData.append("UnloadVolume2", unloadVolume2);
+            formData.append("UnloadVolume", unloadVolume.replace(',','.'));
+            formData.append("UnloadVolume2", unloadVolume2.replace(',', '.'));
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
             formData.append("LocationBId", addressB.id);
@@ -338,7 +338,7 @@ function EditTn({ driverTaskId, handleClose }) {
 
 
                 <div className="form-group col-md-6">
-                    <label>Объем загрузки</label>
+                    <label>Объем выгрузки</label>
                     <input
                         type="text"
                         form="profile-form"
@@ -354,8 +354,8 @@ function EditTn({ driverTaskId, handleClose }) {
                             name="radio-buttons-group"
                             value={unloadUnit}
                             onChange={(e) => setUnloadUnit(e.target.value)}>
-                            <FormControlLabel value="m3" control={<Radio />} label="M3" />
-                            <FormControlLabel value="тн" control={<Radio />} label="Тонны" />
+                            <FormControlLabel value="0" control={<Radio />} label="M3" />
+                            <FormControlLabel value="1" control={<Radio />} label="Тонны" />
                         </RadioGroup>
                     </FormControl>
                 </div>
@@ -369,7 +369,7 @@ function EditTn({ driverTaskId, handleClose }) {
                         </AccordionSummary>
                         <AccordionDetails>
                             <div className="form-group col-md-6">
-                                <label>Объем загрузки</label>
+                                <label>Объем выгрузки</label>
                                 <input
                                     type="text"
                                     form="profile-form"
@@ -395,12 +395,12 @@ function EditTn({ driverTaskId, handleClose }) {
                 </div>
 
                 <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата прибытия на адрес погрузки</label>
+                    <label>Дата прибытия на адрес выгрузки</label>
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffArrivalTime} onChange={(date) => { setDropOffArrivalTime(date) }} />
                 </div>
 
                 <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата выезда с адреса погрузки</label>
+                    <label>Дата выезда с адреса выгрузки</label>
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffDepartureTime} onChange={(date) => { setDropOffDepartureTime(date) }} />
                 </div>
 
