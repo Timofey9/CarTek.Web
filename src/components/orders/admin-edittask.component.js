@@ -40,11 +40,11 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [localUser, setLocalUser] = useState({});
     const [shift, setShift] = useState(0);
     const [startDate, setStartDate] = useState(new Date());
-    const [selectedDriverId, setSelectedDriverId] = useState(0);
+    const [subTaskId, setSubTaskId] = useState(0);
     const [open, setOpen] = useState(false);
+    const [subTaskTnOpen, setSubTaskTnOpen] = useState(false);
     const [reload, setReload] = useState(false);
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
-
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -54,6 +54,18 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         setOpen(false);
         setReload(reload + 1);
     };
+
+
+    const handleClickSubTaskTnOpen = (id) => {
+        setSubTaskId(id);
+        setSubTaskTnOpen(true);
+    };
+
+    const handleSubTaskTnClose = () => {
+        setSubTaskTnOpen(false);
+        setReload(reload + 1);
+    };
+
 
     useEffect(() => {
         setLoading(true);
@@ -365,7 +377,8 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     {subTasks.map((task, taskIndex) => {
                         return (
                             <div className="col-md-2">
-                                <label>Рейс #{task.sequenceNumber+1}</label>
+                                <label>Рейс #{task.sequenceNumber + 1}</label>
+                                <button onClick={() => handleClickSubTaskTnOpen(task.id)} className="btn btn-success mr-10">ТН</button>
                                 <Stepper orientation="vertical" activeStep={task.status}>
                                     {constStatuses.map((label, index) => {
                                         const stepProps = {};
@@ -414,6 +427,20 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                 </Toolbar>
             </AppBar>
             <ViewTn driverTaskId={driverTaskId} handleClose={handleClose}></ViewTn>
+        </Dialog>
+
+        <Dialog
+            fullScreen
+            open={subTaskTnOpen}
+            onClose={handleSubTaskTnClose}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="outlined">
+                    <Button autoFocus color="inherit" onClick={handleSubTaskTnClose}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <ViewTn driverTaskId={subTaskId} isSubTask={'true'} handleClose={handleSubTaskTnClose}></ViewTn>
         </Dialog>
     </div>
 };

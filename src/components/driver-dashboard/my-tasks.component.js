@@ -55,6 +55,7 @@ const MyTasksList = () => {
 
     useEffect(() => {
         setLoading(true);
+
         let user = JSON.parse(localStorage.getItem("user"));
 
         let request = {
@@ -85,11 +86,11 @@ const MyTasksList = () => {
     }, [sortBy, dir, pageSize, pageNumber, searchBy, searchString, reload]);
 
     const columns = [
-        {
-            name: "Тягач",
-            selector: (row, index) => <div>{row.car.plate}</div>,
-            center: true,
-        },
+        //{
+        //    name: "Тягач",
+        //    selector: (row, index) => <div>{row.car.plate}</div>,
+        //    center: true,
+        //},
         {
             name: "Дата",
             selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
@@ -103,6 +104,7 @@ const MyTasksList = () => {
             name: "Смена",
             selector: (row, index) => intToShift(row.shift),
             center: true,
+            wrap: true
         },
         {
             name: "Тип груза",
@@ -124,6 +126,12 @@ const MyTasksList = () => {
         {
             name: "Статус",
             selector: (row, index) => constStatuses[row.status],
+            center: true,
+            wrap: true
+        },
+        {
+            name: "С/ст перевозки",
+            selector: (row, index) => row.price,
             center: true,
             wrap: true
         }

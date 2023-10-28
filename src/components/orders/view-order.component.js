@@ -273,11 +273,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     </div>
                 </div>
 
-                <h1>Заявка от {new Date(startDate).toLocaleDateString('ru-Ru', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                })} {orderName}</h1>
+                <h1>{orderName}</h1>
 
                 {localUser.identity && !localUser.identity.isDispatcher &&
                     <div className="row">

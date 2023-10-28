@@ -17,7 +17,7 @@ import ru from 'date-fns/locale/ru';
 import { useDebouncedCallback } from 'use-debounce';
 registerLocale('ru', ru);
 
-function EditTn({ driverTaskId, handleClose }) {
+function EditTn({ driverTaskId, isSubTask, handleClose }) {
     const [error, setError] = useState("");
     const [reload, setReload] = useState(0);
     const [unit, setUnit] = useState("none");
@@ -57,20 +57,27 @@ function EditTn({ driverTaskId, handleClose }) {
     }
 
     const handleSubmit = useDebouncedCallback((event) => {
+            var lv = loadVolume && loadVolume.replace(',', '.');
+            var lv2 = loadVolume2 ? loadVolume.replace(',', '.') : 0;
+            var unlv = unloadVolume && unloadVolume.replace(',', '.');
+            var unlv2 = unloadVolume2 ? unloadVolume2.replace(',', '.') : 0;
+
+            formData.append("IsSubtask", isSubTask);
+            formData.append("SubTaskId", driverTaskId);
             formData.append("DriverTaskId", driverTaskId);
             formData.append("MaterialId", material.id);
             formData.append("Number", tnNumber);
             formData.append("GoId", go.id);
             formData.append("GpId", gp.id);
-            formData.append("LoadVolume", loadVolume.replace(',', '.'));
+            formData.append("LoadVolume", lv);
             formData.append("Unit", unit);
-            formData.append("LoadVolume2", loadVolume2.replace(',', '.'));
+            formData.append("LoadVolume2", lv2);
             formData.append("Unit2", unit2);
             formData.append("LocationAId", addressA.id);
             formData.append("PickUpArrivalDate", pickupArrivalTime.toUTCString());
             formData.append("PickUpDepartureDate", pickupDepartureTime.toUTCString());
-            formData.append("UnloadVolume", unloadVolume.replace(',','.'));
-            formData.append("UnloadVolume2", unloadVolume2.replace(',', '.'));
+            formData.append("UnloadVolume", unlv);
+            formData.append("UnloadVolume2", unlv2);
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
             formData.append("LocationBId", addressB.id);
@@ -84,6 +91,7 @@ function EditTn({ driverTaskId, handleClose }) {
                     setReload(reload + 1);
                 })
                 .catch((error) => {
+                    setFormData(new FormData());
                     if (error.response.data) {
                         setError(error.response.data.message);
                     }
@@ -137,7 +145,7 @@ function EditTn({ driverTaskId, handleClose }) {
 
     useEffect(() => {
         setLoading(true);
-        ApiService.viewEditTN(driverTaskId)
+        ApiService.viewEditTN(driverTaskId, isSubTask)
             .then(({ data }) => {
                 setTnNumber(data.number);
                 setMaterial(data.material);

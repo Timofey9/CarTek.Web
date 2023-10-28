@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
-import StateRadioButtonGroup from "../radiobuttongroup";
 import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import TextField from '@mui/material/TextField';
 import DatePicker, { registerLocale } from "react-datepicker";
@@ -36,6 +35,7 @@ function DriverTaskForm({order, handleClose}) {
     };
 
     useEffect(() => {
+        console.log(order);
         var count = order.carCount - order.driverTasks.length;
         setLoading(true);
         setTasksCount(count);
@@ -48,7 +48,6 @@ function DriverTaskForm({order, handleClose}) {
     }, []);
 
     useEffect(() => {
-        console.log(order.carCount - order.driverTasks.length);
         setLoading(true);
         ApiService.getAllDrivers()
             .then(({ data }) => {
@@ -137,6 +136,23 @@ function DriverTaskForm({order, handleClose}) {
             });
     }
 
+    function serviceToText(service){
+
+    }
+
+    const intToShift = (shift) => {
+        switch (shift) {
+            case 0:
+                return "Ночная (20:00 - 08:00)";
+            case 1:
+                return "Дневная (08:00 - 20:00)";
+            case 2:
+                return "Сутки";
+            case 3:
+                return "Сутки (неограниченно)";
+        }
+    } 
+
     if (loading) {
         return <div><h1>ЗАГРУЗКА...</h1></div>
     }
@@ -148,6 +164,94 @@ function DriverTaskForm({order, handleClose}) {
                     {error}
                 </div>
             </div>
+
+            <h1>{order.name}</h1>
+
+            <div className="form-row">
+                <label className="bold-label">Смена</label>
+
+                <div className="col-md-6">
+                    {intToShift(order.shift)}
+                </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Услуга</label>
+                    {order.service === 0 ? "Перевозка" : "Поставка"}
+                </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Грузоотправитель (1)</label>
+                    <label>{order.client && order.client.clientName}</label>
+                </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Грузополучатель (2)</label>
+                    <label>{order.gp && order.gp.clientName}</label>
+                </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                <div className="form-row">
+                    <label className="bold-label">Груз (3)</label>
+                    <label>{order.material && order.material.name}</label>
+                </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Объем (общий)</label>
+                    <input
+                        disabled
+                        type="text"
+                        className="form-control"
+                        form="profile-form"
+                        value={order.volume}
+                    />
+                </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Единица измерения</label>
+                    {order.loadUnit === "0" ? "m3" : "тонны"}
+                </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Прием груза (8)</label>
+                    <label>{order.locationA && order.locationA}</label>
+                </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Выдача груза (10)</label>
+                    <label>{order.locationB && order.locationB}</label>
+                </div>
+            </div>
+
+            <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+            {/*<div className="form-row">*/}
+            {/*    <div className="input-group mb-3 col-md-6 pl-1">*/}
+            {/*        <label className="bold-label">Дата начала</label>*/}
+            {/*        <DatePicker disabled dateFormat="dd.MM.yyyy" locale="ru" selected={new Date(order.startDate)} />*/}
+            {/*    </div>*/}
+
+            {/*    <div className="input-group mb-3 col-md-6 pl-1">*/}
+            {/*        <label className="bold-label">Срок выполнения</label>*/}
+            {/*        <DatePicker disabled dateFormat="dd.MM.yyyy" locale="ru" selected={new Date(order.dueDate)} />*/}
+            {/*    </div>*/}
+            {/*</div>*/}
+
+            {/*<Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>*/}
 
             <h1 className="mt-3">Создание задач</h1>
 
@@ -209,7 +313,6 @@ function DriverTaskForm({order, handleClose}) {
                         <Divider sx={{ borderBottomWidth: 5 }}></Divider>
                     </div>)
                 })}
-
 
             {message && (
                 <div className="form-group">

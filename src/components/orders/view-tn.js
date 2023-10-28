@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import ApiService from "../../services/cartekApiService";
+import { useDebouncedCallback } from 'use-debounce';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Dialog from '@mui/material/Dialog';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
+import EditTn from './edit-tn.component'
+import Divider from '@mui/material/Divider';
+import "./orders.css";
 
-function ViewTn({ driverTaskId, handleClose }) {
+function ViewTn({ driverTaskId, isSubTask, handleClose }) {
     const [error, setError] = useState("");
     const [reload, setReload] = useState(0);
     const [unit, setUnit] = useState("none");
     const [unit2, setUnit2] = useState("none");
     const [unloadUnit, setUnloadUnit] = useState("none");
     const [unloadUnit2, setUnloadUnit2] = useState("none");
-
+    const [originalReceived, setOriginalReceived] = useState(false);
     const [material, setMaterial] = useState();
     const [addressA, setAddressA] = useState("");
     const [addressB, setAddressB] = useState("");
@@ -25,11 +35,14 @@ function ViewTn({ driverTaskId, handleClose }) {
     const [dropOffArrivalTime, setDropOffArrivalTime] = useState("");
     const [dropOffDepartureTime, setDropOffDepartureTime] = useState("");
     const [loading, setLoading] = useState(false);
+    const [openEditTn, setOpenEditTn] = useState(false);
+    const [openEditSubTn, setOpenEditSubTn] = useState(false);
 
     useEffect(() => {
         setLoading(true);
-            ApiService.viewTN(driverTaskId)
+            ApiService.viewTN(driverTaskId, isSubTask)
                 .then(({ data }) => {
+                    setOriginalReceived(data.isOriginalReceived);
                     setTnNumber(data.number);
                     setGoInfo(data.goInfo);
                     setGpInfo(data.gpInfo);
@@ -55,9 +68,47 @@ function ViewTn({ driverTaskId, handleClose }) {
         setLoading(false);
     }, [reload]);
 
-    function handleSubmit(event) {
-        //тут будем скачивать ТН
+    const handleEditTnClose = () => {
+        setOpenEditTn(false);
     }
+
+    const handleEditTnOpen = () => {
+        console.log(isSubTask);
+        if (isSubTask) {
+            setOpenEditSubTn(true);
+        } else {
+            setOpenEditTn(true);
+        }
+    }
+
+
+    const handleEditSubTnClose = () => {
+        setOpenEditSubTn(false);
+    }
+
+    const handleEditSubTnOpen = () => {
+        setOpenEditSubTn(true);
+    }
+
+    const handleSubmit = useDebouncedCallback((event) => {
+        var data = {
+            driverTaskId : driverTaskId,
+            isSubTask: isSubTask,
+            isOriginalReceived : originalReceived
+        }
+
+        ApiService.verifyTn(data)
+            .then(({ res }) => {
+                alert("ТН подтверждена");
+                handleClose();
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                if (error.response.data) {
+                    setError(error.response.data.message);
+                }
+            });
+    }, 500);
 
     return (
         <div className="m-5">
@@ -67,7 +118,15 @@ function ViewTn({ driverTaskId, handleClose }) {
                 </div>
             </div>
 
-            <h1 className="mt-3">Информация по задаче</h1>
+            <div className="row">
+                <div col-md-6>
+                    <h1 className="mt-3">Информация по ТН</h1>
+                </div>
+
+                <div col-md-6>
+                    <button onClick={handleEditTnOpen} className="btn btn-warning">Редактировать</button>
+                </div>
+            </div>
 
             <div className="form-row">
                 <div className="form-group col-md-6">
@@ -135,7 +194,45 @@ function ViewTn({ driverTaskId, handleClose }) {
                     <label>{dropOffDepartureTime}</label>
                 </div>
 
+                <div className="form-group col-md-6">
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <FormControlLabel required control={<Checkbox checked={originalReceived}
+                        onChange={(e) => setOriginalReceived(e.target.checked)} />} label="Оригинал получен" />
+                </div>
+
+                <div className="form-group col-md-6 mt-3">
+                    <button onClick={handleSubmit} className="btn btn-success">Подтвердить</button>
+                </div>
+
             </div>
+            <Dialog
+                fullScreen
+                open={openEditTn}
+                onClose={handleEditTnClose}>
+                <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                    <Toolbar variant="dense">
+                        <Button autoFocus color="inherit" onClick={handleEditTnClose}>
+                            Закрыть
+                        </Button>
+                    </Toolbar>
+                </AppBar>
+                <EditTn driverTaskId={driverTaskId} handleClose={handleEditTnClose}></EditTn>
+            </Dialog>
+
+            <Dialog
+                fullScreen
+                open={openEditSubTn}
+                onClose={handleEditSubTnClose}>
+                <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                    <Toolbar variant="dense">
+                        <Button autoFocus color="inherit" onClick={handleEditSubTnClose}>
+                            Закрыть
+                        </Button>
+                    </Toolbar>
+                </AppBar>
+                <EditTn driverTaskId={driverTaskId} isSubTask={'true'} handleClose={handleEditSubTnClose}></EditTn>
+            </Dialog>
         </div>);
 }
 

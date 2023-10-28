@@ -287,6 +287,7 @@ const OrdersList = () => {
             name: "Статус",
             selector: (row, index) => <div>{constStatuses[row.status]}</div>,
             center: true,
+            wrap:true,
             conditionalCellStyles: [
                 {
                     when: row => row.status === 0,

@@ -196,6 +196,7 @@ const DriverEditTask = () => {
             .then(({ data }) => {
                 alert("Статус обновлен");
                 setFormData(new FormData());
+                setTnNumber("");
                 setNote("");
                 setReload(reload + 1);
             })
@@ -310,6 +311,7 @@ const DriverEditTask = () => {
                 .then(({ data }) => {
                     alert("Статус обновлен");
                     setFormData(new FormData());
+                    setTnNumber("");
                     setNote("");
                     setReload(reload + 1);
                     setShowSpinner(false);
@@ -330,6 +332,7 @@ const DriverEditTask = () => {
                     .then(({ data }) => {
                         alert("Статус обновлен");
                         setFormData(new FormData());
+                        setTnNumber("");
                         setNote("");
                         setReload(reload + 1);
                         setShowSpinner(false);
@@ -346,6 +349,7 @@ const DriverEditTask = () => {
                     .then(({ data }) => {
                         alert("Статус обновлен");
                         setFormData(new FormData());
+                        setTnNumber("");
                         setNote("");
                         setReload(reload + 1);
                         setShowSpinner(false);
@@ -432,7 +436,7 @@ const DriverEditTask = () => {
             case 6:
                 return "Выгрузка";
             case 7:
-                return "Выписка документов";
+                return "Выписать документы и завершить";
             case 8:
                 return "Завершить";
             default:
@@ -454,7 +458,6 @@ const DriverEditTask = () => {
                     setCar(data.car);
 
                     if (data.subTasks && data.subTasks.length > 0) {
-                        console.log(data.subTasks);
                         let subTask = data.subTasks.reduce((max, task) => max.sequenceNumber > task.sequenceNumber ? max : task);
                         setCurrentSubTask(subTask);
                         setHasSubTask(true);
@@ -468,7 +471,6 @@ const DriverEditTask = () => {
 
                 }).
                 catch((error) => {
-                    console.log(error);
                     setError(error.response.data);
                 });
         }
@@ -533,11 +535,7 @@ const DriverEditTask = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div className="row">
                     <div className="col-md-10">
-                        <h1>Задача по заявке на {new Date(order.startDate).toLocaleDateString('ru-Ru', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                        })}{hasSubTask &&
+                        <h1>Задача по заявке {order && order.name} {hasSubTask &&
                             <span>,рейс #{currentSubTask.sequenceNumber + 1}</span>}
                         </h1>
                     </div>
@@ -556,7 +554,7 @@ const DriverEditTask = () => {
                     <dd className="col-sm-9">{order.material && order.material.name}</dd>
 
                     <dt className="col-sm-3">Дата: </dt>
-                    <dd className="col-sm-9">{new Date(driverTask.startDate).toLocaleDateString('ru-Ru', {
+                    <dd className="col-sm-9">{driverTask && new Date(driverTask.startDate).toLocaleDateString('ru-Ru', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
@@ -571,11 +569,16 @@ const DriverEditTask = () => {
                     <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
 
+                    <dt className="col-sm-3">Себестоимость перевозки:</dt>
+                    <dd className="col-sm-9">{order.price}</dd>
+
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
 
                     <dt className="col-sm-3">Комментарий по задаче:</dt>
-                    <dd className="col-sm-5">{driverTask.adminComment}</dd>
+                    <dd className="col-sm-9">{driverTask.adminComment}</dd>
+
+
                 </dl>
 
                 {status === 4 &&
