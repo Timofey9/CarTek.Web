@@ -62,7 +62,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
             var unlv = unloadVolume && unloadVolume.replace(',', '.');
             var unlv2 = unloadVolume2 ? unloadVolume2.replace(',', '.') : 0;
 
-            formData.append("IsSubtask", isSubTask);
+            formData.append("IsSubtask", isSubTask === undefined ? "false" : "true");
             formData.append("SubTaskId", driverTaskId);
             formData.append("DriverTaskId", driverTaskId);
             formData.append("MaterialId", material.id);
