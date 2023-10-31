@@ -18,7 +18,7 @@ function DriverForm() {
     const [selectedItem, setSelectedItem] = useState(0);
     const [error, setError] = useState("");
     const [notificationShown, setNotificationShown] = useState(false);
-
+    const [percentage, setPercentage] = useState("");
     const navigate = useNavigate();
 
     let { driverId } = useParams();
@@ -52,6 +52,7 @@ function DriverForm() {
                     setPassword(data.password);
                     setPhone(data.phone);
                     setLogin(data.login);
+                    setPercentage(data.percentage);
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -71,7 +72,8 @@ function DriverForm() {
                 password: password,
                 phone: phone,
                 carId: carId,
-                login: login
+                login: login,
+                percentage: percentage ? percentage.replace(',','.') : 0
             };
 
             if (driverId) {
@@ -80,7 +82,7 @@ function DriverForm() {
                         alert("Водитель обновлен");
                     }).
                     catch((error) => {
-                        setError(error.response.data);
+                        setError(error.response);
                     });
             } else {
                 ApiService.createDriver(newDriver)
@@ -89,7 +91,7 @@ function DriverForm() {
                         navigate("/admin/drivers/");
                     }).
                     catch((error) => {
-                        setError(error.response.data);
+                        setError(error.response.data.message);
                     });
             }
         }
@@ -109,7 +111,7 @@ function DriverForm() {
                     navigate("/admin/drivers/");
                 })
                 .catch((error) => {
-                    setError(error.response.data);
+                    setError(error.response.data.message);
                     setLoading(false);
                 })
         }
@@ -190,6 +192,17 @@ function DriverForm() {
                         form="profile-form"
                         onChange={(e) => setPassword(e.target.value)}
                         value={password} />
+                </div>
+
+
+                <div className="form-group col-md-6">
+                    <label htmlFor="perc">Процент</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        form="profile-form"
+                        onChange={(e) => setPercentage(e.target.value)}
+                        value={percentage} />
                 </div>
 
                 {driver.car ? <div className="form-group col-md-6">

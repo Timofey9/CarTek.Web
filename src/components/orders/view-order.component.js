@@ -223,7 +223,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
         const newOrder = {
             name: orderName,
-            clientName: client.clientName,
+            clientName: client && client.clientName,
             clientId: client.id,
             gpId: gp.id,
             shift: orderShift,

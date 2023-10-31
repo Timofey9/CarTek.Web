@@ -120,6 +120,17 @@ const OrdersList = () => {
             });
     };
 
+    const downloadFullTasks = () => {
+        ApiService.downloadFullTasksReport({
+            startDate: startDate.toUTCString(),
+            endDate: endDate.toUTCString()
+        }).then(response => {
+            let url = window.URL
+                .createObjectURL(new Blob([response.data]));
+            saveAs(url, "задачи.xlsx");    
+            });
+    };
+
     const downloadTnsFile = () => {
         ApiService.getTnsList({
             startDate: startDate.toUTCString(),
@@ -393,12 +404,6 @@ const OrdersList = () => {
                         <div className="input-group-append">
                             <button className="btn btn-default" onClick={(e) => { e.preventDefault(); search() }}><i class="fa fa-search"></i></button>
                         </div>
-                        <div className="input-group-append">
-                            <button className="btn btn-default" onClick={(e) => { e.preventDefault(); downloadFile() }}>Скачать список</button>
-                        </div>
-                        <div className="input-group-append pl-2">
-                            <button className="btn btn-primary" onClick={(e) => { e.preventDefault(); downloadTnsFile() }}>Реестр ТН</button>
-                        </div>
                     </div>
                 </div>
                 {localUser.identity && !localUser.identity.isDispatcher &&
@@ -425,6 +430,17 @@ const OrdersList = () => {
                                     <option value="1">Поставка</option>
                                 </select> : <input className="form-control" type="text" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />}
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-md-12">
+                    <div className="input-group-append pl-2">
+                        <ButtonGroup size="medium" variant="contained" aria-label="small button group">
+                            <Button onClick={(e) => { e.preventDefault(); downloadTnsFile(); }}>Реестр ТН</Button>
+                            <Button onClick={(e) => { e.preventDefault(); downloadFile(); }}>Заявки</Button>
+                            <Button onClick={(e) => { downloadFullTasks(); } }>Задачи</Button>
+                        </ButtonGroup>
                     </div>
                 </div>
             </div>

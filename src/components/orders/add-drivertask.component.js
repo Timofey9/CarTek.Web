@@ -239,6 +239,13 @@ function DriverTaskForm({order, handleClose}) {
 
             <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
+            <div className="form-row">
+                <label className="bold-label">Комментарий по заявке</label>
+                <label>{order.note}</label>
+            </div>
+
+            <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
             {/*<div className="form-row">*/}
             {/*    <div className="input-group mb-3 col-md-6 pl-1">*/}
             {/*        <label className="bold-label">Дата начала</label>*/}
