@@ -184,8 +184,9 @@ const DriverEditTask = () => {
                 setContinueWork(true);
             })
             .catch((error) => {
-                if (error.response.data.message) {
-                    setError(error.response.data.message);
+                if (error.response.data) {
+                    setError(error.response.data);
+                    setShowSpinner(false);
                 }
             });
     }
@@ -201,8 +202,8 @@ const DriverEditTask = () => {
                 setReload(reload + 1);
             })
             .catch((error) => {
-                if (error.response.data.message) {
-                    setError(error.response.data.message);
+                if (error.response.data) {
+                    setShowSpinner(false);
                 }
             });
 
@@ -233,8 +234,10 @@ const DriverEditTask = () => {
             })
             .catch((error) => {
                 if (error.response.data.message) {
-                    setError(error.response.data.message);
+                    setError(error.response.data);
                 }
+
+                setShowSpinner(false);
             });
 
         setShowSpinner(false);
@@ -286,7 +289,9 @@ const DriverEditTask = () => {
                 })
                 .catch((error) => {
                     if (error.response.data) {
-                        setError(error.response.data.message);
+                        setError(error.response.data);
+
+                        setShowSpinner(false);
                     }
                 });
             return;
@@ -318,7 +323,9 @@ const DriverEditTask = () => {
                 })
                 .catch((error) => {
                     if (error.response.data) {
-                        setError(error.response.data.message);
+                        setError(error.response.data);
+
+                        setShowSpinner(false);
                     }
                 });
 
@@ -338,8 +345,9 @@ const DriverEditTask = () => {
                         setShowSpinner(false);
                     })
                     .catch((error) => {
-                        if (error.response.data.message) {
-                            setError(error.response.data.message);
+                        if (error.response.data) {
+                            setError(error.response.data);
+                            setShowSpinner(false);
                         }
                     });
             }
@@ -355,8 +363,9 @@ const DriverEditTask = () => {
                         setShowSpinner(false);
                     })
                     .catch((error) => {
-                        if (error.response.data.message) {
-                            setError(error.response.data.message);
+                        if (error.response.data) {
+                            setError(error.response.data);
+                            setShowSpinner(false);
                         }
                     });
             }
