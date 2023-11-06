@@ -6,7 +6,6 @@ import authHeader from "./auth-header";
 const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
-
     createSetAuthInterceptor = config => {
         const { identityToken } = authHeader();
 
@@ -16,6 +15,22 @@ class ApiService {
 
         return config;
     };
+
+    getRefreshToken = () => {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        if (user && user.refreshToken) {
+            return user.refreshToken;
+        }
+    }
+
+    getAccessToken = () => {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        if (user && user.token) {
+            return user.token;
+        }
+    }
 
     constructor() {
         this._axios = axios.create({
@@ -38,6 +53,7 @@ class ApiService {
             error => {
                 const { status } = error.response;
                 if (status === 401) {
+                    console.log("hahah");
                     EventBus.dispatch("logout", {});
                 }
                 return Promise.reject(error);
@@ -46,11 +62,38 @@ class ApiService {
 
         this._axios.interceptors.response.use(
             response => response,
-            error => {
+            async error => {
+                const originalConfig = error.config;
                 const { status } = error.response;
-                if (status === 401) {
-                    EventBus.dispatch("logout", {});
+                if (originalConfig.url !== "/auth/login" && error.response) {
+                    if (status === 401 && !originalConfig._retry) {
+                        console.log("refreshing");
+                        originalConfig._retry = true;
+                        try {
+                            var accessToken = this.getAccessToken();
+                            var refreshToken = this.getRefreshToken();
+
+                            await this.post("/auth/refresh", {
+                                "AccessToken": accessToken,
+                                "RefreshToken": refreshToken
+                            }).then(response => {
+                                console.log("refreshed");
+                                localStorage.setItem("user", JSON.stringify(response.data));
+                                return this._axios(originalConfig);
+                            }).catch((error) => {
+                                console.log("refresh failed");
+                                EventBus.dispatch("logout", {});
+                                return Promise.reject(error);
+                            });
+                        } catch (_error) {
+                            console.log("refresh failed");
+                            EventBus.dispatch("logout", {});
+                            return Promise.reject(_error);
+                        }
+                    }
                 }
+                console.log("all failed");
+
                 return Promise.reject(error);
             }
         );
@@ -348,10 +391,10 @@ class ApiService {
 
     updateUser = (login, params) => {
         const data = JSON.stringify(Object.keys(params).map(key => {
-                return {
-                    op: "add",
-                    path: `/${key}`,
-                    value: params[key]                
+            return {
+                op: "add",
+                path: `/${key}`,
+                value: params[key]
             }
         }));
 

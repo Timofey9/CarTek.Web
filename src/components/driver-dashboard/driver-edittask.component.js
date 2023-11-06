@@ -172,7 +172,7 @@ const DriverEditTask = () => {
         }
     };
 
-    const createSubTask = () => {
+    const createSubTask = useDebouncedCallback((event) => {
         var data = {
             driverTaskId: driverTaskId
         }
@@ -189,7 +189,7 @@ const DriverEditTask = () => {
                     setShowSpinner(false);
                 }
             });
-    }
+    });
 
     const getBack = useDebouncedCallback((event) => {
         setShowSpinner(true);
@@ -304,7 +304,7 @@ const DriverEditTask = () => {
                 formData.append("IsSubtask", true);
                 formData.append("SubTaskId", currentSubTask.id);
             }
-            formData.append("UnloadVolume", unloadVolume);
+            formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',','.'));
             formData.append("UnloadVolume2", unloadVolume2);
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
@@ -654,7 +654,8 @@ const DriverEditTask = () => {
                             <label>Объем загрузки</label>
                             <input
                                 className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
+                                type="number"
+                                step="0.1"
                                 form="profile-form"
                                 onChange={(e) => setLoadVolume(e.target.value)}
                                 value={loadVolume} />
@@ -687,7 +688,8 @@ const DriverEditTask = () => {
                                         <label>Объем загрузки</label>
                                         <input
                                             className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                            type="text"
+                                            type="number"
+                                            step="0.1"
                                             form="profile-form"
                                             onChange={(e) => setLoadVolume2(e.target.value)}
                                             value={loadVolume2} />
@@ -745,7 +747,8 @@ const DriverEditTask = () => {
                             <label>Объем выгрузки</label>
                             <input
                                 className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
+                                type="number"
+                                step="0.1"
                                 form="profile-form"
                                 onChange={(e) => setUnloadVolume(e.target.value)}
                                 value={unloadVolume} />

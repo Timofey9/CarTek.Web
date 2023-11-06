@@ -253,7 +253,8 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 <div className="form-group col-md-6">
                     <label>Объем загрузки</label>
                     <input
-                        type="text"
+                        type="number"
+                        step="0.1"
                         form="profile-form"
                         onChange={(e) => setLoadVolume(e.target.value)}
                         value={loadVolume} />
@@ -284,7 +285,8 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                             <div className="form-group col-md-6">
                                 <label>Объем загрузки</label>
                                 <input
-                                    type="text"
+                                    type="number"
+                                    step="0.1"
                                     form="profile-form"
                                     onChange={(e) => setLoadVolume2(e.target.value)}
                                     value={loadVolume2} />
@@ -348,7 +350,8 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 <div className="form-group col-md-6">
                     <label>Объем выгрузки</label>
                     <input
-                        type="text"
+                        type="number"
+                        step="0.1"
                         form="profile-form"
                         onChange={(e) => setUnloadVolume(e.target.value)}
                         value={unloadVolume} />
@@ -379,7 +382,8 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                             <div className="form-group col-md-6">
                                 <label>Объем выгрузки</label>
                                 <input
-                                    type="text"
+                                    type="number"
+                                    step="0.1"
                                     form="profile-form"
                                     onChange={(e) => setUnloadVolume2(e.target.value)}
                                     value={unloadVolume2} />

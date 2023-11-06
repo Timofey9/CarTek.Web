@@ -491,7 +491,8 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Объем (общий)</label>
                         <input
-                            type="text"
+                            type="number"
+                            step="0.1"
                             className="form-control"
                             form="profile-form"
                             onChange={(e) => setVolume(e.target.value)}

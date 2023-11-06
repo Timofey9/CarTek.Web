@@ -22,8 +22,6 @@ const MyTasksList = () => {
     date2.setDate(date.getDate() + 2);
 
     const [loading, setLoading] = useState(true);
-    const [sortBy, setSortBy] = useState("");
-    const [dir, setDir] = useState("desc");
     const [totalNumber, setTotalNumber] = useState(0);
     const [pageSize, setPageSize] = useState(15);
     const [pageNumber, setPageNumber] = useState(1);
@@ -83,7 +81,7 @@ const MyTasksList = () => {
 
         setLoading(false);
 
-    }, [sortBy, dir, pageSize, pageNumber, searchBy, searchString, reload]);
+    }, [pageSize, pageNumber, searchBy, searchString, reload]);
 
     const columns = [
         //{
@@ -227,8 +225,6 @@ const MyTasksList = () => {
             striped="true"
             highlightOnHover
             paginationServer
-            defaultSortFieldId={1}
-            defaultSortAsc
             noDataComponent="Задач не найдено"
             progressPending={loading}
             paginationTotalRows={totalNumber}
