@@ -31,6 +31,8 @@ import CarsWork from "./components/orders/task-distribution.component";
 import MyTasksList from "./components/driver-dashboard/my-tasks.component";
 import DriverDashboard from "./components/driver-dashboard/driver-dashboard.component";
 import DriverEditTask from "./components/driver-dashboard/driver-edittask.component";
+import DriverEditSubTask from "./components/driver-dashboard/driver-editsubtask.component";
+
 import AdminEditTask from "./components/orders/admin-edittask.component";
 import NotificationsList from "./components/driver-dashboard/notification-list.component";
 import AddressesList from "./components/addresses-list.component";
@@ -196,6 +198,7 @@ class App extends Component {
                         <Route exact path="/driver-dashboard/mytasks" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><MyTasksList /></RequireAuth>} />
                         <Route exact path="/driver/notifications" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><NotificationsList /></RequireAuth>} />
                         <Route exact path="/driver-dashboard/task/:driverTaskId" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><DriverEditTask /></RequireAuth>} />
+                        <Route exact path="/driver-dashboard/subtask/:subTaskId" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><DriverEditSubTask /></RequireAuth>} />
 
                         <Route exact path="/cars/car/:plate" element={<RequireAuth currentUser={currentUser}><CarComponent /></RequireAuth>} />
 

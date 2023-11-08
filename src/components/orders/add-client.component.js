@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ApiService from "../../services/cartekApiService";
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 
 function ClientForm({client, handleClose }) {
     const [name, setName] = useState(""); 
@@ -8,12 +13,15 @@ function ClientForm({client, handleClose }) {
     const [isClient, setIsClient] = useState(false);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const [unit, setUnit] = useState("");
 
     useEffect(() => {
         if (client !== undefined) {
+            console.log(client.clientUnit);
             setAddress(client.clientAddress);
             setInn(client.inn);
             setName(client.clientName);
+            setUnit(client.clientUnit.toString());
             setIsClient(true);
         }
     }, [])
@@ -33,7 +41,8 @@ function ClientForm({client, handleClose }) {
         const newClient = {
             clientName: name,
             inn: inn,
-            clientAddress: address
+            clientAddress: address,
+            clientUnit: unit
         };
 
         if (isClient) {
@@ -119,6 +128,20 @@ function ClientForm({client, handleClose }) {
                         value={address}
                     />
                 </div>
+            </div>
+
+            <div className="form-row">
+                <FormControl>
+                    <FormLabel id="radio-buttons-group-label">Ед. измерения</FormLabel>
+                    <RadioGroup row
+                        aria-labelledby="radio-buttons-group-label"
+                        name="radio-buttons-group"
+                        value={unit}
+                        onChange={(e) => setUnit(e.target.value)}>
+                        <FormControlLabel value="0" control={<Radio />} label="M3" />
+                        <FormControlLabel value="1" control={<Radio />} label="Тонны" />
+                    </RadioGroup>
+                </FormControl>
             </div>
             <div className="row mt-5">
                 <div className="col-md-3"></div>

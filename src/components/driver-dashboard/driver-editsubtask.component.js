@@ -42,10 +42,11 @@ import EditTn from '../orders/edit-tn.component'
 
 registerLocale('ru', ru);
 
-const DriverEditTask = () => {
+const DriverEditSubTask = () => {
     const [driver, setDriver] = useState({});
     const [car, setCar] = useState({});
     const [driverTask, setDriverTask] = useState({});
+    const [driverTaskId, setDriverTaskId] = useState(0);
     const [order, setOrder] = useState({});
     const [status, setStatus] = useState(0);
     const [error, setError] = useState("");
@@ -77,7 +78,7 @@ const DriverEditTask = () => {
     const [pickupDepartureDate, setPickupDepartureDate] = useState(new Date());
     const [pickupDepartureTime, setPickupDepartureTime] = useState("");
     const [currentSubTask, setCurrentSubTask] = useState({});
-    const [hasSubTask, setHasSubTask] = useState(false);
+    const [hasSubTask, setHasSubTask] = useState(true);
     const [continueWork, setContinueWork] = useState(false);
     const [validated, setValidated] = useState(true);
 
@@ -90,7 +91,7 @@ const DriverEditTask = () => {
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
-    let { driverTaskId } = useParams();
+    let { subTaskId } = useParams();
 
     const navigate = useNavigate();
 
@@ -176,7 +177,7 @@ const DriverEditTask = () => {
 
     const createSubTask = useDebouncedCallback((event) => {
         var data = {
-            driverTaskId: driverTaskId
+            driverTaskId: driverTask.id
         }
 
         ApiService.createSubTask(data)
@@ -196,7 +197,7 @@ const DriverEditTask = () => {
 
     const getBack = useDebouncedCallback((event) => {
         setShowSpinner(true);
-        ApiService.TaskGetBack({ driverTaskId: driverTaskId })
+        ApiService.TaskGetBack({ driverTaskId: subTaskId, isSubTask: true })
             .then(({ data }) => {
                 alert("Статус обновлен");
                 setFormData(new FormData());
@@ -223,7 +224,7 @@ const DriverEditTask = () => {
                 formData.delete(key)
         };
 
-        formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
+        formData.append("DriverTaskId", subTaskId);
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
 
@@ -255,18 +256,12 @@ const DriverEditTask = () => {
                 formData.delete(key)
         };
 
-        formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
-        formData.append("UpdatedStatus", status + 1);
-        formData.append("Note", note);
+        formData.set("DriverTaskId", subTaskId);
+        formData.set("UpdatedStatus", status + 1);
+        formData.append("IsSubtask", true);
+        formData.append("SubTaskId", subTaskId);
 
         if (status === 4 && validate()) {
-            if (hasSubTask) {
-                formData.set("DriverTaskId", driverTask.id);
-                formData.set("UpdatedStatus", currentSubTask.status + 1);
-                formData.append("IsSubtask", true);
-                formData.append("SubTaskId", currentSubTask.id);
-            }
-
             formData.append("MaterialId", material.id);
             formData.append("Number", tnNumber);
             formData.append("GoId", go.id);
@@ -301,13 +296,7 @@ const DriverEditTask = () => {
         }
 
         if (status === 7 && validate()) {
-
-            if (hasSubTask) {
-                formData.set("UpdatedStatus", currentSubTask.status + 1);
-                formData.append("IsSubtask", true);
-                formData.append("SubTaskId", currentSubTask.id);
-            }
-            formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',','.'));
+            formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',', '.'));
             formData.append("UnloadVolume2", unloadVolume2);
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
@@ -335,43 +324,23 @@ const DriverEditTask = () => {
             return;
         }
 
-        if (hasSubTask) {
-            formData.set("UpdatedStatus", currentSubTask.status + 1);
-            if (validate()) {
-                ApiService.EditDriverSubTaskAsync(formData)
-                    .then(({ data }) => {
-                        alert("Статус обновлен");
-                        setFormData(new FormData());
-                        setTnNumber("");
-                        setNote("");
-                        setReload(reload + 1);
+        if (validate()) {
+            ApiService.EditDriverSubTaskAsync(formData)
+                .then(({ data }) => {
+                    alert("Статус обновлен");
+                    setFormData(new FormData());
+                    setTnNumber("");
+                    setNote("");
+                    setReload(reload + 1);
+                    setShowSpinner(false);
+                })
+                .catch((error) => {
+                    if (error.response.data) {
+                        setError(error.response.data);
                         setShowSpinner(false);
-                    })
-                    .catch((error) => {
-                        if (error.response.data) {
-                            setError(error.response.data);
-                            setShowSpinner(false);
-                        }
-                    });
-            }
-        } else {
-            if (validate()) {
-                ApiService.EditDriverTaskAsync(formData)
-                    .then(({ data }) => {
-                        alert("Статус обновлен");
-                        setFormData(new FormData());
-                        setTnNumber("");
-                        setNote("");
-                        setReload(reload + 1);
-                        setShowSpinner(false);
-                    })
-                    .catch((error) => {
-                        if (error.response.data) {
-                            setError(error.response.data);
-                            setShowSpinner(false);
-                        }
-                    });
-            }
+                    }
+                });
+
         }
         setShowSpinner(false);
     }, 500);
@@ -430,7 +399,6 @@ const DriverEditTask = () => {
         return isValid;
     }
 
-
     const statusToButtonTxt = (status) => {
         switch (status) {
             case 0:
@@ -458,24 +426,15 @@ const DriverEditTask = () => {
 
     useEffect(() => {
         setLoading(true);
-        if (driverTaskId) {
-            ApiService.getDriverTaskById(driverTaskId)
+            ApiService.getSubTask(subTaskId)
                 .then(({ data }) => {
-                    setDriverTask(data);
-                    setDriver(data.driver);
-                    setOrder(data.order);
+                    setCurrentSubTask(data);
+                    setDriverTask(data.driverTask);
+                    setDriver(data.driverTask.driver);
+                    setOrder(data.driverTask.order);                   
                     setStatus(data.status);
-                    data.notes.unshift({ status: 0, dateCreated: new Date(data.dateCreated), text: "назначена", s3Links: [] });
                     setNotes(data.notes);
-                    setCar(data.car);
-
-                    //if (data.subTasks && data.subTasks.length > 0) {
-                    //    let subTask = data.subTasks.reduce((max, task) => max.sequenceNumber > task.sequenceNumber ? max : task);
-                    //    setCurrentSubTask(subTask);
-                    //    setHasSubTask(true);
-                    //    setNotes(subTask.notes);
-                    //    setStatus(subTask.status);
-                    //}
+                    setCar(data.driverTask.car);
 
                     if (data.status === 4 || data.status === 7) {
                         scrollToTop();
@@ -485,7 +444,7 @@ const DriverEditTask = () => {
                 catch((error) => {
                     setError(error.response.data);
                 });
-        }
+        
         setLoading(false);
     }, [reload]);
 
@@ -639,7 +598,7 @@ const DriverEditTask = () => {
                         <div className="form-row">
                             <label>Тип груза (3)</label>
                             <Autocomplete
-                                renderOption={(props, item) => ( <li {...props} key={item.id}>{item.name}</li>)}
+                                renderOption={(props, item) => (<li {...props} key={item.id}>{item.name}</li>)}
                                 className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
                                 options={materialsList}
                                 disablePortal
@@ -845,7 +804,7 @@ const DriverEditTask = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div> }
+                        </div>}
                 </div>
                 <div className="row mt-3">
                     <div className="col-md-3">
@@ -871,7 +830,7 @@ const DriverEditTask = () => {
                                                             <Typography>{note.text}</Typography>
                                                             {showLinks && links.map((link, linkindex) => {
                                                                 const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                return (<div key={linkindex}><a target="_blank" href={fullLink}>Изображение {linkindex+1}</a></div>);
+                                                                return (<div key={linkindex}><a target="_blank" href={fullLink}>Изображение {linkindex + 1}</a></div>);
                                                             })}
                                                         </div>
                                                     )
@@ -897,7 +856,7 @@ const DriverEditTask = () => {
                                         <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
                                     </div>
                                 </div>}
-  
+
 
                             <div className="row">
                                 <div className="col-md-12">
@@ -928,7 +887,7 @@ const DriverEditTask = () => {
                                     </button>
                                 </div>
                             </div>
- 
+
                             {error &&
                                 <div className="row d-flex justify-content-center mt-3">
                                     <div className="alert alert-danger mt-2" role="alert">
@@ -1018,7 +977,7 @@ const DriverEditTask = () => {
             </DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    Вы хотите вернуться на предыдущий шаг. Нажмите "Продолжить" 
+                    Вы хотите вернуться на предыдущий шаг. Нажмите "Продолжить"
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1040,9 +999,9 @@ const DriverEditTask = () => {
                     </Button>
                 </Toolbar>
             </AppBar>
-            <EditTn driverTaskId={driverTaskId} handleClose={handleEditTnClose}></EditTn>
+            <EditTn driverTaskId={subTaskId} isSubTask={true} handleClose={handleEditTnClose}></EditTn>
         </Dialog>
     </div>
 };
 
-export default DriverEditTask;
+export default DriverEditSubTask;

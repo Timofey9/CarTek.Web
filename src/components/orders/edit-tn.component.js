@@ -279,7 +279,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                         <AccordionSummary
                             aria-controls="panel1a-content"
                             id="panel1a-header">
-                            <Typography>В другой ед. измерения</Typography>
+                            <Typography>Также в другой ед. измерения</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <div className="form-group col-md-6">
@@ -376,7 +376,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                         <AccordionSummary
                             aria-controls="panel1a-content"
                             id="panel1a-header">
-                            <Typography>В другой ед. измерения</Typography>
+                            <Typography>Также в другой ед. измерения</Typography>
                         </AccordionSummary>
                         <AccordionDetails>
                             <div className="form-group col-md-6">

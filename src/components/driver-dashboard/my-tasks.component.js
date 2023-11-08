@@ -10,7 +10,52 @@ registerLocale('ru', ru);
 
 const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
 
-const rowPreDisabled = row => row.driverTasks < 1;
+const rowPreDisabled = row => row.subTasks < 1;
+
+const columnsSubTasks = [
+    {
+        name: "Номер рейса",
+        selector: (row, index) => row.sequenceNumber + 1,
+        wrap: true,
+        center: true
+    },
+    {
+        name: "Статус",
+        selector: (row, index) => constStatuses[row.status],
+        center: true,
+        wrap: true,
+        conditionalCellStyles: [
+            {
+                when: row => row.status === 0,
+                style: {
+                    backgroundColor: '#ff726f',
+                    color: 'white',
+                    '&:hover': {
+                        cursor: 'pointer',
+                    }
+                }
+            },
+            {
+                when: row => row.status === 9,
+                style: {
+                    backgroundColor: '#d1ffbd',
+                    '&:hover': {
+                        cursor: 'pointer',
+                    }
+                }
+            },
+            {
+                when: row => row.status !== 0 && row.status !== 9,
+                style: {
+                    backgroundColor: '#ffefac',
+                    '&:hover': {
+                        cursor: 'pointer',
+                    }
+                }
+            },
+        ]
+    },
+];
 
 const MyTasksList = () => {
     let cancelled = false;
@@ -50,6 +95,23 @@ const MyTasksList = () => {
     } 
 
     const navigate = useNavigate();
+
+
+    const ExpandedComponent = ({ data }) => <pre>
+        <DataTable
+            columns={columnsSubTasks}
+            responsive
+            noHeader
+            striped='true'
+            highlightOnHover
+            dense='true'
+            onRowClicked={(row, event) => {
+                navigate(`/driver-dashboard/subtask/${row.id}`);
+            }}
+            data={data.subTasks}
+        /></pre>;
+
+
 
     useEffect(() => {
         setLoading(true);
@@ -232,9 +294,9 @@ const MyTasksList = () => {
             conditionalRowStyles={conditionalRowStyles}
             data={orders}
             pagination
-            //expandableRows
-            //expandableRowDisabled={rowPreDisabled}
-            //expandableRowsComponent={ExpandedComponent}
+            expandableRows
+            expandableRowDisabled={rowPreDisabled}
+            expandableRowsComponent={ExpandedComponent}
             onChangePage={(page, totalRows) => {
                 !cancelled && setPageNumber(page);
             }}
