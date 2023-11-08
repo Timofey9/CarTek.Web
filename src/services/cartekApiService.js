@@ -2,8 +2,8 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-const API_URL = "https://localhost:32772/api/";
-//const API_URL = "https://api-cartek.ru/api/";
+//const API_URL = "https://localhost:32772/api/";
+const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
     createSetAuthInterceptor = config => {
@@ -124,6 +124,12 @@ class ApiService {
     getTnsList(params) {
         const query = new URLSearchParams(params).toString();
         var res = this._axiosXlsx.get(`order/gettnxls/?${query}`);
+        return res;
+    }
+
+    getSalariesReport(params) {
+        const query = new URLSearchParams(params).toString();
+        var res = this._axiosXlsx.get(`order/getaccountantreport/?${query}`);
         return res;
     }
 

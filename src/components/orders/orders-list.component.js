@@ -143,6 +143,18 @@ const OrdersList = () => {
     };
 
 
+    const downloadSalariesFile = () => {
+        ApiService.getSalariesReport({
+            startDate: startDate.toUTCString(),
+            endDate: endDate.toUTCString()
+        }).then(response => {
+            let url = window.URL
+                .createObjectURL(new Blob([response.data]));
+            saveAs(url, "реестр_зп.xlsx");    
+            });
+    };
+
+
     const downloadTN = (id) => {
         ApiService.downloadTN({
             driverTaskId: id
@@ -438,6 +450,7 @@ const OrdersList = () => {
                     <div className="input-group-append pl-2">
                         <ButtonGroup size="medium" variant="contained" aria-label="small button group">
                             <Button onClick={(e) => { e.preventDefault(); downloadTnsFile(); }}>Реестр ТН</Button>
+                            <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>
                             <Button onClick={(e) => { e.preventDefault(); downloadFile(); }}>Заявки</Button>
                             <Button onClick={(e) => { downloadFullTasks(); } }>Задачи</Button>
                         </ButtonGroup>
