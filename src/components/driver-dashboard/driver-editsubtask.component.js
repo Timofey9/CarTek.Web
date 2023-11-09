@@ -907,7 +907,12 @@ const DriverEditSubTask = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="row mt-3 mb-3">
+                    <div className="row mt-3 mb-3">
+                        <div className="col-md-12">
+                                <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
+                                    На шаг назад
+                                </button>
+                        </div>
                             <div className="col-md-12">
                                 <button type="submit" onClick={createSubTask} className="btn btn-success mt-3">
                                     Продолжить

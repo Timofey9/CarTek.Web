@@ -941,7 +941,12 @@ const DriverEditTask = () => {
 
                 {status === 9 && driverTask.shift === 3 &&
                     <>
-                        <div className="row">
+                    <div className="row">
+                            <div className="col-md-12">
+                                <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
+                                    На шаг назад
+                                </button>
+                            </div>
                             <div className="col-md-12">
                                 <div className="alert alert-primary" role="alert">
                                     Продолжить работу?
