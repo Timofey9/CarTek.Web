@@ -325,6 +325,7 @@ const DriverEditSubTask = () => {
         }
 
         if (validate()) {
+            formData.set("DriverTaskId", subTaskId);
             ApiService.EditDriverSubTaskAsync(formData)
                 .then(({ data }) => {
                     alert("Статус обновлен");
