@@ -256,7 +256,7 @@ const DriverEditSubTask = () => {
                 formData.delete(key)
         };
 
-        formData.set("DriverTaskId", subTaskId);
+        formData.set("DriverTaskId", driverTask.id);
         formData.set("UpdatedStatus", status + 1);
         formData.append("IsSubtask", true);
         formData.append("SubTaskId", subTaskId);
