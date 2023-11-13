@@ -2,8 +2,8 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32772/api/";
-const API_URL = "https://api-cartek.ru/api/";
+const API_URL = "https://localhost:32768/api/";
+//const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
     createSetAuthInterceptor = config => {
@@ -62,10 +62,10 @@ class ApiService {
 
         this._axios.interceptors.response.use(
             response => response,
-            async error => {
+            error => {
                 const originalConfig = error.config;
                 const { status } = error.response;
-                if (originalConfig.url !== "/auth/login" && error.response) {
+                if (originalConfig.url !== "auth/login" && error.response) {
                     if (status === 401 && !originalConfig._retry) {
                         console.log("refreshing");
                         originalConfig._retry = true;
@@ -73,28 +73,32 @@ class ApiService {
                             var accessToken = this.getAccessToken();
                             var refreshToken = this.getRefreshToken();
 
-                            await this.post("/auth/refresh", {
+                            this.post("/auth/refresh", {
                                 "AccessToken": accessToken,
                                 "RefreshToken": refreshToken
                             }).then(response => {
-                                console.log("refreshed");
-                                localStorage.setItem("user", JSON.stringify(response.data));
-                                return this._axios(originalConfig);
+                                if (response) {
+                                    console.log("refreshed");
+                                    localStorage.setItem("user", JSON.stringify(response.data));
+                                    return this._axios(originalConfig);
+                                }
                             }).catch((error) => {
-                                console.log("refresh failed");
+                                console.log("refresh failed1");
+                                console.log(error);
                                 EventBus.dispatch("logout", {});
                                 return Promise.reject(error);
                             });
                         } catch (_error) {
-                            console.log("refresh failed");
+                            console.log("refresh failed2");
                             EventBus.dispatch("logout", {});
                             return Promise.reject(_error);
                         }
                     }
                 }
-                console.log("all failed");
-
-                return Promise.reject(error);
+                else {
+                    console.log("not refresh");
+                    return Promise.reject(error);
+                }
             }
         );
     }

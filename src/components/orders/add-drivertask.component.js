@@ -77,31 +77,6 @@ function DriverTaskForm({order, handleClose}) {
         setLoading(false);
     }, []);
 
-    function handleSubmit(event) {
-        event.preventDefault();
-        setMessage("");
-
-        const newTask = {
-            orderId: order.id,
-            shift: shift,
-            driverId: driver.id,
-            carId: car.id,
-            taskDate: startDate,
-            forceChange: forceChange,
-            comment: comment,
-            isComplete: false
-        };
-
-        ApiService.createDriverTask(newTask)
-            .then(({ data }) => {
-                alert(data.message);
-                handleClose();
-            }).
-            catch((error) => {
-                setMessage(error.response.data.message);
-                setForceChange(true);
-            });
-    }
 
     function handleCreateDriverTasks(event) {
         event.preventDefault();
@@ -219,7 +194,7 @@ function DriverTaskForm({order, handleClose}) {
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Единица измерения</label>
-                    {order.loadUnit === "0" ? "m3" : "тонны"}
+                    {order.loadUnit === 0 ? "m3" : "тонны"}
                 </div>
 
                 <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>

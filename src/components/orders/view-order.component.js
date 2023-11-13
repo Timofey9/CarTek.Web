@@ -56,6 +56,33 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [applyChanges, setApplyChanges] = useState(true);
     const [orderShift, setOrderShift] = useState(0);
 
+    const shiftToShortString = (shift) => {
+        switch (shift) {
+            case '0':
+                return "Ночь";
+            case '1':
+                return "День";
+            case '2':
+                return "Сутки";
+            case '3':
+                return "Сутки неограниченно";
+            default:
+                return shift;
+        }
+    }
+
+    const updateShiftInName = (newShift) => {
+        var newS = shiftToShortString(newShift);
+        var oldS = shiftToShortString(orderShift);
+        if (oldS !== '' && orderName.includes(oldS)) {
+            var newName = orderName.replace(oldS, newS);
+            setOrderName(newName);
+        } else {
+            var newName2 = orderName + " " + shiftToShortString(newShift);
+            setOrderName(newName2)
+        }
+    }   
+
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -109,7 +136,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setCarCount(data.carCount);
                 setMileage(data.mileage);
                 setGp(data.gp);
-                setOrderShift(data.shift);
+                setOrderShift(data.shift.toString());
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -301,7 +328,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <ShiftRadioButtonGroup disabled={!isEdit} value={orderShift} onChange={(event) => { setOrderShift(event.target.value); setReload(reload + 1); }} />
+                        <ShiftRadioButtonGroup disabled={!isEdit} value={orderShift} onChange={(event) => { updateShiftInName(event.target.value); setOrderShift(event.target.value)}} />
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>

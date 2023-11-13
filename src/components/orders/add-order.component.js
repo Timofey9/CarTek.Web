@@ -52,7 +52,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [orderId, setOrderId] = useState(0);
     const [validated, setValidated] = useState(false);
     const [isOrderCreated, setIsOrderCreated] = useState(false);
-    const [orderShift, setOrderShift] = useState(0);
+    const [orderShift, setOrderShift] = useState("");
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -77,11 +77,12 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
         var newS = shiftToShortString(newShift);
         var oldS = shiftToShortString(orderShift);
 
-        if (orderName.includes(oldS)) {
+        if (oldS !== '' && orderName.includes(oldS)) {
             var newName = orderName.replace(oldS, newS);
             setOrderName(newName);
         } else {
-            setOrderName(orderName + " " + shiftToShortString(newShift))
+            var newName2 = orderName + " " + shiftToShortString(newShift);
+            setOrderName(newName2)
         }
     }   
 
@@ -90,7 +91,6 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
         if (newAddress === null) {
             var newName = orderName.replace(addressB.textAddress, "");
             setOrderName(newName);
-
             return;
         }
 
@@ -98,7 +98,8 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             var newName = orderName.replace(addressB.textAddress, newAddress.textAddress);
             setOrderName(newName);
         } else {
-            setOrderName(orderName + " " + newAddress.textAddress)
+            var newName2 = orderName + " " + newAddress.textAddress;
+            setOrderName(newName2);
         }
     }
 
@@ -556,7 +557,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     <div className="form-group col-md-6">
                         <label>Количество машин</label>
                         <input
-                            className={validated && carCount === 0 ? "form-control not-valid-input-border" : "form-control"}
+                            className={validated && carCount === '' ? "form-control not-valid-input-border" : "form-control"}
                             type="number"
                             form="profile-form"
                             onChange={(e) => setCarCount(e.target.value)}

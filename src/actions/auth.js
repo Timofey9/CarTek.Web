@@ -57,7 +57,11 @@ export const login = (username, password, isDriver) => (dispatch) => {
     },
         (error) => {
             console.log(error);
-            const message = (error.response && error.response.data && error.response.data.message) || error.response.data || error.toString();
+            const message = (error && error.response
+                && error.response.data
+                && error.response.data.message)
+                || error.response.data
+                || error.toString();
 
       dispatch({
         type: LOGIN_FAIL,

@@ -175,6 +175,17 @@ const DriverEditSubTask = () => {
         }
     };
 
+    const selectFile2 = (e) => {
+        try {
+            for (var file of e.target.files) {
+                formData.append("Files", file);
+            }
+        }
+        catch (e) {
+            alert("Прикрепите фото еще раз");
+        }
+    };
+
     const createSubTask = useDebouncedCallback((event) => {
         var data = {
             driverTaskId: driverTask.id
@@ -794,18 +805,33 @@ const DriverEditSubTask = () => {
                     </div>}
                 <div>
                     {status === 7 &&
-                        <div className="row mt-3 mb-3">
-                            <div className="col-md-9">
-                                <div className="alert alert-danger" role="alert">
-                                    ПРИКРЕПИТЬ ФОТО ТН СО ВСЕХ СТОРОН!
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                        <>
+                            <div className="row mt-3 mb-3">
+                                <div className="col-md-9">
+                                    <div className="alert alert-danger" role="alert">
+                                        ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>}
+
+                            <div className="row mt-3 mb-3">
+                                <div className="col-md-9">
+                                    <div className="alert alert-danger" role="alert">
+                                        ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <input type="file" id="files2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>}
                 </div>
                 <div className="row mt-3">
                     <div className="col-md-3">

@@ -94,6 +94,22 @@ const DriverEditTask = () => {
 
     const navigate = useNavigate();
 
+    const updateVolume = (setter, value) => {
+        var str = value.toString();
+        if (str.length > 2) {
+            if (str[2] === ',' || str[2] === '.'
+                || str[1] === ',' || str[1] === '.') {
+                setter(value);
+            } else {
+                var newString = str.slice(0, 2) + '.' + str.slice(2);
+                setter(newString);
+            }
+
+        } else {
+            setter(value);
+        }
+    }
+
     const handleConfirmationOpen = () => {
         setConfirmationOpen(true);
     };
@@ -165,6 +181,17 @@ const DriverEditTask = () => {
     const selectFile = (e) => {
         try {
             formData.delete("Files");
+            for (var file of e.target.files) {
+                formData.append("Files", file);
+            }
+        }
+        catch (e) {
+            alert("Прикрепите фото еще раз");
+        }
+    };
+
+    const selectFile2 = (e) => {
+        try {
             for (var file of e.target.files) {
                 formData.append("Files", file);
             }
@@ -660,7 +687,7 @@ const DriverEditTask = () => {
                                 type="number"
                                 step="0.1"
                                 form="profile-form"
-                                onChange={(e) => setLoadVolume(e.target.value)}
+                                onChange={(e) => updateVolume(setLoadVolume, e.target.value) }
                                 value={loadVolume} />
                         </div>
 
@@ -694,7 +721,7 @@ const DriverEditTask = () => {
                                             type="number"
                                             step="0.1"
                                             form="profile-form"
-                                            onChange={(e) => setLoadVolume2(e.target.value)}
+                                            onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
                                             value={loadVolume2} />
                                     </div>
 
@@ -753,7 +780,7 @@ const DriverEditTask = () => {
                                 type="number"
                                 step="0.1"
                                 form="profile-form"
-                                onChange={(e) => setUnloadVolume(e.target.value)}
+                                onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
                                 value={unloadVolume} />
                         </div>
 
@@ -786,7 +813,7 @@ const DriverEditTask = () => {
                                             className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                             type="text"
                                             form="profile-form"
-                                            onChange={(e) => setUnloadVolume2(e.target.value)}
+                                            onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
                                             value={unloadVolume2} />
                                     </div>
 
@@ -834,10 +861,11 @@ const DriverEditTask = () => {
                     </div>}
                 <div>
                     {status === 7 &&
-                        <div className="row mt-3 mb-3">
+                        <>
+                            <div className="row mt-3 mb-3">
                             <div className="col-md-9">
                                 <div className="alert alert-danger" role="alert">
-                                    ПРИКРЕПИТЬ ФОТО ТН СО ВСЕХ СТОРОН!
+                                    ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
                                     <div className="row">
                                         <div className="col-md-12">
                                             <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
@@ -845,7 +873,21 @@ const DriverEditTask = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div> }
+                        </div>
+                                          
+                        <div className="row mt-3 mb-3">
+                            <div className="col-md-9">
+                                <div className="alert alert-danger" role="alert">
+                                    ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <input type="file" id="files2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </>}
                 </div>
                 <div className="row mt-3">
                     <div className="col-md-3">
