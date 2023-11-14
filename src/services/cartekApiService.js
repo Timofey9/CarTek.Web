@@ -2,7 +2,7 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-const API_URL = "https://localhost:32768/api/";
+const API_URL = "https://localhost:32770/api/";
 //const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
@@ -162,7 +162,6 @@ class ApiService {
     }
 
     viewTN(id, isSubTask) {
-        console.log(isSubTask);
         var res = this.get(`order/viewtn/${id}/${isSubTask}`);
         return res;
     }
@@ -235,8 +234,8 @@ class ApiService {
         return await res;
     }
 
-    updateTn(data) {
-        var res = this.post(`drivers/updatetn`, data, { 'Content-Type': 'multipart/form-data' });
+    async updateTn(data) {
+        var res = await this.post(`drivers/updatetn`, data, { 'Content-Type': 'multipart/form-data' });
         return res;
     }
 

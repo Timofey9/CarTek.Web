@@ -37,34 +37,36 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
     const [loading, setLoading] = useState(false);
     const [openEditTn, setOpenEditTn] = useState(false);
     const [openEditSubTn, setOpenEditSubTn] = useState(false);
+    const [s3Links, setS3Links] = useState([]);
 
     useEffect(() => {
         setLoading(true);
-            ApiService.viewTN(driverTaskId, isSubTask)
-                .then(({ data }) => {
-                    setOriginalReceived(data.isOriginalReceived);
-                    setTnNumber(data.number);
-                    setGoInfo(data.goInfo);
-                    setGpInfo(data.gpInfo);
-                    setMaterial(data.material);
-                    setLoadVolume(data.loadVolume);
-                    setLoadVolume2(data.loadVolume2);
-                    setUnloadVolume(data.unloadVolume);
-                    setUnloadVolume2(data.unloadVolume2);
-                    setUnit(data.unit);
-                    setUnit2(data.unit2);
-                    setUnloadUnit(data.unloadUnit);
-                    setUnloadUnit2(data.unloadUnit2);
-                    setAddressA(data.locationA);
-                    setAddressB(data.locationB);
-                    setPickupArrivalTime(data.pickUpArrivalTime);
-                    setPickupDepartureTime(data.pickUpDepartureTime);
-                    setDropOffArrivalTime(data.dropOffArrivalTime);
-                    setDropOffDepartureTime(data.dropOffDepartureTime);
-                }).
-                catch((error) => {
-                    setError(error.response.data);
-                });
+        ApiService.viewTN(driverTaskId, isSubTask)
+            .then(({ data }) => {
+                setOriginalReceived(data.isOriginalReceived);
+                setTnNumber(data.number);
+                setGoInfo(data.goInfo);
+                setGpInfo(data.gpInfo);
+                setMaterial(data.material);
+                setLoadVolume(data.loadVolume);
+                setLoadVolume2(data.loadVolume2);
+                setUnloadVolume(data.unloadVolume);
+                setUnloadVolume2(data.unloadVolume2);
+                setUnit(data.unit);
+                setUnit2(data.unit2);
+                setUnloadUnit(data.unloadUnit);
+                setUnloadUnit2(data.unloadUnit2);
+                setAddressA(data.locationA);
+                setAddressB(data.locationB);
+                setPickupArrivalTime(data.pickUpArrivalTime);
+                setPickupDepartureTime(data.pickUpDepartureTime);
+                setDropOffArrivalTime(data.dropOffArrivalTime);
+                setDropOffDepartureTime(data.dropOffDepartureTime);
+                setS3Links(data.s3Links);
+            }).
+            catch((error) => {
+                setError(error.response.data);
+            });
         setLoading(false);
     }, [reload]);
 
@@ -73,7 +75,6 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
     }
 
     const handleEditTnOpen = () => {
-        console.log(isSubTask);
         if (isSubTask) {
             setOpenEditSubTn(true);
         } else {
@@ -92,9 +93,9 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
 
     const handleSubmit = useDebouncedCallback((event) => {
         var data = {
-            driverTaskId : driverTaskId,
+            driverTaskId: driverTaskId,
             isSubTask: isSubTask,
-            isOriginalReceived : originalReceived
+            isOriginalReceived: originalReceived
         }
 
         ApiService.verifyTn(data)
@@ -129,13 +130,23 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
             </div>
 
             <div className="form-row">
+                {s3Links.length > 0 &&
+                    <div className="form-group col-md-6">
+                        <label className="bold-label">Фото</label>
+                        {s3Links.map((link, linkindex) => {
+                            const fullLink = "https://storage.yandexcloud.net/" + link;
+                            return (<div><a target="_blank" href={fullLink}>Фото {linkindex + 1}</a></div>);
+                        })}
+                    </div>
+                }
+
                 <div className="form-group col-md-6">
                     <label className="bold-label">Номер ТН</label>
                     <input
                         type="text"
                         className="form-control"
                         form="profile-form"
-                        value={tnNumber}/>
+                        value={tnNumber} />
                 </div>
 
                 <div className="form-group col-md-6">

@@ -56,6 +56,17 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
         }
     }
 
+    const selectFile = (e) => {
+        try {
+            for (var file of e.target.files) {
+                formData.append("Files", file);
+            }
+        }
+        catch (e) {
+            alert("Прикрепите фото еще раз");
+        }
+    }; 
+
     const handleSubmit = useDebouncedCallback((event) => {
             var lv = loadVolume && loadVolume.replace(',', '.');
             var lv2 = loadVolume2 ? loadVolume.replace(',', '.') : 0;
@@ -414,6 +425,13 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 <div className="input-group mb-3 col-md-6 pl-1">
                     <label>Дата выезда с адреса выгрузки</label>
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffDepartureTime} onChange={(date) => { setDropOffDepartureTime(date) }} />
+                </div>
+
+                <div className="row">
+                    <div className="col-md-12">
+                        <label htmlFor="files">Прикрепить фотографии</label>
+                        <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
+                    </div>
                 </div>
 
                 <div className="btn btn-success" onClick={(e) => handleSubmit(e)}>Обновить</div>
