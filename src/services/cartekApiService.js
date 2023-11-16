@@ -2,8 +2,8 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-const API_URL = "https://localhost:32770/api/";
-//const API_URL = "https://api-cartek.ru/api/";
+//const API_URL = "https://localhost:32772/api/";
+const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
     createSetAuthInterceptor = config => {
@@ -48,18 +48,6 @@ class ApiService {
 
         this._axiosXlsx.interceptors.request.use(this.createSetAuthInterceptor);
 
-        this._axiosXlsx.interceptors.response.use(
-            response => response,
-            error => {
-                const { status } = error.response;
-                if (status === 401) {
-                    console.log("hahah");
-                    EventBus.dispatch("logout", {});
-                }
-                return Promise.reject(error);
-            }
-        );
-
         this._axios.interceptors.response.use(
             response => response,
             error => {
@@ -81,6 +69,9 @@ class ApiService {
                                     console.log("refreshed");
                                     localStorage.setItem("user", JSON.stringify(response.data));
                                     return this._axios(originalConfig);
+                                } else {
+                                    EventBus.dispatch("logout", {});
+                                    return Promise.reject(error);
                                 }
                             }).catch((error) => {
                                 console.log("refresh failed1");
@@ -101,6 +92,53 @@ class ApiService {
                 }
             }
         );
+
+        this._axiosXlsx.interceptors.response.use(
+            response => response,
+            error => {
+                const originalConfig = error.config;
+                const { status } = error.response;
+                if (originalConfig.url !== "auth/login" && error.response) {
+                    if (status === 401 && !originalConfig._retry) {
+                        console.log("refreshing");
+                        originalConfig._retry = true;
+                        try {
+                            var accessToken = this.getAccessToken();
+                            var refreshToken = this.getRefreshToken();
+
+                            this.post("/auth/refresh", {
+                                "AccessToken": accessToken,
+                                "RefreshToken": refreshToken
+                            }).then(response => {
+                                console.log(response);
+                                if (response) {
+                                    console.log("refreshed");
+                                    localStorage.setItem("user", JSON.stringify(response.data));
+                                    return this._axiosXlsx(originalConfig);
+                                } else {
+                                    EventBus.dispatch("logout", {});
+                                    return Promise.reject(error);
+                                }
+                            }).catch((error) => {
+                                console.log("refresh failed1");
+                                console.log(error);
+                                EventBus.dispatch("logout", {});
+                                return Promise.reject(error);
+                            });
+                        } catch (_error) {
+                            console.log("refresh failed2");
+                            EventBus.dispatch("logout", {});
+                            return Promise.reject(_error);
+                        }
+                    }
+                }
+                else {
+                    console.log("not refresh");
+                    return Promise.reject(error);
+                }
+            }
+        );
+
     }
 
     post(url, data, headers = {}) {

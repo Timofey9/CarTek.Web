@@ -87,7 +87,6 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     }   
 
     const updateAddressInName = (newAddress) => {
-
         if (newAddress === null) {
             var newName = orderName.replace(addressB.textAddress, "");
             setOrderName(newName);

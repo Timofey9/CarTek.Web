@@ -3,6 +3,7 @@ import ApiService from "../../services/cartekApiService";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 
@@ -14,14 +15,20 @@ function ClientForm({client, handleClose }) {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [unit, setUnit] = useState("");
+    const [fixedPrice, setFixedPrice] = useState();
+    const [isFixedPrice, setIsFixedPrice] = useState(false);
 
     useEffect(() => {
         if (client !== undefined) {
-            console.log(client.clientUnit);
             setAddress(client.clientAddress);
             setInn(client.inn);
             setName(client.clientName);
             setUnit(client.clientUnit.toString());
+            setFixedPrice(client.fixedPrice);
+            if (client.fixedPrice > 0) {
+                setIsFixedPrice(true);
+            }
+
             setIsClient(true);
         }
     }, [])
@@ -44,6 +51,10 @@ function ClientForm({client, handleClose }) {
             clientAddress: address,
             clientUnit: unit
         };
+
+        if (isFixedPrice) {
+            newClient.fixedPrice = fixedPrice;
+        }
 
         if (isClient) {
             newClient.id = client.id;
@@ -129,7 +140,26 @@ function ClientForm({client, handleClose }) {
                     />
                 </div>
             </div>
-
+            <div className="form-row">
+                <div className="form-group col-md-6">
+                    <FormControlLabel required control={<Checkbox checked={isFixedPrice}
+                        onChange={(e) => setIsFixedPrice(e.target.checked)} />} label="Фиксированная стоимость" />
+                </div>
+            </div>
+            <div className="form-row">
+                <div className="form-group col-md-6">
+                    <label>Себестоимость перевозки</label>
+                    <input
+                        disabled={!isFixedPrice}
+                        type="number"
+                        step="0.1"
+                        className="form-control"
+                        form="profile-form"
+                        onChange={(e) => setFixedPrice(e.target.value)}
+                        value={fixedPrice}
+                    />
+                </div>
+            </div>
             <div className="form-row">
                 <FormControl>
                     <FormLabel id="radio-buttons-group-label">Ед. измерения</FormLabel>

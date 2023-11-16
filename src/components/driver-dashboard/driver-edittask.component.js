@@ -80,6 +80,7 @@ const DriverEditTask = () => {
     const [hasSubTask, setHasSubTask] = useState(false);
     const [continueWork, setContinueWork] = useState(false);
     const [validated, setValidated] = useState(true);
+    const [transporter, setTransporter] = useState("ООО \"КарТэк\"");
 
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [open, setOpen] = useState(false);
@@ -285,6 +286,7 @@ const DriverEditTask = () => {
         formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
+        formData.append("Transporter", transporter);
 
         if (status === 4 && validate()) {
             if (hasSubTask) {
@@ -655,6 +657,16 @@ const DriverEditTask = () => {
                                 getOptionLabel={(option) => `${option.clientName}`}
                                 renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
                             {/*    {driverTask.order.client.name}*/}
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Перевозчик (6)</label>
+                            <input
+                                className={validated && transporter.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                type="text"
+                                form="profile-form"
+                                onChange={(e) => setTransporter(e.target.value)}
+                                value={transporter} />
                         </div>
 
                         <div className="form-group col-md-6">

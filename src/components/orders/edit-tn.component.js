@@ -44,6 +44,23 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
     const [materialsList, setMaterialsList] = useState([]);
     const [addresses, setAddresses] = useState([]);
     const [formData, setFormData] = useState(new FormData());
+    const [transporter, setTransporter] = useState("");
+
+    const updateVolume = (setter, value) => {
+        var str = value.toString();
+        if (str.length > 2) {
+            if (str[2] === ',' || str[2] === '.'
+                || str[1] === ',' || str[1] === '.') {
+                setter(value);
+            } else {
+                var newString = str.slice(0, 2) + '.' + str.slice(2);
+                setter(newString);
+            }
+
+        } else {
+            setter(value);
+        }
+    }
 
     const stringToUnit = (unit) => {
         switch (unit) {
@@ -69,9 +86,9 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
 
     const handleSubmit = useDebouncedCallback((event) => {
             var lv = loadVolume && loadVolume.replace(',', '.');
-            var lv2 = loadVolume2 ? loadVolume.replace(',', '.') : 0;
+            var lv2 = loadVolume2 && loadVolume2.replace(',', '.');
             var unlv = unloadVolume && unloadVolume.replace(',', '.');
-            var unlv2 = unloadVolume2 ? unloadVolume2.replace(',', '.') : 0;
+            var unlv2 = unloadVolume2 && unloadVolume2.replace(',', '.');
 
             formData.append("IsSubtask", isSubTask === undefined ? "false" : "true");
             formData.append("SubTaskId", driverTaskId);
@@ -94,6 +111,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
             formData.append("LocationBId", addressB.id);
             formData.append("DropOffArrivalDate", dropOffArrivalTime.toUTCString());
             formData.append("DropOffDepartureDate", dropOffDepartureTime.toUTCString());
+            formData.append("Transporter", transporter);            
 
             ApiService.updateTn(formData)
                 .then(({ data }) => {
@@ -171,23 +189,33 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 setAddressA(data.locationA);
                 setAddressB(data.locationB);
 
+                if (data.transporter && data.transporter.length > 0) {
+                    setTransporter(data.transporter);
+                } else {
+                    setTransporter("ООО \"КарТэк\"");
+                }
+
                 if (data.pickUpArrivalTime) {
                     var date1 = data.pickUpArrivalTime.split('.');
                     var gg = new Date(date1[2] + '-' + date1[1] + '-' + date1[0]);
                     setPickupArrivalTime(gg);
                 }
+
                 if (data.pickUpDepartureTime) {
                     var date1 = data.pickUpDepartureTime.split('.');
                     setPickupDepartureTime(new Date(date1[2] + '-' + date1[1] + '-' + date1[0]));
                 }
+
                 if (data.dropOffArrivalTime) {
                     var date1 = data.dropOffArrivalTime.split('.');
                     setDropOffArrivalTime(new Date(date1[2] + '-' + date1[1] + '-' + date1[0]));
                 }
+
                 if (data.dropOffDepartureTime) {
                     var date1 = data.dropOffDepartureTime.split('.');
                     setDropOffDepartureTime(new Date(date1[2] + '-' + date1[1] + '-' + date1[0]));
                 }
+
                 setGp(data.gp);
                 setGo(data.go);
             }).
@@ -247,6 +275,15 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                     </Autocomplete>
                 </div>
 
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Перевозчик (6)</label>
+                    <input
+                        type="text"
+                        form="profile-form"
+                        onChange={(e) => setTransporter(e.target.value)}
+                        value={transporter} />
+                </div>
+
                 <div className="form-row">
                     <label className="bold-label">Тип груза (3)</label>
                     <Autocomplete
@@ -267,7 +304,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                         type="number"
                         step="0.1"
                         form="profile-form"
-                        onChange={(e) => setLoadVolume(e.target.value)}
+                        onChange={(e) => updateVolume(setLoadVolume,e.target.value)}
                         value={loadVolume} />
                 </div>
 
@@ -299,7 +336,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                                     type="number"
                                     step="0.1"
                                     form="profile-form"
-                                    onChange={(e) => setLoadVolume2(e.target.value)}
+                                    onChange={(e) => updateVolume(setLoadVolume2,e.target.value)}
                                     value={loadVolume2} />
                             </div>
 
@@ -340,7 +377,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 </div>
 
                 <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата выезда с адреса погрузки</label>
+                    <label>Дата выезда с адреса погрузки</label> 
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureTime} onChange={(date) => { setPickupDepartureTime(date) }} />
                 </div>
 
@@ -354,8 +391,8 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                         onChange={(e, newvalue) => { setAddressB(newvalue) }}
                         sx={{ width: 300 }}
                         getOptionLabel={(option) => `${option.textAddress}`}
-                        renderInput={(params) => <TextField {...params} label="Список адресов" />} />                </div>
-
+                        renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                </div>
 
 
                 <div className="form-group col-md-6">
@@ -364,7 +401,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                         type="number"
                         step="0.1"
                         form="profile-form"
-                        onChange={(e) => setUnloadVolume(e.target.value)}
+                        onChange={(e) => updateVolume(setUnloadVolume,e.target.value)}
                         value={unloadVolume} />
                 </div>
 
@@ -396,7 +433,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                                     type="number"
                                     step="0.1"
                                     form="profile-form"
-                                    onChange={(e) => setUnloadVolume2(e.target.value)}
+                                    onChange={(e) => updateVolume(setUnloadVolume2,e.target.value)}
                                     value={unloadVolume2} />
                             </div>
 
@@ -434,7 +471,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                     </div>
                 </div>
 
-                <div className="btn btn-success" onClick={(e) => handleSubmit(e)}>Обновить</div>
+                <div className="mt-3 btn btn-success" onClick={(e) => handleSubmit(e)}>Обновить</div>
             </div>
         </div>);
 }

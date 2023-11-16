@@ -83,6 +83,22 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
         }
     }   
 
+    const updateAddressInName = (newAddress) => {
+        if (newAddress === null) {
+            var newName = orderName.replace(addressB.textAddress, "");
+            setOrderName(newName);
+            return;
+        }
+
+        if (addressB && orderName.includes(addressB.textAddress)) {
+            var newName = orderName.replace(addressB.textAddress, newAddress.textAddress);
+            setOrderName(newName);
+        } else {
+            var newName2 = orderName + " " + newAddress.textAddress;
+            setOrderName(newName2);
+        }
+    }
+
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -443,7 +459,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         {isEdit && <Autocomplete
                             options={addresses}
                             disablePortal
-                            onChange={(e, newvalue) => { setAddressB(newvalue) }}
+                            onChange={(e, newvalue) => { updateAddressInName(newvalue); setAddressB(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />}

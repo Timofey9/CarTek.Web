@@ -38,6 +38,7 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
     const [openEditTn, setOpenEditTn] = useState(false);
     const [openEditSubTn, setOpenEditSubTn] = useState(false);
     const [s3Links, setS3Links] = useState([]);
+    const [transporter, setTransporter] = useState("");
 
     useEffect(() => {
         setLoading(true);
@@ -63,6 +64,12 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
                 setDropOffArrivalTime(data.dropOffArrivalTime);
                 setDropOffDepartureTime(data.dropOffDepartureTime);
                 setS3Links(data.s3Links);
+
+                if (data.transporter && data.transporter.length > 0) {
+                    setTransporter(data.transporter);
+                } else {
+                    setTransporter("ООО \"КарТэк\"");
+                }
             }).
             catch((error) => {
                 setError(error.response.data);
@@ -157,6 +164,11 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
                 <div className="form-group col-md-6">
                     <label className="bold-label">Грузополучатель (2)</label>
                     <label>{gpInfo}</label>
+                </div>
+
+                <div className="form-group col-md-6">
+                    <label className="bold-label">Перевозчик (6)</label>
+                    <label>{transporter}</label>
                 </div>
 
                 <div className="form-row">
