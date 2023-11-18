@@ -257,7 +257,6 @@ const CarsWork = () => {
 
     const filterData = (search, temp) => {
         setSearchString(search);
-        console.log(temp);
 
         switch (searchBy) {
             case "plate": {
@@ -279,8 +278,10 @@ const CarsWork = () => {
             }
             case "driver": {
                 var filteredArr = [];
+                const capitalized = search.charAt(0).toUpperCase() + search.slice(1);
+                setSearchString(capitalized);
                 for (var i = 0; i < temp.length; i++) {
-                    var filteredTasks = temp[i].driverTasks.filter((dt) => dt.driver.fullName.includes(search));
+                    var filteredTasks = temp[i].driverTasks.filter((dt) => dt.driver.fullName.includes(capitalized));
                     temp[i].driverTasks = filteredTasks;
 
                     if (temp[i].driverTasks.length > 0) {

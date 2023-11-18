@@ -82,49 +82,56 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
         catch (e) {
             alert("Прикрепите фото еще раз");
         }
-    }; 
+    };
 
     const handleSubmit = useDebouncedCallback((event) => {
-            var lv = loadVolume && loadVolume.replace(',', '.');
-            var lv2 = loadVolume2 && loadVolume2.replace(',', '.');
-            var unlv = unloadVolume && unloadVolume.replace(',', '.');
-            var unlv2 = unloadVolume2 && unloadVolume2.replace(',', '.');
+        var lv = loadVolume && loadVolume.replace(',', '.');
+        var lv2 = loadVolume2 && loadVolume2.replace(',', '.');
+        var unlv = unloadVolume && unloadVolume.replace(',', '.');
+        var unlv2 = unloadVolume2 && unloadVolume2.replace(',', '.');
 
-            formData.append("IsSubtask", isSubTask === undefined ? "false" : "true");
-            formData.append("SubTaskId", driverTaskId);
-            formData.append("DriverTaskId", driverTaskId);
-            formData.append("MaterialId", material.id);
-            formData.append("Number", tnNumber);
-            formData.append("GoId", go.id);
-            formData.append("GpId", gp.id);
-            formData.append("LoadVolume", lv);
-            formData.append("Unit", unit);
+        formData.append("IsSubtask", isSubTask === undefined ? "false" : "true");
+        formData.append("SubTaskId", driverTaskId);
+        formData.append("DriverTaskId", driverTaskId);
+        formData.append("MaterialId", material.id);
+        formData.append("Number", tnNumber);
+        formData.append("GoId", go.id);
+        formData.append("GpId", gp.id);
+        formData.append("LoadVolume", lv);
+        formData.append("Unit", unit);
+        if (lv2)
             formData.append("LoadVolume2", lv2);
-            formData.append("Unit2", unit2);
-            formData.append("LocationAId", addressA.id);
-            formData.append("PickUpArrivalDate", pickupArrivalTime.toUTCString());
-            formData.append("PickUpDepartureDate", pickupDepartureTime.toUTCString());
+        formData.append("Unit2", unit2);
+        formData.append("LocationAId", addressA.id);
+        formData.append("PickUpArrivalDate", pickupArrivalTime.toUTCString());
+        formData.append("PickUpDepartureDate", pickupDepartureTime.toUTCString());
+        if (unlv) {
             formData.append("UnloadVolume", unlv);
-            formData.append("UnloadVolume2", unlv2);
-            formData.append("UnloadUnit", unloadUnit);
-            formData.append("UnloadUnit2", unloadUnit2);
-            formData.append("LocationBId", addressB.id);
-            formData.append("DropOffArrivalDate", dropOffArrivalTime.toUTCString());
-            formData.append("DropOffDepartureDate", dropOffDepartureTime.toUTCString());
-            formData.append("Transporter", transporter);            
+        }
 
-            ApiService.updateTn(formData)
-                .then(({ data }) => {
-                    alert("ТН обновлена");
-                    handleClose();
-                    setReload(reload + 1);
-                })
-                .catch((error) => {
-                    setFormData(new FormData());
-                    if (error.response.data) {
-                        setError(error.response.data.message);
-                    }
-                });
+        if (unlv2)
+            formData.append("UnloadVolume2", unlv2);
+        formData.append("UnloadUnit", unloadUnit);
+        formData.append("UnloadUnit2", unloadUnit2);
+
+        if (addressB)
+            formData.append("LocationBId", addressB.id);
+        formData.append("DropOffArrivalDate", dropOffArrivalTime.toUTCString());
+        formData.append("DropOffDepartureDate", dropOffDepartureTime.toUTCString());
+        formData.append("Transporter", transporter);
+
+        ApiService.updateTn(formData)
+            .then(({ data }) => {
+                alert("ТН обновлена");
+                handleClose();
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                setFormData(new FormData());
+                if (error.response.data) {
+                    setError(error.response.data.message);
+                }
+            });
     }, 500);
 
 
@@ -304,7 +311,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                         type="number"
                         step="0.1"
                         form="profile-form"
-                        onChange={(e) => updateVolume(setLoadVolume,e.target.value)}
+                        onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
                         value={loadVolume} />
                 </div>
 
@@ -336,7 +343,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                                     type="number"
                                     step="0.1"
                                     form="profile-form"
-                                    onChange={(e) => updateVolume(setLoadVolume2,e.target.value)}
+                                    onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
                                     value={loadVolume2} />
                             </div>
 
@@ -361,7 +368,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                     <label className="bold-label">Адрес погрузки(8)</label>
                     <Autocomplete
                         options={addresses}
-                        defaultValue={addressA}                        
+                        defaultValue={addressA}
                         value={addressA}
                         disablePortal
                         onChange={(e, newvalue) => { setAddressA(newvalue) }}
@@ -377,7 +384,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 </div>
 
                 <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата выезда с адреса погрузки</label> 
+                    <label>Дата выезда с адреса погрузки</label>
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureTime} onChange={(date) => { setPickupDepartureTime(date) }} />
                 </div>
 
@@ -401,7 +408,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                         type="number"
                         step="0.1"
                         form="profile-form"
-                        onChange={(e) => updateVolume(setUnloadVolume,e.target.value)}
+                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
                         value={unloadVolume} />
                 </div>
 
@@ -433,7 +440,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                                     type="number"
                                     step="0.1"
                                     form="profile-form"
-                                    onChange={(e) => updateVolume(setUnloadVolume2,e.target.value)}
+                                    onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
                                     value={unloadVolume2} />
                             </div>
 

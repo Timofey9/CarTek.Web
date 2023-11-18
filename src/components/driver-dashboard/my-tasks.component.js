@@ -4,7 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import ApiService from "../../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 import DatePicker, { registerLocale } from "react-datepicker";
+import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import "react-datepicker/dist/react-datepicker.css";
+import { saveAs } from 'file-saver';
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
@@ -60,7 +63,7 @@ const columnsSubTasks = [
 const MyTasksList = () => {
     let cancelled = false;
     var date = new Date();
-    var yesterday = date - 1000 * 60 * 60 * 24 * 2;   // current date's milliseconds - 1,000 ms * 60 s * 60 mins * 24 hrs * (# of days beyond one to go back)
+    var yesterday = date - 1000 * 60 * 60 * 24 * 2;
     yesterday = new Date(yesterday);
 
     let date2 = new Date(date);
@@ -76,6 +79,7 @@ const MyTasksList = () => {
     const [endDate, setEndDate] = useState(date2);
     const [searchBy, setSearchBy] = useState("clientName");
     const [searchString, setSearchString] = useState("");
+    const [driverId, setDriverId] = useState(0);
 
     const search = () => {
         setReload(reload + 1);
@@ -117,6 +121,8 @@ const MyTasksList = () => {
         setLoading(true);
 
         let user = JSON.parse(localStorage.getItem("user"));
+
+        setDriverId(user.identity.id);
 
         let request = {
             driverId: user.identity.id,
@@ -228,6 +234,18 @@ const MyTasksList = () => {
         }
     ];
 
+    const downloadSalariesFile = () => {
+        ApiService.getSalariesReportDriver({
+            startDate: startDate.toUTCString(),
+            endDate: endDate.toUTCString(),
+            driverId: driverId
+        }).then(response => {
+            let url = window.URL
+                .createObjectURL(new Blob([response.data]));
+            saveAs(url, "реестр_зп.xlsx");
+        });
+    };
+
     const customStyles = {
         headCells: {
             style: {
@@ -276,6 +294,16 @@ const MyTasksList = () => {
                         <div className="mb-3 col-md-4 pl-1">
                             <input className="form-control" type="text" value={searchString} onChange={(e) => { setSearchString(e.target.value) }} />
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="col-md-12">
+                    <div className="input-group-append pl-2">
+                        <ButtonGroup size="medium" variant="contained" aria-label="small button group">
+                            <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>
+                        </ButtonGroup>
                     </div>
                 </div>
             </div>
