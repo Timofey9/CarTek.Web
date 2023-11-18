@@ -55,6 +55,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [startDateChanged, setStartDateChanged] = useState(false);
     const [applyChanges, setApplyChanges] = useState(true);
     const [orderShift, setOrderShift] = useState(0);
+    const [customer, setCustomer] = useState(0);
 
     const shiftToShortString = (shift) => {
         switch (shift) {
@@ -68,6 +69,31 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 return "Сутки неограниченно";
             default:
                 return shift;
+        }
+    }
+
+    const unitToString = (unit) => {
+        switch (unit) {
+            case 0:
+                return "m3"
+            case 1:
+                return "тн";
+            default:
+                return "";
+        }
+    }
+
+    const updateCustomer = (value) => {
+        if (serviceType === "0") {
+            setCustomer(value);
+            if (value.fixedPrice) {
+                setPrice(value.fixedPrice.toString());
+            }
+        } else {
+            setCustomer(value);
+            if (value.fixedPrice) {
+                setPrice(value.fixedPrice.toString());
+            }
         }
     }
 
@@ -138,6 +164,11 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             .then(({ data }) => {
                 setOrderName(data.name);
                 setServiceType(data.service);
+                if (data.service === "0") {
+                    setCustomer(data.client);
+                } else {
+                    setCustomer(data.gp);
+                }
                 setClient(data.client);
                 setMaterial(data.material);
                 setVolume(data.volume);
@@ -153,6 +184,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setMileage(data.mileage);
                 setGp(data.gp);
                 setOrderShift(data.shift.toString());
+
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -517,7 +549,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Себестоимость перевозки</label>
+                        <label className="bold-label">Себестоимость перевозки руб/{customer && unitToString(customer.clientUnit)}</label>
                         <input
                             disabled={!isEdit}
                             type="text"

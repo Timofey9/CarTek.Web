@@ -53,10 +53,36 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [validated, setValidated] = useState(false);
     const [isOrderCreated, setIsOrderCreated] = useState(false);
     const [orderShift, setOrderShift] = useState("");
+    const [customer, setCustomer] = useState({});
 
     const handleClickOpen = () => {
         setOpen(true);
     };
+
+    const unitToString = (unit) => {
+        switch (unit) {
+            case 0:
+                return "m3"
+            case 1:
+                return "тн";
+            default:
+                return "";
+        }
+    }
+
+    const updateCustomer = (value) => {
+        if (serviceType === "0") {
+            setCustomer(value);
+            if (value.fixedPrice) {
+                setPrice(value.fixedPrice.toString());
+            }
+        } else {
+            setCustomer(value);
+            if (value.fixedPrice) {
+                setPrice(value.fixedPrice.toString());
+            }
+        }
+    }
 
     const shiftToShortString = (shift) => {
         switch (shift) {
@@ -445,7 +471,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             className={checkObjectKeys(client) ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
-                            onChange={(e, newvalue) => { setClient(newvalue) }}
+                            onChange={(e, newvalue) => { setClient(newvalue); updateCustomer(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             isOptionEqualToValue={(o,v) => o === v.clientName} 
@@ -459,7 +485,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             className={checkObjectKeys(gp) ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
-                            onChange={(e, newvalue) => { setGp(newvalue) }}
+                            onChange={(e, newvalue) => { setGp(newvalue); updateCustomer() }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
@@ -534,7 +560,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Себестоимость перевозки</label>
+                        <label>Себестоимость перевозки руб/{customer && unitToString(customer.clientUnit)}</label>
                         <input
                             type="text"
                             className={validated && price.length === 0 ? "form-control not-valid-input-border" : "form-control"}

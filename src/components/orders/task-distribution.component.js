@@ -141,6 +141,7 @@ const CarsWork = () => {
             selector: (row, index) => row.state === 0 ? "На базе" : "На линии",
             sortable: false,
             maxWidth: '1em',
+            wrap:true
         },
         {
             name: "Задачи",
@@ -202,6 +203,7 @@ const CarsWork = () => {
             name: "Статус",
             selector: (row, index) => <div>{constStatuses[row.status]}</div>,
             center: true,
+            wrap: true,
             conditionalCellStyles: [
                 {
                     when: row => row.status === 0,

@@ -2,8 +2,8 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32772/api/";
-const API_URL = "https://api-cartek.ru/api/";
+const API_URL = "https://localhost:32769/api/";
+//const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
     createSetAuthInterceptor = config => {
@@ -33,10 +33,27 @@ class ApiService {
     }
 
     constructor() {
+        let failedQueue = [];
+
+        this._processQueue = (error, token = null) => {
+            failedQueue.forEach((prom) => {
+                if (error) {
+                    prom.reject(error);
+                } else {
+                    prom.resolve(token);
+                }
+            });
+
+            failedQueue = [];
+        };
+
+
         this._axios = axios.create({
             baseURL: API_URL,
             headers: { 'Content-Type': 'application/json' }
         });
+
+        this._isRefreshing = false;
 
         this._axiosXlsx = axios.create({
             baseURL: API_URL,
@@ -58,36 +75,48 @@ class ApiService {
                         console.log("refreshing");
                         originalConfig._retry = true;
                         try {
-                            var accessToken = this.getAccessToken();
-                            var refreshToken = this.getRefreshToken();
+                            if (!this._isRefreshing) {
 
-                            this.post("/auth/refresh", {
-                                "AccessToken": accessToken,
-                                "RefreshToken": refreshToken
-                            }).then(response => {
-                                if (response) {
-                                    console.log("refreshed");
-                                    localStorage.setItem("user", JSON.stringify(response.data));
-                                    return this._axios(originalConfig);
-                                } else {
+                                this._isRefreshing = true;
+
+                                var accessToken = this.getAccessToken();
+                                var refreshToken = this.getRefreshToken();
+
+                                this.post("/auth/refresh", {
+                                    "AccessToken": accessToken,
+                                    "RefreshToken": refreshToken
+                                }).then(response => {
+                                    if (response) {
+                                        console.log("refreshed");
+                                        console.log(this._isRefreshing);
+                                        localStorage.setItem("user", JSON.stringify(response.data));
+                                        this._isRefreshing = false;
+                                        return this._axios(originalConfig);
+                                    } else {
+                                        EventBus.dispatch("logout", {});
+                                        return Promise.reject(error);
+                                    }
+                                }).catch((error) => {
+                                    console.log("refresh failed1");
+                                    console.log(this._isRefreshing);
                                     EventBus.dispatch("logout", {});
                                     return Promise.reject(error);
-                                }
-                            }).catch((error) => {
-                                console.log("refresh failed1");
-                                console.log(error);
-                                EventBus.dispatch("logout", {});
-                                return Promise.reject(error);
-                            });
+                                });
+                            }
+
                         } catch (_error) {
                             console.log("refresh failed2");
                             EventBus.dispatch("logout", {});
                             return Promise.reject(_error);
                         }
+                        finally {
+                            this._isRefreshing = false;
+                        }
                     }
                 }
                 else {
                     console.log("not refresh");
+                    this._isRefreshing = false;
                     return Promise.reject(error);
                 }
             }

@@ -220,7 +220,7 @@ const DriverEditTask = () => {
                     setShowSpinner(false);
                 }
             });
-    });
+    }, 1000);
 
     const getBack = useDebouncedCallback((event) => {
         setShowSpinner(true);
@@ -611,7 +611,7 @@ const DriverEditTask = () => {
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
 
                     <dt className="col-sm-3">Себестоимость перевозки:</dt>
-                    <dd className="col-sm-9">{order.price}</dd>
+                    <dd className="col-sm-9">{driverTask.price}</dd>
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>

@@ -95,15 +95,15 @@ const ClientsList = () => {
         }
     };
     return <>
-        {
-            list.length === 0 && !loading ?
-                <section className="empty-view">
-                    <header>Нет адресов</header>
-                </section>
-                :
+
                 <div>
                     <Button color="success" className="pull-right" onClick={(e) => handleClickOpenCreate()} variant="contained">Создать</Button>
-
+            {
+                list.length === 0 && !loading ?
+                    <section className="empty-view">
+                        <header>Нет клиентов</header>
+                    </section>
+                    :
                     <DataTable
                         columns={columns}
                         responsive
@@ -118,8 +118,9 @@ const ClientsList = () => {
                             !cancelled && setDir(direction);
                         }}
                         data={list} />
+            }
                 </div>
-        }
+        
 
         <Dialog
             fullScreen
