@@ -74,6 +74,20 @@ class ApiService {
                     if (status === 401 && !originalConfig._retry) {
                         console.log("refreshing");
                         originalConfig._retry = true;
+
+                        if (this._isRefreshing) {
+                            return new Promise(function (resolve, reject) {
+                                failedQueue.push({ resolve, reject });
+                            })
+                                .then((identity) => {
+                                    originalConfig.headers["Authorization"] = "Bearer " + identity.token;
+                                    return this._axios.request(originalConfig);
+                                })
+                                .catch((err) => {
+                                    return Promise.reject(err);
+                                });
+                        }
+
                         try {
                             if (!this._isRefreshing) {
 
@@ -90,16 +104,20 @@ class ApiService {
                                         console.log("refreshed");
                                         console.log(this._isRefreshing);
                                         localStorage.setItem("user", JSON.stringify(response.data));
+                                        this._processQueue(null, response.data.token);
                                         this._isRefreshing = false;
                                         return this._axios(originalConfig);
                                     } else {
                                         EventBus.dispatch("logout", {});
+                                        this._processQueue(error, null);
                                         return Promise.reject(error);
                                     }
                                 }).catch((error) => {
                                     console.log("refresh failed1");
                                     console.log(this._isRefreshing);
                                     EventBus.dispatch("logout", {});
+                                    this._processQueue(error, null);
+                                    this._isRefreshing = false;
                                     return Promise.reject(error);
                                 });
                             }
@@ -107,11 +125,9 @@ class ApiService {
                         } catch (_error) {
                             console.log("refresh failed2");
                             EventBus.dispatch("logout", {});
+                            this._processQueue(_error, null);
                             return Promise.reject(_error);
-                        }
-                        finally {
-                            this._isRefreshing = false;
-                        }
+                        } 
                     }
                 }
                 else {

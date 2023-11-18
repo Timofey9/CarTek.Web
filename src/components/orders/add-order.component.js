@@ -72,15 +72,17 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
 
     const updateCustomer = (value) => {
         if (serviceType === "0") {
-            setCustomer(value);
             if (value.fixedPrice) {
                 setPrice(value.fixedPrice.toString());
+                value.unit = "";
             }
+            setCustomer(value);
         } else {
-            setCustomer(value);
             if (value.fixedPrice) {
                 setPrice(value.fixedPrice.toString());
+                value.unit = "";
             }
+            setCustomer(value);
         }
     }
 
