@@ -298,15 +298,15 @@ const MyTasksList = () => {
                 </div>
             </div>
 
-            <div className="row">
-                <div className="col-md-12">
-                    <div className="input-group-append pl-2">
-                        <ButtonGroup size="medium" variant="contained" aria-label="small button group">
-                            <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>
-                        </ButtonGroup>
-                    </div>
-                </div>
-            </div>
+            {/*<div className="row">*/}
+            {/*    <div className="col-md-12">*/}
+            {/*        <div className="input-group-append pl-2">*/}
+            {/*            <ButtonGroup size="medium" variant="contained" aria-label="small button group">*/}
+            {/*                <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>*/}
+            {/*            </ButtonGroup>*/}
+            {/*        </div>*/}
+            {/*    </div>*/}
+            {/*</div>*/}
         </form>
         <DataTable
             columns={columns}
