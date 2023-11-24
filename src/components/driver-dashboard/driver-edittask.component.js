@@ -16,6 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import "react-datepicker/dist/react-datepicker.css";
@@ -76,8 +77,6 @@ const DriverEditTask = () => {
     const [pickupArrivalTime, setPickupArrivalTime] = useState("");
     const [pickupDepartureDate, setPickupDepartureDate] = useState(new Date());
     const [pickupDepartureTime, setPickupDepartureTime] = useState("");
-    const [currentSubTask, setCurrentSubTask] = useState({});
-    const [hasSubTask, setHasSubTask] = useState(false);
     const [continueWork, setContinueWork] = useState(false);
     const [validated, setValidated] = useState(true);
     const [transporter, setTransporter] = useState("ООО \"КарТэк\"");
@@ -94,6 +93,15 @@ const DriverEditTask = () => {
     let { driverTaskId } = useParams();
 
     const navigate = useNavigate();
+
+    const clearFileInput = (ctrl) => {
+        try {
+            ctrl.value = null;
+        } catch (ex) { }
+        if (ctrl.value) {
+            ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
+        }
+    }
 
     const updateVolume = (setter, value) => {
         var str = value.toString();
@@ -117,6 +125,7 @@ const DriverEditTask = () => {
 
     const handleEditTnClose = () => {
         setOpenEditTn(false);
+        setReload(reload + 1);
     }
 
     const handleEditTnOpen = () => {
@@ -251,7 +260,7 @@ const DriverEditTask = () => {
                 formData.delete(key)
         };
 
-        formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
+        formData.append("DriverTaskId", driverTask.id);
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
 
@@ -259,6 +268,7 @@ const DriverEditTask = () => {
             .then(({ data }) => {
                 alert("Статус обновлен");
                 setFormData(new FormData());
+                clearFileInput(document.getElementById("imageFileInput"));
                 setNote("");
                 setReload(reload + 1);
                 setShowSpinner(false);
@@ -283,18 +293,12 @@ const DriverEditTask = () => {
                 formData.delete(key)
         };
 
-        formData.append("DriverTaskId", hasSubTask ? currentSubTask.id : driverTask.id);
+        formData.append("DriverTaskId", driverTask.id);
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
         formData.append("Transporter", transporter);
 
         if (status === 4 && validate()) {
-            if (hasSubTask) {
-                formData.set("DriverTaskId", driverTask.id);
-                formData.set("UpdatedStatus", currentSubTask.status + 1);
-                formData.append("IsSubtask", true);
-                formData.append("SubTaskId", currentSubTask.id);
-            }
 
             formData.append("MaterialId", material.id);
             formData.append("Number", tnNumber);
@@ -317,6 +321,7 @@ const DriverEditTask = () => {
                     setPickupDepartureTime("");
                     setLoadVolume("");
                     setNote("");
+                    clearFileInput(document.getElementById("imageFileInput"));
                     setShowSpinner(false);
                 })
                 .catch((error) => {
@@ -330,12 +335,6 @@ const DriverEditTask = () => {
         }
 
         if (status === 7 && validate()) {
-
-            if (hasSubTask) {
-                formData.set("UpdatedStatus", currentSubTask.status + 1);
-                formData.append("IsSubtask", true);
-                formData.append("SubTaskId", currentSubTask.id);
-            }
             formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',','.'));
             formData.append("UnloadVolume2", unloadVolume2);
             formData.append("UnloadUnit", unloadUnit);
@@ -352,6 +351,9 @@ const DriverEditTask = () => {
                     setNote("");
                     setReload(reload + 1);
                     setShowSpinner(false);
+                    clearFileInput(document.getElementById("imageFileInputTN"));
+                    clearFileInput(document.getElementById("imageFileInputTN2"));
+
                 })
                 .catch((error) => {
                     if (error.response.data) {
@@ -364,26 +366,6 @@ const DriverEditTask = () => {
             return;
         }
 
-        if (hasSubTask) {
-            formData.set("UpdatedStatus", currentSubTask.status + 1);
-            if (validate()) {
-                ApiService.EditDriverSubTaskAsync(formData)
-                    .then(({ data }) => {
-                        alert("Статус обновлен");
-                        setFormData(new FormData());
-                        setTnNumber("");
-                        setNote("");
-                        setReload(reload + 1);
-                        setShowSpinner(false);
-                    })
-                    .catch((error) => {
-                        if (error.response.data) {
-                            setError(error.response.data);
-                            setShowSpinner(false);
-                        }
-                    });
-            }
-        } else {
             if (validate()) {
                 ApiService.EditDriverTaskAsync(formData)
                     .then(({ data }) => {
@@ -401,7 +383,7 @@ const DriverEditTask = () => {
                         }
                     });
             }
-        }
+        
         setShowSpinner(false);
     }, 500);
 
@@ -562,6 +544,25 @@ const DriverEditTask = () => {
         setLoading(false);
     }, [reload]);
 
+    const deleteImage = (imagePath, noteId) => {
+        var data =
+        {
+            "NoteId": noteId,
+            "UrlToDelete": imagePath
+        }
+
+        ApiService.DeleteS3ImageAsync(data)
+            .then(({ res }) => {
+                alert("Фото удалено");
+                setReload(reload + 1);
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setError(error.response.data.message);
+                }
+            });
+    }
+
     const checkObjectKeys = (obj) => {
         if (obj !== null && obj !== undefined) {
             return validated && Object.keys(obj).length === 0;
@@ -570,14 +571,13 @@ const DriverEditTask = () => {
         return validated;
     }
 
-
     return <div className="container">
         {!loading && (
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div className="row">
                     <div className="col-md-10">
-                        <h1>Задача по заявке {order && order.name} {hasSubTask &&
-                            <span>,рейс #{currentSubTask.sequenceNumber + 1}</span>}
+                        <h1>Задача по заявке {order && order.name} {driverTask.shift === 3 &&
+                            <span>,рейс #1</span>}
                         </h1>
                     </div>
                     <div className="col-md-2">
@@ -880,7 +880,7 @@ const DriverEditTask = () => {
                                     ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
                                     <div className="row">
                                         <div className="col-md-12">
-                                            <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                                            <input type="file" id="imageFileInputTN" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
                                         </div>
                                     </div>
                                 </div>
@@ -893,7 +893,7 @@ const DriverEditTask = () => {
                                     ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
                                     <div className="row">
                                         <div className="col-md-12">
-                                            <input type="file" id="files2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
+                                            <input type="file" id="imageFileInputTN2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
                                         </div>
                                     </div>
                                 </div>
@@ -925,7 +925,11 @@ const DriverEditTask = () => {
                                                             <Typography>{note.text}</Typography>
                                                             {showLinks && links.map((link, linkindex) => {
                                                                 const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                return (<div key={linkindex}><a target="_blank" href={fullLink}>Изображение {linkindex+1}</a></div>);
+                                                                return (<div key={linkindex}>
+                                                                    <a target="_blank" href={fullLink}>Изображение {linkindex + 1}</a>
+                                                                    <IconButton onClick={(e) => deleteImage(link, note.id)} aria-label="delete">
+                                                                        <i className="fa fa-trash" aria-hidden="true"></i>                                                                    </IconButton>
+                                                                </div>);
                                                             })}
                                                         </div>
                                                     )
@@ -948,7 +952,7 @@ const DriverEditTask = () => {
                                 <div className="row">
                                     <div className="col-md-12">
                                         <label htmlFor="files">Прикрепить фотографии</label>
-                                        <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
+                                        <input type="file" id="imageFileInput" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
                                     </div>
                                 </div>}
   
@@ -957,7 +961,7 @@ const DriverEditTask = () => {
                                 <div className="col-md-12">
                                     <div className="col-md-3">
                                         <button type="submit" onClick={handleSubmitNote} className="btn btn-primary mt-3">
-                                            Отправить комментарий
+                                            Отправить комментарий/фото
                                         </button>
                                     </div>
                                 </div>
@@ -993,7 +997,7 @@ const DriverEditTask = () => {
                         </div>}
                 </div>
 
-                {status === 9 && driverTask.shift === 3 &&
+                {status === 9 && driverTask.shift === 3 && driverTask.subTasksCount < 1 &&
                     <>
                     <div className="row">
                             <div className="col-md-12">

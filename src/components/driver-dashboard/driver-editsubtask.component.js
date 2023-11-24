@@ -101,6 +101,7 @@ const DriverEditSubTask = () => {
 
     const handleEditTnClose = () => {
         setOpenEditTn(false);
+        setReload(reload + 1);
     }
 
     const handleEditTnOpen = () => {
@@ -889,7 +890,7 @@ const DriverEditSubTask = () => {
                                 <div className="col-md-12">
                                     <div className="col-md-3">
                                         <button type="submit" onClick={handleSubmitNote} className="btn btn-primary mt-3">
-                                            Отправить комментарий
+                                            Отправить комментарий/фото
                                         </button>
                                     </div>
                                 </div>

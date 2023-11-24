@@ -142,7 +142,11 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
                         <label className="bold-label">Фото</label>
                         {s3Links.map((link, linkindex) => {
                             const fullLink = "https://storage.yandexcloud.net/" + link;
-                            return (<div><a target="_blank" href={fullLink}>Фото {linkindex + 1}</a></div>);
+
+                            return (
+                            <div>
+                                <a target="_blank" href={fullLink}>Фото {linkindex + 1}</a>
+                            </div>);
                         })}
                     </div>
                 }

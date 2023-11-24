@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
 import DatePicker, { registerLocale } from "react-datepicker";
+import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Divider from '@mui/material/Divider';
@@ -164,6 +165,38 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
             .then(({ data }) => {
                 alert("Задача удалена");
                 handleCloseTaskForm();
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setError(error.response.data.message);
+                }
+            });
+    }
+
+    function deleteSubTask(taskId) {
+        ApiService.deleteSubtask(taskId)
+            .then(({ data }) => {
+                alert("Подадача удалена");
+                handleCloseTaskForm();
+            }).
+            catch((error) => {
+                if (error.response.data.message) {
+                    setError(error.response.data.message);
+                }
+            });
+    }
+
+    function deleteImage(imagePath, noteId) {
+        var data =
+        {
+            "NoteId": noteId,
+            "UrlToDelete": imagePath
+        }
+
+        ApiService.DeleteS3ImageAsync(data)
+            .then(({ res }) => {
+                alert("Фото удалено");
+                setReload(reload + 1);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -362,7 +395,10 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                                             <Typography>{note.text}</Typography>
                                                             {showLinks && links.map((link, linkindex) => {
                                                                 const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                return (<div><a target="_blank" href={fullLink}>Изображение {linkindex+1}</a></div>);
+                                                                return (<div>
+                                                                    <a target="_blank" href={fullLink}>Изображение {linkindex + 1}</a>
+                                                                    <IconButton onClick={(e) => deleteImage(link, note.id)} aria-label="delete">
+                                                                        <i className="fa fa-trash" aria-hidden="true"></i>  </IconButton>                                                                </div>);
                                                             })}
                                                         </div>
                                                     )
@@ -379,6 +415,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                             <div className="col-md-2">
                                 <label>Рейс #{task.sequenceNumber + 1}</label>
                                 <button onClick={() => handleClickSubTaskTnOpen(task.id)} className="btn btn-success mr-10">ТН</button>
+                                <button  className="btn btn-danger" onClick={() => deleteSubTask(task.id)} className="btn btn-danger mr-10"><i className="fa fa-trash" aria-hidden="true"></i></button>
                                 <Stepper orientation="vertical" activeStep={task.status}>
                                     {constStatuses.map((label, index) => {
                                         const stepProps = {};
@@ -400,7 +437,11 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                                                 <Typography>{note.text}</Typography>
                                                                 {showLinks && links.map((link, linkindex) => {
                                                                     const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                    return (<div><a target="_blank" href={fullLink}>Изображение {linkindex+1}</a></div>);
+                                                                    return (
+                                                                        <div>
+                                                                            <a target="_blank" href={fullLink}>Изображение {linkindex + 1}</a>
+                                                                            <IconButton onClick={(e) => deleteImage(link, note.id)} aria-label="delete">
+                                                                                <i className="fa fa-trash" aria-hidden="true"></i>  </IconButton>                                                                            </div>);
                                                                 })}
                                                             </div>
                                                         )

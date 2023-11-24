@@ -2,8 +2,8 @@ import axios from "axios";
 import EventBus from "../common/EventBus";
 import authHeader from "./auth-header";
 //const API_URL = "http://185.46.8.6:5000/api/";
-//const API_URL = "https://localhost:32770/api/";
-const API_URL = "https://api-cartek.ru/api/";
+const API_URL = "https://localhost:32768/api/";
+//const API_URL = "https://api-cartek.ru/api/";
 
 class ApiService {
     createSetAuthInterceptor = config => {
@@ -281,6 +281,11 @@ class ApiService {
         return this.delete(`order/deleteorder/${id}`);
     }
 
+
+    deleteSubtask(id) {
+        return this.delete(`order/deleteSubTask/${id}`);
+    }
+
     deleteTask(id) {
         return this.delete(`order/deletetask/${id}`);
     }
@@ -330,6 +335,11 @@ class ApiService {
 
     async AdminEditDriverTaskAsync(data) {
         var res = await this.post(`order/updatedrivertask`, data);
+        return await res;
+    }
+
+    async DeleteS3ImageAsync(data) {
+        var res = await this.post(`order/deleteS3Image`, data);
         return await res;
     }
 

@@ -478,7 +478,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                     </div>
                 </div>
 
-                <div className="mt-3 btn btn-success" onClick={(e) => handleSubmit(e)}>Обновить</div>
+                <div className="mt-3 btn btn-success" onClick={(e) => handleSubmit(e)}>Обновить/отправить фото</div>
             </div>
         </div>);
 }
