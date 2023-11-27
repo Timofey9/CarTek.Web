@@ -97,10 +97,29 @@ const DriverEditTask = () => {
     const clearFileInput = (ctrl) => {
         try {
             ctrl.value = null;
+            formData.delete("Files");
         } catch (ex) { }
         if (ctrl.value) {
             ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
         }
+    }
+
+    const clearFileInputById = (id) => {
+        var ctrl = document.getElementById(id);
+        try {
+            ctrl.value = null;
+            formData.delete("Files");
+        } catch (ex) { }
+        if (ctrl.value) {
+            ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
+        }
+        setContinueWork(true);
+    }
+
+    const hasFiles = (id) => {
+        var ctrl = document.getElementById(id);
+
+        return ctrl && ctrl.files.length > 0;
     }
 
     const updateVolume = (setter, value) => {
@@ -194,6 +213,7 @@ const DriverEditTask = () => {
             for (var file of e.target.files) {
                 formData.append("Files", file);
             }
+            setContinueWork(true);
         }
         catch (e) {
             alert("Прикрепите фото еще раз");
@@ -205,6 +225,7 @@ const DriverEditTask = () => {
             for (var file of e.target.files) {
                 formData.append("Files", file);
             }
+            setContinueWork(true);
         }
         catch (e) {
             alert("Прикрепите фото еще раз");
@@ -221,7 +242,6 @@ const DriverEditTask = () => {
                 alert("Подзадача добавлена");
                 navigate(`/driver-dashboard/subtask/${data.message}`);
                 setReload(reload + 1);
-                setContinueWork(true);
             })
             .catch((error) => {
                 if (error.response.data) {
@@ -881,6 +901,8 @@ const DriverEditTask = () => {
                                     <div className="row">
                                         <div className="col-md-12">
                                             <input type="file" id="imageFileInputTN" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                                            {hasFiles("imageFileInputTN") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN")} aria-label="delete">
+                                                <i className="fa fa-cancel" aria-hidden="true"></i>  </IconButton>}
                                         </div>
                                     </div>
                                 </div>
@@ -894,6 +916,9 @@ const DriverEditTask = () => {
                                     <div className="row">
                                         <div className="col-md-12">
                                             <input type="file" id="imageFileInputTN2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
+                                            {hasFiles("imageFileInputTN2") &&
+                                                <IconButton onClick={(e) => clearFileInputById("imageFileInputTN2")} aria-label="delete">
+                                                    <i className="fa fa-xmark" aria-hidden="true"></i>  </IconButton>}
                                         </div>
                                     </div>
                                 </div>
@@ -952,7 +977,12 @@ const DriverEditTask = () => {
                                 <div className="row">
                                     <div className="col-md-12">
                                         <label htmlFor="files">Прикрепить фотографии</label>
+                                        {hasFiles("imageFileInput") && 
+                                            <IconButton onClick={(e) => clearFileInputById("imageFileInput")} aria-label="delete">
+                                            <i className="fa fa-close" aria-hidden="true"></i>  </IconButton>}
+
                                         <input type="file" id="imageFileInput" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
+
                                     </div>
                                 </div>}
   
