@@ -81,6 +81,8 @@ const DriverEditTask = () => {
     const [validated, setValidated] = useState(true);
     const [transporter, setTransporter] = useState("ООО \"КарТэк\"");
 
+    const [customer, setCustomer] = useState({});
+
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [openAddress, setOpenAddress] = useState(false);
@@ -499,7 +501,7 @@ const DriverEditTask = () => {
                     data.notes.unshift({ status: 0, dateCreated: new Date(data.dateCreated), text: "назначена", s3Links: [] });
                     setNotes(data.notes);
                     setCar(data.car);
-
+                    setCustomer(data.orderCustomer);
                     //if (data.subTasks && data.subTasks.length > 0) {
                     //    let subTask = data.subTasks.reduce((max, task) => max.sequenceNumber > task.sequenceNumber ? max : task);
                     //    setCurrentSubTask(subTask);
@@ -629,6 +631,15 @@ const DriverEditTask = () => {
 
                     <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
+
+                    <dt className="col-sm-3">Заказчик: </dt>
+                    <dd className="col-sm-9">{customer.clientName}</dd>
+
+                    {customer.density &&
+                    <>
+                        <dt className="col-sm-3">Насыпной коэффициент: </dt>
+                        <dd className="col-sm-9">{customer.density}</dd>
+                    </>}
 
                     <dt className="col-sm-3">Себестоимость перевозки:</dt>
                     <dd className="col-sm-9">{driverTask.price}</dd>
