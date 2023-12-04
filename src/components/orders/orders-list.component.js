@@ -331,7 +331,17 @@ const OrdersList = () => {
                     }
                 },
                 {
-                    when: row => row.status !== 0 && row.status !== 9,
+                    when: row => row.status === 10,
+                    style: {
+                        backgroundColor: '#696969',
+                        color: 'white',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                },
+                {
+                    when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
                     style: {
                         backgroundColor: '#ffefac',
                         '&:hover': {

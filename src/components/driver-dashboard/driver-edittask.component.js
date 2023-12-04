@@ -273,6 +273,26 @@ const DriverEditTask = () => {
     }, 500);
 
 
+    const cancelTask = useDebouncedCallback((event) => {
+        setShowSpinner(true);
+        ApiService.CancelTask({ driverTaskId: driverTaskId })
+            .then(({ data }) => {
+                alert("Статус обновлен");
+                setFormData(new FormData());
+                setTnNumber("");
+                setNote("");
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                if (error.response.data) {
+                    setShowSpinner(false);
+                }
+            });
+
+        setShowSpinner(false);
+    }, 500);
+
+
     const handleSubmitNote = useDebouncedCallback((event) => {
         event.preventDefault();
         setShowSpinner(true);
@@ -606,6 +626,9 @@ const DriverEditTask = () => {
                         <button disabled={status < 4} form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleEditTnOpen(e) }}>
                             ТН
                         </button>
+                        <button disabled={status >= 10} form="profile-form" className="btn btn-danger mt-2" onClick={(e) => { cancelTask(e) }}>
+                            Отменить задачу
+                        </button>
                     </div>
                 </div>
 
@@ -653,8 +676,7 @@ const DriverEditTask = () => {
 
                 </dl>
 
-                {status === 4 &&
-                    <div className="form-row">
+                     <div className="form-row">
                         <div className="form-group col-md-6">
                             <label>Номер ТН</label>
                             <input

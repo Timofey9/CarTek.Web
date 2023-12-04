@@ -48,7 +48,17 @@ const columnsSubTasks = [
                 }
             },
             {
-                when: row => row.status !== 0 && row.status !== 9,
+                when: row => row.status === 10,
+                style: {
+                    backgroundColor: '#696969',
+                    color: 'white',
+                    '&:hover': {
+                        cursor: 'pointer',
+                    }
+                }
+            },
+            {
+                when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
                 style: {
                     backgroundColor: '#ffefac',
                     '&:hover': {
@@ -224,7 +234,17 @@ const MyTasksList = () => {
             }
         },
         {
-            when: row => row.status !== 0 && row.status !== 9,
+            when: row => row.status === 10,
+            style: {
+                backgroundColor: '#696969',
+                color: 'white',
+                '&:hover': {
+                    cursor: 'pointer',
+                }
+            }
+        },
+        {
+            when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
             style: {
                 backgroundColor: '#ffefac',
                 '&:hover': {
@@ -298,15 +318,15 @@ const MyTasksList = () => {
                 </div>
             </div>
 
-            {/*<div className="row">*/}
-            {/*    <div className="col-md-12">*/}
-            {/*        <div className="input-group-append pl-2">*/}
-            {/*            <ButtonGroup size="medium" variant="contained" aria-label="small button group">*/}
-            {/*                <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>*/}
-            {/*            </ButtonGroup>*/}
-            {/*        </div>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
+            <div className="row">
+                <div className="col-md-12">
+                    <div className="input-group-append pl-2">
+                        <ButtonGroup size="medium" variant="contained" aria-label="small button group">
+                            <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>
+                        </ButtonGroup>
+                    </div>
+                </div>
+            </div>
         </form>
         <DataTable
             columns={columns}

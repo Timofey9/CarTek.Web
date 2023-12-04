@@ -104,7 +104,6 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const updateShiftInName = (newShift) => {
         var newS = shiftToShortString(newShift);
         var oldS = shiftToShortString(orderShift);
-
         if (oldS !== '' && orderName.includes(oldS)) {
             var newName = orderName.replace(oldS, newS);
             setOrderName(newName);
@@ -232,7 +231,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             setPrice(clonedOrder.price ?? 0);
             setMaterialPrice(clonedOrder.materialPrice  ?? 0);
             setVolume(clonedOrder.volume ?? 0);
-            setOrderShift(clonedOrder.shift ?? 0);
+            setOrderShift(clonedOrder.shift.toString() ?? '0');
         }
     }, [addresses]);
 
