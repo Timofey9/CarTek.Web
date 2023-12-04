@@ -42,7 +42,7 @@ const OrdersList = () => {
     const [localUser, setLocalUser] = useState({});
     const [cloningOrder, setCloningOrder] = useState({});
 
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена', 'Отменена'];
 
     const handleClickOpen = (orderId) => {
         setSelectedOrderId(orderId);

@@ -18,6 +18,7 @@ import Divider from '@mui/material/Divider';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import ViewTn from "./view-tn";
+import { useDebouncedCallback } from 'use-debounce';
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
@@ -76,7 +77,6 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         ApiService.getAllActiveOrders(req)
             .then(({ data }) => {
                 setOrders(data);
-                console.log(data);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -173,6 +173,18 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
             });
     }
 
+    const cancelTask = useDebouncedCallback((event) => {
+        ApiService.CancelTask({ driverTaskId: driverTaskId })
+            .then(({ data }) => {
+                alert("Статус обновлен");
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                setError(error.response.data.message);
+            });
+
+    }, 500);
+
     function deleteSubTask(taskId) {
         ApiService.deleteSubtask(taskId)
             .then(({ data }) => {
@@ -256,6 +268,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     {localUser.identity && !localUser.identity.isDispatcher &&
                         <div className="col-md-6">
                             <button onClick={() => deleteTask()} className="btn btn-danger mr-10">Удалить</button>
+                            <button onClick={() => cancelTask()} className="btn btn-warning mr-10">Отменить</button>
                             <button onClick={() => handleClickOpen()} className="btn btn-success mr-10">ТН</button>
                             {isEdit
                                 ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success">Сохранить</button>

@@ -33,7 +33,7 @@ const CarsWork = () => {
     const [openEditTask, setOpenEditTask] = useState(false);
     const [localUser, setLocalUser] = useState({});
     const [filtered, setFiltered] = useState([]);
-    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена'];
+    const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена', 'Отменена'];
 
     const ExpandedComponent = ({ data }) => <pre>
         <DataTable
@@ -391,6 +391,7 @@ const CarsWork = () => {
                                     <option value="8">Выгрузка</option>
                                     <option value="9">Выписка документов</option>
                                     <option value="10">Завершена</option>
+                                    <option value="11">Отменена</option>
                                 </select>                                
                                 :
                                 <input className="form-control" type="text" value={searchString} onChange={(e) => { filterData(e.target.value, JSON.parse(JSON.stringify(cars)))}} />}
