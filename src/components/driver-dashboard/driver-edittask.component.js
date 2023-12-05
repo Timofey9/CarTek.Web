@@ -675,7 +675,7 @@ const DriverEditTask = () => {
 
 
                 </dl>
-
+                {status === 4 &&
                      <div className="form-row">
                         <div className="form-group col-md-6">
                             <label>Номер ТН</label>
