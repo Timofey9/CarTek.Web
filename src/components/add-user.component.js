@@ -1,7 +1,12 @@
 import React, { Component, useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
-import withRouter  from "./withRouter";
+import withRouter from "./withRouter";
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 
 class UserForm extends Component {
     statuses = {
@@ -18,8 +23,20 @@ class UserForm extends Component {
                 .then(({ data }) => {
                     this.setState({
                         loading: false,
-                        ...data                      
+                        ...data
                     })
+                    if (data.isAdmin) {
+                        this.setState({role: '1'});
+                    }
+                    if (data.isDispatcher) {
+                        this.setState({ role: '2' });
+                    }
+                    if (data.isInitialBookkeeper) {
+                        this.setState({ role: '3' });
+                    }
+                    if (data.isSalaryBookkeeper) {
+                        this.setState({ role: '4' });
+                    }
                 })
                 .catch((error) => {
                     this.setState({ loading: false, error })
@@ -35,7 +52,7 @@ class UserForm extends Component {
             error: "",
             login: "",
             firstName: "",
-            middleName:"",
+            middleName: "",
             lastName: "",
             phone: "",
             isAdmin: false,
@@ -43,7 +60,8 @@ class UserForm extends Component {
             password: "",
             email: "",
             notificationShown: false,
-            userExists: false
+            userExists: false,
+            role: '0'
         };
 
         this.handleSubmit = (event) => {
@@ -55,8 +73,10 @@ class UserForm extends Component {
                     lastName: this.state.lastName,
                     login: this.state.login,
                     phone: this.state.phone,
-                    isAdmin: this.state.isAdmin,
-                    isDispatcher: this.state.isDispatcher
+                    isAdmin: this.state.role === '1',
+                    isDispatcher: this.state.role === '2',
+                    isInitialBookkeeper: this.state.role === '3',
+                    isSalaryBookkeeper: this.state.role === '4',
                 };
                 const { login } = this.props.params;
                 if (login) {
@@ -94,8 +114,7 @@ class UserForm extends Component {
         this.validate = () => {
             if (this.state.login.trim() === '' ||
                 this.state.firstName.trim() === '' ||
-                this.state.lastName.trim() === '')
-            {
+                this.state.lastName.trim() === '') {
                 this.setState({ error: "Поля логин, пароль, имя и фамилия являются обязательными" })
                 return false;
             }
@@ -133,6 +152,7 @@ class UserForm extends Component {
         this.handleEmailChange = this.handleEmailChange.bind(this);
         this.handleLoginChange = this.handleLoginChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
+        this.handleRoleChange = this.handleRoleChange.bind(this);
     }
 
 
@@ -180,6 +200,11 @@ class UserForm extends Component {
         this.setState({ isAdmin: event.target.value === "on" });
     }
 
+
+    handleRoleChange(event) {
+        this.setState({ role: event.target.value });
+    }
+
     handleIsDispatcherChange(event) {
         if (event.target.value === "on") {
             this.setState({ isDispatcher: true });
@@ -195,7 +220,7 @@ class UserForm extends Component {
 
     render() {
 
-        const { loading, error, firstName, middleName, lastName, isAdmin, isDispatcher, phone, login, email, password } = this.state;
+        const { loading, error, firstName, middleName, lastName, isAdmin, isDispatcher, phone, login, email, password, role } = this.state;
 
         if (loading) {
             return "ЗАГРУЗКА...";
@@ -221,7 +246,7 @@ class UserForm extends Component {
                         className="form-control"
                         form="profile-form"
                         onChange={this.handleMiddleNameChange}
-                        value={middleName}/>
+                        value={middleName} />
                 </div>
                 <div className="form-group col-md-6">
                     <label htmlFor="firstName">Фамилия</label>
@@ -279,70 +304,22 @@ class UserForm extends Component {
                     </div>
                 </div>
             </div>
-            <div className="form-row pb-2">
-                <div className="col-md-2">
-                    <label htmlFor="notifications">Администратор</label>
-                    <div className="form-check">
-                        <input className="form-check-input"
-                            type="radio"
-                            name="isAdmin"
-                            onChange={this.handleIsAdminChange}
-                            id="admin_on"
-                            value="on"
-                            form="profile-form"
-                            checked={isAdmin}
-                        />
-                        <label className="form-check-label" htmlFor="admin_on">
-                            Да
-                        </label>
-                    </div>
-                    <div className="form-check">
-                        <input className="form-check-input"
-                            type="radio"
-                            name="isAdmin"
-                            id="admin_off"
-                            value="off"
-                            onChange={this.handleIsAdminChange}
-                            form="profile-form"
-                            checked={!isAdmin}
-                        />
-                        <label className="form-check-label" htmlFor="admin_off">
-                            Нет
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div className="form-row pb-2">
-                <div className="col-md-2">
-                    <label>Диспетчер</label>
-                    <div className="form-check">
-                        <input className="form-check-input"
-                            type="radio"
-                            name="isDispatcher"
-                            onChange={this.handleIsDispatcherChange}
-                            id="isDispatcher_on"
-                            value="on"
-                            form="profile-form"
-                            checked={isDispatcher}
-                        />
-                        <label className="form-check-label" htmlFor="isDispatcher_on">
-                            Да
-                        </label>
-                    </div>
-                    <div className="form-check">
-                        <input className="form-check-input"
-                            type="radio"
-                            name="isDispatcher"
-                            id="isDispatcher_off"
-                            value="off"
-                            onChange={this.handleIsDispatcherChange}
-                            form="profile-form"
-                            checked={!isDispatcher}
-                        />
-                        <label className="form-check-label" htmlFor="isDispatcher_off">
-                            Нет
-                        </label>
-                    </div>
+            <div className="form-row">
+                <div className="form-group">
+                    <FormControl>
+                        <FormLabel id="radio-buttons-group-label">Роль</FormLabel>
+                        <RadioGroup
+                            aria-labelledby="radio-buttons-group-label"
+                            name="radio-buttons-group"
+                            value={role}
+                            onChange={(e) => this.handleRoleChange(e)}>
+                            <FormControlLabel value="0" control={<Radio />} label="Mеханик" />
+                            <FormControlLabel value="1" control={<Radio />} label="Логист-администратор" />
+                            <FormControlLabel value="2" control={<Radio />} label="Диспетчер" />
+                            <FormControlLabel value="3" control={<Radio />} label="Бухгалтер первички" />
+                            <FormControlLabel value="4" control={<Radio />} label="Бухгалтер ЗП" />
+                        </RadioGroup>
+                    </FormControl>
                 </div>
             </div>
             {this.state.error && (
@@ -371,9 +348,9 @@ class UserForm extends Component {
                             <button type="submit" form="profile-form" className="btn btn-success ml-2" onClick={(e) => { this.handleSubmit(e) }}>
                                 Сохранить
                             </button>
-                        </div>   
+                        </div>
                     </div>
-                </div>             
+                </div>
             </div>
         </>
     }

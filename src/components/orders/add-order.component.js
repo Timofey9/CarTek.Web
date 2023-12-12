@@ -445,24 +445,25 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
                         <label>{addressA && addressA.textAddress}</label>
-                    </div>
-
-                    <div className="form-group col-md-6">
-                        <label>Выдача груза (10)</label>
-
-                        <Autocomplete
-                            className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
-                            options={addresses}
-                            disablePortal
-                            onChange={(e, newvalue) => { updateAddressInName(newvalue); setAddressB(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
-
-                        <label>{addressB && addressB.textAddress}</label>
 
                         <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
                             Добавить адрес
+                        </button>
+                    </div>
+
+                    <div className="form-row">
+                        <label>Тип груза (3)</label>
+                        <Autocomplete
+                            options={materialsList}
+                            disablePortal
+                            onChange={(e, newvalue) => { setMaterial(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.name}`}
+                            renderInput={(params) => <TextField {...params} label="Список материалов" />} />
+                        <div>{material && material.name}</div>
+
+                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
+                            Добавить тип груза
                         </button>
                     </div>
 
@@ -499,20 +500,20 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                         </button>
                     </div>
 
-                    <div className="form-row">
-                        <label>Тип груза (3)</label>
-                        <Autocomplete
-                            options={materialsList}
-                            disablePortal
-                            onChange={(e, newvalue) => { setMaterial(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.name}`}
-                            renderInput={(params) => <TextField {...params} label="Список материалов" />} />
-                        <div>{material && material.name}</div>
 
-                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
-                            Добавить тип груза
-                        </button>
+                    <div className="form-group col-md-6">
+                        <label>Выдача груза (10)</label>
+
+                        <Autocomplete
+                            className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
+                            options={addresses}
+                            disablePortal
+                            onChange={(e, newvalue) => { updateAddressInName(newvalue); setAddressB(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.textAddress}`}
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+
+                        <label>{addressB && addressB.textAddress}</label>
                     </div>
 
                     <div className="form-group col-md-6">

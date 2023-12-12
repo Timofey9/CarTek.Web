@@ -308,6 +308,11 @@ class ApiService {
         return res;
     }
 
+    RestoreTask(data) {
+        var res = this.post(`order/restoredrivertask`, data);
+        return res;
+    }
+
     async SubmitNoteAsync(data) {
         var res = await this.post(`drivers/postnote`, data, { 'Content-Type': 'multipart/form-data' });
         return await res;

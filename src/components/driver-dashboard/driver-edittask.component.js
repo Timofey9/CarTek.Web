@@ -655,6 +655,9 @@ const DriverEditTask = () => {
                     <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
 
+                    <dt className="col-sm-3">Услуга: </dt>
+                    <dd className="col-sm-9">{order.service === 0 ? "Перевозка" : "Поставка"}</dd>
+
                     <dt className="col-sm-3">Заказчик: </dt>
                     <dd className="col-sm-9">{customer.clientName}</dd>
 
@@ -666,6 +669,9 @@ const DriverEditTask = () => {
 
                     <dt className="col-sm-3">Себестоимость перевозки:</dt>
                     <dd className="col-sm-9">{driverTask.price}</dd>
+
+                    <dt className="col-sm-3">Транспорт :</dt>
+                    <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>)})}</dd>
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>

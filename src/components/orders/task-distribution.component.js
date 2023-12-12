@@ -153,7 +153,7 @@ const CarsWork = () => {
             name: "Создать",
             selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpen(row.id)}>+</Button>,
             center: true,
-            omit: localUser.identity && localUser.identity.isDispatcher
+            omit: localUser.identity && (localUser.identity.isDispatcher || localUser.identity.isInitialBookkeeper || localUser.identity.isSalaryBookkeeper)
         }
     ];
 
@@ -201,7 +201,7 @@ const CarsWork = () => {
         },
         {
             name: "Статус",
-            selector: (row, index) => <div>{constStatuses[row.status]}</div>,
+            selector: (row, index) => <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
             center: true,
             wrap: true,
             conditionalCellStyles: [
@@ -209,16 +209,6 @@ const CarsWork = () => {
                     when: row => row.status === 0,
                     style: {
                         backgroundColor: '#ff726f',
-                        color: 'white',
-                        '&:hover': {
-                            cursor: 'pointer',
-                        }
-                    }
-                },
-                {
-                    when: row => row.status === 10,
-                    style: {
-                        backgroundColor: '#696969',
                         color: 'white',
                         '&:hover': {
                             cursor: 'pointer',
@@ -238,6 +228,16 @@ const CarsWork = () => {
                     when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
                     style: {
                         backgroundColor: '#ffefac',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                },
+                {
+                    when: row => row.isCanceled,
+                    style: {
+                        backgroundColor: '#696969',
+                        color: 'white',
                         '&:hover': {
                             cursor: 'pointer',
                         }

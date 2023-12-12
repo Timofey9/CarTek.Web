@@ -19,6 +19,7 @@ const ClientsList = () => {
     const [selectedClient, setSelectedClient] = useState({});
     const [reload, setReload] = useState(0);
     const [open, setOpen] = useState(false);
+    const [filterText, setFilterText] = useState('');
 
     const handleClickOpen = (client) => {
         setOpen(true);
@@ -48,6 +49,23 @@ const ClientsList = () => {
 
         return () => cancelled = true
     }, [sortBy, dir, reload]);
+
+
+    const filteredItems = list.filter(
+        item => item.clientName && item.clientName.toLowerCase().includes(filterText.toLowerCase()),
+    );
+
+    const subHeaderComponentMemo = React.useMemo(() => {
+        const handleClear = () => {
+            if (filterText) {
+                setFilterText('');
+            }
+        };
+
+        return (
+            <input className="pull-left" value={filterText} placeholder="Поиск по имени" onChange={(e) => setFilterText(e.target.value)}></input>
+        );
+    }, [filterText]);
 
     const columns = [
         {
@@ -107,6 +125,9 @@ const ClientsList = () => {
                     <DataTable
                         columns={columns}
                         responsive
+                        subHeader
+                        subHeaderAlign="left"
+                        subHeaderComponent={subHeaderComponentMemo}
                         noHeader
                         highlightOnHover
                         defaultSortFieldId={1}
@@ -117,7 +138,7 @@ const ClientsList = () => {
                             !cancelled && setSortBy(column.sortBy);
                             !cancelled && setDir(direction);
                         }}
-                        data={list} />
+                        data={filteredItems} />
             }
                 </div>
         

@@ -14,10 +14,15 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import ViewTn from "./view-tn";
+import ButtonGroup from '@mui/material/ButtonGroup';
 import { useDebouncedCallback } from 'use-debounce';
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
@@ -45,6 +50,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const [subTaskId, setSubTaskId] = useState(0);
     const [open, setOpen] = useState(false);
     const [subTaskTnOpen, setSubTaskTnOpen] = useState(false);
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [reload, setReload] = useState(false);
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
@@ -65,6 +71,17 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
 
     const handleSubTaskTnClose = () => {
         setSubTaskTnOpen(false);
+        setReload(reload + 1);
+    };
+
+    const handleConfirmationClose = () => {
+        setConfirmationOpen(false);
+        setReload(reload + 1);
+    };
+
+    const handleConfirmationCloseSuccess = () => {
+        deleteTask();
+        setConfirmationOpen(false);
         setReload(reload + 1);
     };
 
@@ -158,7 +175,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
             case 3:
                 return "Сутки (неограниченно)";
         }
-    } 
+    }
 
     function deleteTask() {
         ApiService.deleteTask(driverTaskId)
@@ -177,6 +194,20 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         ApiService.CancelTask({ driverTaskId: driverTaskId })
             .then(({ data }) => {
                 alert("Статус обновлен");
+                handleCloseTaskForm();
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                setError(error.response.data.message);
+            });
+
+    }, 500);
+
+    const restoreTask = useDebouncedCallback((event) => {
+        ApiService.RestoreTask ({ driverTaskId: driverTaskId })
+            .then(({ data }) => {
+                alert("Статус обновлен");
+                handleCloseTaskForm();
                 setReload(reload + 1);
             })
             .catch((error) => {
@@ -237,8 +268,8 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         var data = {
-            "TaskId" : driverTask.id,
-            "DriverId" : driver.id,
+            "TaskId": driverTask.id,
+            "DriverId": driver.id,
             "CarId": car.id,
             "AdminComment": adminComment,
             "OrderId": order.id,
@@ -262,19 +293,35 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
         {!loading && (
             <>
                 <div className="row">
-                    <div className="col-md-6"> 
+                    <div className="col-md-6">
                         <h1>Задача по заявке для "{order.clientName}"</h1>
                     </div>
-                    {localUser.identity && !localUser.identity.isDispatcher &&
+                    {localUser.identity && !localUser.identity.isDispatcher && !localUser.identity.isSalaryBookkeeper &&
                         <div className="col-md-6">
-                            <button onClick={() => deleteTask()} className="btn btn-danger mr-10">Удалить</button>
-                            <button onClick={() => cancelTask()} className="btn btn-warning mr-10">Отменить</button>
-                            <button onClick={() => handleClickOpen()} className="btn btn-success mr-10">ТН</button>
-                            {isEdit
-                                ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success">Сохранить</button>
-                                : <button onClick={() => setIsEdit(true)} className="btn btn-warning">Редактировать</button>
-                            }
-                        </div>                        
+
+                            <div className="btn-group">
+                                {!localUser.identity.isInitialBookkeeper &&
+                                    <>
+                                        <button onClick={() => setConfirmationOpen(true)} className="btn btn-danger mr-10">Удалить</button>
+
+                                    {!driverTask.isCanceled ? <button onClick={() => cancelTask()} className="btn btn-secondary mr-10">Отменить</button> :
+                                        <button onClick={() => restoreTask()} className="btn btn-success mr-10">Восстановить</button>}
+                                    </>
+                                }
+
+                                <button onClick={() => handleClickOpen()} className="btn btn-info mr-10">ТН</button>
+
+                                {!localUser.identity.isInitialBookkeeper &&
+                                    <>
+                                        {isEdit
+                                            ? <button onClick={(event) => handleSubmit(event)} className="btn btn-success mr-10">Сохранить</button>
+                                            : <button onClick={() => setIsEdit(true)} className="btn btn-warning">Редактировать</button>}
+                                    </>
+                                }
+                            </div>
+
+
+                        </div>
                     }
                 </div>
 
@@ -283,7 +330,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     <dd className="col-sm-9">
                         {isEdit &&
                             <Autocomplete
-                            options={orders}
+                                options={orders}
                                 disablePortal
                                 onChange={(e, newvalue) => setOrder(newvalue)}
                                 sx={{ width: 300 }}
@@ -311,8 +358,8 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.fullName}`}
                                 renderInput={(params) => <TextField {...params} label="Выберите водителя" />} />}
-                            
-                            <span>{driver.fullName}</span>
+
+                        <span>{driver.fullName}</span>
                     </dd>
 
                     <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -328,7 +375,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.brand}:${option.plate}`}
                                 renderInput={(params) => <TextField {...params} label="Выберите тягач" />}
-                            />}                            
+                            />}
                         <span>{car.plate}</span>
                     </dd>
 
@@ -353,7 +400,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     <dd className="col-sm-9">{
                         isEdit ? <div className="form-group col-md-6">
                             <ShiftRadioButtonGroup value={shift} onChange={handleShiftChange}></ShiftRadioButtonGroup>
-                        </div> : <span>{intToShift(driverTask.shift)}</span>}                        
+                        </div> : <span>{intToShift(driverTask.shift)}</span>}
                     </dd>
 
                     <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -365,7 +412,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
 
                     <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
-            
+
                     <Divider className="m-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
@@ -428,7 +475,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                             <div className="col-md-2">
                                 <label>Рейс #{task.sequenceNumber + 1}</label>
                                 <button onClick={() => handleClickSubTaskTnOpen(task.id)} className="btn btn-success mr-10">ТН</button>
-                                <button  className="btn btn-danger" onClick={() => deleteSubTask(task.id)} className="btn btn-danger mr-10"><i className="fa fa-trash" aria-hidden="true"></i></button>
+                                <button className="btn btn-danger" onClick={() => deleteSubTask(task.id)} className="btn btn-danger mr-10"><i className="fa fa-trash" aria-hidden="true"></i></button>
                                 <Stepper orientation="vertical" activeStep={task.status}>
                                     {constStatuses.map((label, index) => {
                                         const stepProps = {};
@@ -437,7 +484,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                             <Step key={label} {...stepProps} expanded={true}>
                                                 <StepLabel {...labelProps}>{label}</StepLabel>
                                                 <StepContent>
-                                                    {task.notes && task.notes.filter((n) => n.status+1 === index).map((note, noteindex) => {
+                                                    {task.notes && task.notes.filter((n) => n.status + 1 === index).map((note, noteindex) => {
                                                         let showLinks = false;
                                                         let links;
                                                         if (note.s3Links.length > 0) {
@@ -495,6 +542,27 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                 </Toolbar>
             </AppBar>
             <ViewTn driverTaskId={subTaskId} isSubTask={'true'} handleClose={handleSubTaskTnClose}></ViewTn>
+        </Dialog>
+
+        <Dialog
+            open={confirmationOpen}
+            onClose={handleConfirmationClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description">
+            <DialogTitle id="alert-dialog-title">
+                {"Подтвердите действие"}
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    Вы действительно хотите удалить задачу?
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleConfirmationClose}>Нет</Button>
+                <Button onClick={handleConfirmationCloseSuccess} autoFocus>
+                    Да
+                </Button>
+            </DialogActions>
         </Dialog>
     </div>
 };

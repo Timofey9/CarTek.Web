@@ -73,9 +73,8 @@ class App extends Component {
         if (user) {
             this.setState({
                 currentUser: user,
-                showModeratorBoard: user.identity.isAdmin,
                 showAdminBoard: user.identity.isAdmin,
-                isDispatcher: user.identity.isDispatcher,
+                isDispatcher: user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper,
                 showDriver: user.isDriver
             });
         }
@@ -212,20 +211,21 @@ class App extends Component {
                         <Route exact path="/cars/acceptCar/:uniqueId" element={<RequireAuth currentUser={currentUser}><AcceptanceComponent /></RequireAuth>} />
                         <Route exact path="/questionary/car/:plate" element={<RequireAuth currentUser={currentUser}><Questionary /></RequireAuth>} />
                         <Route exact path="/questionary/details/:uniqueId" element={<RequireAuth currentUser={currentUser}><QuestionaryDetailsComponent /></RequireAuth>} />
-                        <Route exact path="/admin" element={<RequireAuth currentUser={currentUser}><BoardAdmin /></RequireAuth>} />
-                        <Route exact path="/admin/user/" element={<RequireAuth currentUser={currentUser}><UserForm /></RequireAuth>} />
-                        <Route exact path="/admin/user/:login" element={<RequireAuth currentUser={currentUser}><UserForm /></RequireAuth>} />
-                        <Route exact path="/admin/users" element={<RequireAuth currentUser={currentUser}><UsersList /></RequireAuth>} />
-                        <Route exact path="/admin/drivers" element={<RequireAuth currentUser={currentUser}><DriversList /></RequireAuth>} />
-                        <Route exact path="/admin/driver" element={<RequireAuth currentUser={currentUser}><DriverForm /></RequireAuth>} />
-                        <Route exact path="/admin/driver/:driverId" element={<RequireAuth currentUser={currentUser}><DriverForm /></RequireAuth>} />
-                        <Route exact path="/admin/orders" element={<RequireAuth currentUser={currentUser}><OrdersList /></RequireAuth>} />
-                        <Route exact path="/admin/workload" element={<RequireAuth currentUser={currentUser}><CarsWork /></RequireAuth>} />
-                        <Route exact path="/admin/orders/create" element={<RequireAuth currentUser={currentUser}><OrderForm /></RequireAuth>} />
-                        <Route exact path="/admin/addresses" element={<RequireAuth currentUser={currentUser}><AddressesList /></RequireAuth>} />
-                        <Route exact path="/admin/clients" element={<RequireAuth currentUser={currentUser}><ClientsList /></RequireAuth>} />
-                        <Route exact path="/admin/materials" element={<RequireAuth currentUser={currentUser}><MaterialsList /></RequireAuth>} />
-                        <Route exact path="/admin/drivertask/:driverTaskId" element={<RequireAuth currentUser={currentUser}><AdminEditTask /></RequireAuth>} />
+
+                        <Route exact path="/admin" element={<RequireAuth currentUser={currentUser}><RequireAdmin><BoardAdmin /></RequireAdmin></RequireAuth>} />
+                        <Route exact path="/admin/user/" element={<RequireAuth currentUser={currentUser}><RequireAdmin><UserForm /></RequireAdmin></RequireAuth>} />
+                        <Route exact path="/admin/user/:login" element={<RequireAuth currentUser={currentUser}><RequireAdmin><UserForm /></RequireAdmin></RequireAuth>} />
+                        <Route exact path="/admin/users" element={<RequireAuth currentUser={currentUser}><RequireAdmin> <UsersList /> </RequireAdmin></RequireAuth>} />
+                        <Route exact path="/admin/drivers" element={<RequireAuth currentUser={currentUser}><RequireAdmin> <DriversList /> </RequireAdmin></RequireAuth>} />
+                        <Route exact path="/admin/driver" element={<RequireAuth currentUser={currentUser}><RequireAdmin> <DriverForm /> </RequireAdmin></RequireAuth>} />
+                        <Route exact path="/admin/driver/:driverId" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <DriverForm /> </RequireAdmin> </RequireAuth>} />
+                        <Route exact path="/admin/orders" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <OrdersList /> </RequireAdmin> </RequireAuth>} />
+                        <Route exact path="/admin/workload" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <CarsWork /> </RequireAdmin> </RequireAuth>} />
+                        <Route exact path="/admin/orders/create" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <OrderForm /> </RequireAdmin> </RequireAuth>} />
+                        <Route exact path="/admin/addresses" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <AddressesList /> </RequireAdmin> </RequireAuth>} />
+                        <Route exact path="/admin/clients" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <ClientsList /> </RequireAdmin> </RequireAuth>} />
+                        <Route exact path="/admin/materials" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <MaterialsList /> </RequireAdmin> </RequireAuth>} />
+                        <Route exact path="/admin/drivertask/:driverTaskId" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <AdminEditTask /> </RequireAdmin> </RequireAuth>} />
                     </Routes>
                 </div>
 
@@ -237,10 +237,8 @@ class App extends Component {
 
 
 function RequireAuth({ currentUser, isDriverComponent, children }) {
-
     let user = JSON.parse(localStorage.getItem("user"));
     let isAuthenticated = user !== null;
-
     
     if (isAuthenticated && isDriverComponent === undefined && user.isDriver) {
         return <Navigate to="/driver-dashboard" />;
@@ -250,9 +248,13 @@ function RequireAuth({ currentUser, isDriverComponent, children }) {
 }
 
 function RequireAdmin({ currentUser, children }) {
-    let user = localStorage.getItem("user");
+    let user = JSON.parse(localStorage.getItem("user"));
     let isAuthenticated = user !== null;
-    return isAuthenticated ? children : <Navigate to="/login" />;
+    if (user === null) {
+        return <Navigate to="/login" />;
+    }
+    let hasAdminPrivileges = user.identity.isAdmin || user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper;
+    return isAuthenticated && hasAdminPrivileges ? children : <Navigate to="/" />;
 }
 
 function mapStateToProps(state) {

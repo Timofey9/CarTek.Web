@@ -96,7 +96,7 @@ function Home() {
                                     </div>
                                     <div className="row mt-3">
                                         <div className="col d-flex justify-content-center">
-                                            <Link id="goToQuestionary" to={`/questionary/car/${car.plate}`} onClick={(e) => clearStorage(e)} className="btn btn-success">Перейти к осмотру</Link>
+                                            <Link id="goToQuestionary" to={`/questionary/car/${car.id}`} onClick={(e) => clearStorage(e)} className="btn btn-success">Перейти к осмотру</Link>
                                         </div>
                                     </div>
                                 </div>) : (<div></div>)}

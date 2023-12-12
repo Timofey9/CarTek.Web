@@ -102,7 +102,7 @@ const OrdersList = () => {
             case 3:
                 return "Сутки (неограниченно)";
         }
-    } 
+    }
 
     const search = () => {
         setReload(reload + 1);
@@ -115,8 +115,8 @@ const OrdersList = () => {
         }).then(response => {
             let url = window.URL
                 .createObjectURL(new Blob([response.data]));
-            saveAs(url, "заявки.xlsx");    
-            });
+            saveAs(url, "заявки.xlsx");
+        });
     };
 
     const downloadFullTasks = () => {
@@ -126,8 +126,8 @@ const OrdersList = () => {
         }).then(response => {
             let url = window.URL
                 .createObjectURL(new Blob([response.data]));
-            saveAs(url, "задачи.xlsx");    
-            });
+            saveAs(url, "задачи.xlsx");
+        });
     };
 
     const downloadTnsFile = () => {
@@ -137,8 +137,8 @@ const OrdersList = () => {
         }).then(response => {
             let url = window.URL
                 .createObjectURL(new Blob([response.data]));
-            saveAs(url, "реестр.xlsx");    
-            });
+            saveAs(url, "реестр.xlsx");
+        });
     };
 
 
@@ -149,8 +149,8 @@ const OrdersList = () => {
         }).then(response => {
             let url = window.URL
                 .createObjectURL(new Blob([response.data]));
-            saveAs(url, "реестр_зп.xlsx");    
-            });
+            saveAs(url, "реестр_зп.xlsx");
+        });
     };
 
 
@@ -160,8 +160,8 @@ const OrdersList = () => {
         }).then(response => {
             let url = window.URL
                 .createObjectURL(new Blob([response.data]));
-            saveAs(url, "TN.xlsx");    
-            });
+            saveAs(url, "TN.xlsx");
+        });
     };
 
     const ExpandedComponent = ({ data }) => <pre>
@@ -225,55 +225,55 @@ const OrdersList = () => {
                     cursor: 'pointer',
                 }
             }
-        }          
+        }
     ];
 
     const columns = [
         {
             name: "Название",
             selector: (row, index) => <div>{row.name}</div>,
-            wrap:true
-        },    
+            wrap: true
+        },
         {
             name: "Заказчик",
             selector: (row, index) => <div>{row.service === 0 ? (row.client && row.client.clientName) : (row.gp && row.gp.clientName)}</div>,
-            wrap:true
-        },   
+            wrap: true
+        },
         {
             name: "Услуга",
             selector: (row, index) => <div>{row.service === 0 ? "Перевозка" : "Поставка"}</div>,
             center: true,
-        },    
+        },
         {
             name: "Дата",
             selector: (row, index) => buildDates(new Date(row.startDate), new Date(row.dueDate)),
             wrap: true,
             center: true,
-        },    
+        },
         {
             name: "Погрузка",
             selector: (row, index) => row.locationA,
             wrap: true,
-        },    
+        },
         {
             name: "Выгрузка",
             selector: (row, index) => row.locationB,
             wrap: true,
-        },         
+        },
         {
             name: "Материал",
             selector: (row, index) => <div>{row.material && row.material.name}</div>,
             wrap: true
-        },    
+        },
         {
             name: "Задачи",
             selector: (row, index) => <div>{row.driverTasks.length}/{row.carCount}</div>,
             center: true,
             compact: true
-        },    
+        },
         {
             name: "Действия",
-            selector: (row, index) => 
+            selector: (row, index) =>
                 <ButtonGroup orientation="vertical" size="medium" variant="contained" aria-label="small button group">
                     <Button disabled={row.driverTasks.length >= row.carCount} onClick={e => handleClickOpen(row)}><i className="fa fa-plus" aria-hidden="true"></i></Button>
                     <Button onClick={e => handleClickOpenEditOrder(row.id)}><i className="fa fa-external-link" aria-hidden="true"></i></Button>
@@ -281,7 +281,7 @@ const OrdersList = () => {
                 </ButtonGroup>,
             center: true,
             wrap: true,
-            omit: localUser.identity && localUser.identity.isDispatcher
+            omit: localUser.identity && (localUser.identity.isDispatcher || localUser.identity.isInitialBookkeeper || localUser.identity.isSalaryBookkeeper)
         }
     ];
 
@@ -291,7 +291,7 @@ const OrdersList = () => {
             selector: (row, index) => <div>{row.driver.fullName}</div>,
             center: true,
             grow: 2,
-            wrap:true
+            wrap: true
         },
         {
             name: "Тягач",
@@ -307,9 +307,9 @@ const OrdersList = () => {
         },
         {
             name: "Статус",
-            selector: (row, index) => <div>{constStatuses[row.status]}</div>,
+            selector: (row, index) => <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
             center: true,
-            wrap:true,
+            wrap: true,
             conditionalCellStyles: [
                 {
                     when: row => row.status === 0,
@@ -331,16 +331,6 @@ const OrdersList = () => {
                     }
                 },
                 {
-                    when: row => row.status === 10,
-                    style: {
-                        backgroundColor: '#696969',
-                        color: 'white',
-                        '&:hover': {
-                            cursor: 'pointer',
-                        }
-                    }
-                },
-                {
                     when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
                     style: {
                         backgroundColor: '#ffefac',
@@ -349,6 +339,16 @@ const OrdersList = () => {
                         }
                     }
                 },
+                {
+                    when: row => row.isCanceled,
+                    style: {
+                        backgroundColor: '#696969',
+                        color: 'white',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                }
             ]
         },
         {
@@ -404,7 +404,7 @@ const OrdersList = () => {
 
 
     const buildDates = (start, end) => {
-        return `${start.getDate()}-${end.toLocaleDateString('ru-Ru', {day: '2-digit',month: '2-digit',year: 'numeric'})}`
+        return `${start.getDate()}-${end.toLocaleDateString('ru-Ru', { day: '2-digit', month: '2-digit', year: 'numeric' })}`
     }
 
     if (loading) {
@@ -427,7 +427,7 @@ const OrdersList = () => {
                         </div>
                     </div>
                 </div>
-                {localUser.identity && !localUser.identity.isDispatcher &&
+                {localUser.identity && localUser.identity.isAdmin &&
                     <div className="form-group col-md-4">
                         <Button variant="contained" color="success" onClick={() => handleClickOpenOrder()} className="pull-right mb-2">Создать заявку</Button>
                     </div>
@@ -458,10 +458,14 @@ const OrdersList = () => {
                 <div className="col-md-12">
                     <div className="input-group-append pl-2">
                         <ButtonGroup size="medium" variant="contained" aria-label="small button group">
-                            <Button onClick={(e) => { e.preventDefault(); downloadTnsFile(); }}>Реестр ТН</Button>
-                            <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>
+                            {localUser.identity && !localUser.identity.isDispatcher &&
+                                <>
+                                    <Button onClick={(e) => { e.preventDefault(); downloadTnsFile(); }}>Реестр ТН</Button>
+                                    <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>
+                                </>
+                            }
                             <Button onClick={(e) => { e.preventDefault(); downloadFile(); }}>Заявки</Button>
-                            <Button onClick={(e) => { downloadFullTasks(); } }>Задачи</Button>
+                            <Button onClick={(e) => { downloadFullTasks(); }}>Задачи</Button>
                         </ButtonGroup>
                     </div>
                 </div>

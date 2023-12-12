@@ -19,6 +19,7 @@ const MaterialsList = () => {
     const [selectedMaterial, setSelectedMaterial] = useState({});
     const [reload, setReload] = useState(0);
     const [open, setOpen] = useState(false);
+    const [filterText, setFilterText] = useState('');
 
     const handleClickOpen = (material) => {
         setOpen(true);
@@ -34,6 +35,22 @@ const MaterialsList = () => {
         setOpen(false);
         setReload(reload + 1);
     };
+
+    const filteredItems = list.filter(
+        item => item.name && item.name.toLowerCase().includes(filterText.toLowerCase()),
+    );
+
+    const subHeaderComponentMemo = React.useMemo(() => {
+        const handleClear = () => {
+            if (filterText) {
+                setFilterText('');
+            }
+        };
+
+        return (
+            <input className="pull-left" value={filterText} placeholder="Поиск по названию" onChange={(e) => setFilterText(e.target.value)}></input>
+        );
+    }, [filterText]);
 
     useEffect(() => {
         !cancelled && setLoading(true);
@@ -90,6 +107,9 @@ const MaterialsList = () => {
                         columns={columns}
                         responsive
                         noHeader
+                        subHeader
+                        subHeaderAlign="left"
+                        subHeaderComponent={subHeaderComponentMemo}
                         highlightOnHover
                         defaultSortAsc
                         progressPending={loading}
@@ -98,7 +118,7 @@ const MaterialsList = () => {
                             !cancelled && setSortBy(column.sortBy);
                             !cancelled && setDir(direction);
                         }}
-                        data={list}
+                        data={filteredItems}
                     />
                 </div>
         }

@@ -13,7 +13,8 @@ registerLocale('ru', ru);
 
 const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена', 'Отменена'];
 
-const rowPreDisabled = row => row.subTasks < 1;
+const rowPreDisabled = row => row.subTasksCount < 1;
+const rowPreExpanded = row => row.subTasksCount > 0;
 
 const columnsSubTasks = [
     {
@@ -48,7 +49,7 @@ const columnsSubTasks = [
                 }
             },
             {
-                when: row => row.status === 10,
+                when: row => row.isCanceled,
                 style: {
                     backgroundColor: '#696969',
                     color: 'white',
@@ -201,7 +202,7 @@ const MyTasksList = () => {
         },
         {
             name: "Статус",
-            selector: (row, index) => constStatuses[row.status],
+            selector: (row, index) => <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
             center: true,
             wrap: true
         },
@@ -234,19 +235,19 @@ const MyTasksList = () => {
             }
         },
         {
-            when: row => row.status === 10,
+            when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
             style: {
-                backgroundColor: '#696969',
-                color: 'white',
+                backgroundColor: '#ffefac',
                 '&:hover': {
                     cursor: 'pointer',
                 }
             }
         },
         {
-            when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
+            when: row => row.isCanceled,
             style: {
-                backgroundColor: '#ffefac',
+                backgroundColor: '#696969',
+                color: 'white',
                 '&:hover': {
                     cursor: 'pointer',
                 }
@@ -344,6 +345,7 @@ const MyTasksList = () => {
             pagination
             expandableRows
             expandableRowDisabled={rowPreDisabled}
+            expandableRowExpanded={rowPreExpanded}
             expandableRowsComponent={ExpandedComponent}
             onChangePage={(page, totalRows) => {
                 !cancelled && setPageNumber(page);

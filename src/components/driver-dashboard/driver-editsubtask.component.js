@@ -81,7 +81,7 @@ const DriverEditSubTask = () => {
     const [hasSubTask, setHasSubTask] = useState(true);
     const [continueWork, setContinueWork] = useState(false);
     const [validated, setValidated] = useState(true);
-
+    const [customer, setCustomer] = useState({});
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [openAddress, setOpenAddress] = useState(false);
@@ -448,6 +448,7 @@ const DriverEditSubTask = () => {
                     setStatus(data.status);
                     setNotes(data.notes);
                     setCar(data.driverTask.car);
+                    setCustomer(data.driverTask.orderCustomer);
 
                     if (data.status === 4 || data.status === 7) {
                         scrollToTop();
@@ -553,8 +554,18 @@ const DriverEditSubTask = () => {
                     <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
 
+                    <dt className="col-sm-3">Услуга: </dt>
+                    <dd className="col-sm-9">{order.service === 0 ? "Перевозка" : "Поставка"}</dd>
+
+                    <dt className="col-sm-3">Заказчик: </dt>
+                    <dd className="col-sm-9">{customer.clientName}</dd>
+
                     <dt className="col-sm-3">Себестоимость перевозки:</dt>
                     <dd className="col-sm-9">{order.price}</dd>
+
+
+                    <dt className="col-sm-3">Транспорт :</dt>
+                    <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>) })}</dd>
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>

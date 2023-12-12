@@ -19,6 +19,7 @@ const AddressesList = () => {
     const [open, setOpen] = useState(false);
     const [selectedAddress, setSelectedAddress] = useState({});
     const [reload, setReload] = useState(0);
+    const [filterText, setFilterText] = useState('');
 
     useEffect(() => {
         !cancelled && setLoading(true);
@@ -50,6 +51,22 @@ const AddressesList = () => {
         setReload(reload + 1);
     };
 
+
+    const filteredItems = list.filter(
+        item => item.textAddress && item.textAddress.toLowerCase().includes(filterText.toLowerCase()),
+    );
+
+    const subHeaderComponentMemo = React.useMemo(() => {
+        const handleClear = () => {
+            if (filterText) {
+                setFilterText('');
+            }
+        };
+
+        return (
+            <input className="pull-left" value={filterText} placeholder="Поиск по названию" onChange={(e) => setFilterText(e.target.value)}></input>
+        );
+    }, [filterText]);
 
     const columns = [
         {
@@ -102,6 +119,9 @@ const AddressesList = () => {
                         columns={columns}
                         responsive
                         noHeader
+                        subHeader
+                        subHeaderAlign="left"
+                        subHeaderComponent={subHeaderComponentMemo}
                         highlightOnHover
                         defaultSortFieldId={1}
                         defaultSortAsc
@@ -111,12 +131,10 @@ const AddressesList = () => {
                             !cancelled && setSortBy(column.sortBy);
                             !cancelled && setDir(direction);
                         }}
-                        data={list}
+                        data={filteredItems}
                     />}
                 </div>
-
-        
-
+       
         <Dialog
             fullScreen
             open={open}
