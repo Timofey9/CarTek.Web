@@ -590,8 +590,7 @@ const DriverEditSubTask = () => {
 
 
                 </dl>
-
-                <div className="form-row">
+                {status < 9 && <>                <div className="form-row">
                     <div className="form-group col-md-6">
                         <label>Номер ТН</label>
                         <input
@@ -660,7 +659,7 @@ const DriverEditSubTask = () => {
                             type="number"
                             step="0.1"
                             form="profile-form"
-                            onChange={(e) => updateVolume(setLoadVolume,e.target.value)}
+                            onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
                             value={loadVolume} />
                     </div>
 
@@ -694,7 +693,7 @@ const DriverEditSubTask = () => {
                                         type="number"
                                         step="0.1"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setLoadVolume2,e.target.value)}
+                                        onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
                                         value={loadVolume2} />
                                 </div>
 
@@ -745,172 +744,173 @@ const DriverEditSubTask = () => {
 
                 </div>
 
-                <div className="form-row">
-                    <div className="form-group col-md-6">
-                        <label>Объем выгрузки</label>
-                        <input
-                            className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                            type="number"
-                            step="0.1"
-                            form="profile-form"
-                            onChange={(e) => updateVolume(setUnloadVolume,e.target.value)}
-                            value={unloadVolume} />
+                    <div className="form-row">
+                        <div className="form-group col-md-6">
+                            <label>Объем выгрузки</label>
+                            <input
+                                className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                type="number"
+                                step="0.1"
+                                form="profile-form"
+                                onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
+                                value={unloadVolume} />
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <FormControl>
+                                <FormLabel id="radio-label">Ед. измерения</FormLabel>
+                                <RadioGroup row
+                                    className={validated && unloadUnit === "none" ? "not-valid-input-border" : ""}
+                                    aria-labelledby="radio-label"
+                                    name="radio-buttons"
+                                    value={unloadUnit}
+                                    onChange={(e) => setUnloadUnit(e.target.value)}>
+                                    <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                    <FormControlLabel value="1" control={<Radio />} label="Тонны" />
+                                </RadioGroup>
+                            </FormControl>
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <Accordion>
+                                <AccordionSummary
+                                    aria-controls="panel2a-content"
+                                    id="panel2a-header">
+                                    <Typography>Также в другой ед. измерения</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <div className="form-group col-md-6">
+                                        <label>Объем выгрузки</label>
+                                        <input
+                                            className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                            type="number"
+                                            step="0.1"
+                                            form="profile-form"
+                                            onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
+                                            value={unloadVolume2} />
+                                    </div>
+
+                                    <div className="form-group col-md-6">
+                                        <FormControl>
+                                            <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
+                                            <RadioGroup row
+                                                className={validated && unloadUnit2 === "none" ? "not-valid-input-border" : ""}
+                                                aria-labelledby="buttons-group-label"
+                                                name="buttons-group"
+                                                value={unloadUnit2}
+                                                onChange={(e) => setUnloadUnit2(e.target.value)}>
+                                                <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </div>
+                                </AccordionDetails>
+                            </Accordion>
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Адрес выгрузки (10)</label>
+                            <Autocomplete
+                                className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
+                                options={addresses}
+                                disablePortal
+                                key={addressBKey}
+                                onChange={(e, newvalue) => { setAddressB(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.textAddress}`}
+                                renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата прибытия на адрес выгрузки</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy"
+                                selected={dropOffArrivalDate} onChange={(date) => { setDropOffArrivalDate(date) }} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата выезда с адреса выгрузки</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffDepartureDate} onChange={(date) => { setDropOffDepartureDate(date) }} />
+                        </div>
+
                     </div>
-
-                    <div className="form-group col-md-6">
-                        <FormControl>
-                            <FormLabel id="radio-label">Ед. измерения</FormLabel>
-                            <RadioGroup row
-                                className={validated && unloadUnit === "none" ? "not-valid-input-border" : ""}
-                                aria-labelledby="radio-label"
-                                name="radio-buttons"
-                                value={unloadUnit}
-                                onChange={(e) => setUnloadUnit(e.target.value)}>
-                                <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                            </RadioGroup>
-                        </FormControl>
-                    </div>
-
-                    <div className="form-group col-md-6">
-                        <Accordion>
-                            <AccordionSummary
-                                aria-controls="panel2a-content"
-                                id="panel2a-header">
-                                <Typography>Также в другой ед. измерения</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <div className="form-group col-md-6">
-                                    <label>Объем выгрузки</label>
-                                    <input
-                                        className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                        type="number"
-                                        step="0.1"
-                                        form="profile-form"
-                                        onChange={(e) => updateVolume(setUnloadVolume2,e.target.value)}
-                                        value={unloadVolume2} />
-                                </div>
-
-                                <div className="form-group col-md-6">
-                                    <FormControl>
-                                        <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
-                                        <RadioGroup row
-                                            className={validated && unloadUnit2 === "none" ? "not-valid-input-border" : ""}
-                                            aria-labelledby="buttons-group-label"
-                                            name="buttons-group"
-                                            value={unloadUnit2}
-                                            onChange={(e) => setUnloadUnit2(e.target.value)}>
-                                            <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                            <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                        </RadioGroup>
-                                    </FormControl>
-                                </div>
-                            </AccordionDetails>
-                        </Accordion>
-                    </div>
-
-                    <div className="form-group col-md-6">
-                        <label>Адрес выгрузки (10)</label>
-                        <Autocomplete
-                            className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
-                            options={addresses}
-                            disablePortal
-                            key={addressBKey}
-                            onChange={(e, newvalue) => { setAddressB(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
-                    </div>
-
-                    <div className="input-group mb-3 col-md-6 pl-1">
-                        <label>Дата прибытия на адрес выгрузки</label>
-                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy"
-                            selected={dropOffArrivalDate} onChange={(date) => { setDropOffArrivalDate(date) }} />
-                    </div>
-
-                    <div className="input-group mb-3 col-md-6 pl-1">
-                        <label>Дата выезда с адреса выгрузки</label>
-                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffDepartureDate} onChange={(date) => { setDropOffDepartureDate(date) }} />
-                    </div>
-
-                </div>
-                <div>
-                    <>
-                        <div className="row mt-3 mb-3">
-                            <div className="col-md-9">
-                                <div className="alert alert-danger" role="alert">
-                                    ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            {hasFiles("imageFileInputTN") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN")} aria-label="delete">
-                                                <i className="fa fa-cancel"></i>  </IconButton>}
-                                            <input type="file" id="imageFileInputTN" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                    <div>
+                        <>
+                            <div className="row mt-3 mb-3">
+                                <div className="col-md-9">
+                                    <div className="alert alert-danger" role="alert">
+                                        ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                {hasFiles("imageFileInputTN") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN")} aria-label="delete">
+                                                    <i className="fa fa-cancel"></i>  </IconButton>}
+                                                <input type="file" id="imageFileInputTN" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="row mt-3 mb-3">
-                            <div className="col-md-9">
-                                <div className="alert alert-danger" role="alert">
-                                    ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            {hasFiles("imageFileInputTN2") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN2")} aria-label="delete">
-                                                <i className="fa fa-cancel" aria-hidden="true"></i>  </IconButton>}
-                                            <input type="file" id="imageFileInputTN2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
+                            <div className="row mt-3 mb-3">
+                                <div className="col-md-9">
+                                    <div className="alert alert-danger" role="alert">
+                                        ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                {hasFiles("imageFileInputTN2") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN2")} aria-label="delete">
+                                                    <i className="fa fa-cancel" aria-hidden="true"></i>  </IconButton>}
+                                                <input type="file" id="imageFileInputTN2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </>
-                </div>
-                <div className="row mt-3">
-                    {status <= 8 &&
-                        <div className="col-md-9">
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <textarea id="acceptanceComment" value={note} onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
-                                </div>
-                            </div>
-                            {status !== 7 &&
+                        </>
+                    </div>
+                    <div className="row mt-3">
+                        {status <= 8 &&
+                            <div className="col-md-9">
                                 <div className="row">
                                     <div className="col-md-12">
-                                        <label htmlFor="files">Прикрепить фотографии</label>
-                                        <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
+                                        <textarea id="acceptanceComment" value={note} onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
                                     </div>
-                                </div>}
+                                </div>
+                                {status !== 7 &&
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <label htmlFor="files">Прикрепить фотографии</label>
+                                            <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
+                                        </div>
+                                    </div>}
 
 
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="col-md-3">
-                                        <button type="submit" onClick={handleSubmitNote} className="btn btn-primary mt-3">
-                                            Отправить комментарий/фото
+                                <div className="row">
+                                    <div className="col-md-12">
+                                        <div className="col-md-3">
+                                            <button type="submit" onClick={handleSubmitNote} className="btn btn-primary mt-3">
+                                                Отправить комментарий/фото
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="row mb-5">
+                                    <div className="col-md-12">
+                                        <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
+                                            {statusToButtonTxt(status)}
                                         </button>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="row mb-5">
-                                <div className="col-md-12">
-                                    <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
-                                        {statusToButtonTxt(status)}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {error &&
-                                <div className="row d-flex justify-content-center mt-3">
-                                    <div className="alert alert-danger mt-2" role="alert">
-                                        {error}
+                                {error &&
+                                    <div className="row d-flex justify-content-center mt-3">
+                                        <div className="alert alert-danger mt-2" role="alert">
+                                            {error}
+                                        </div>
                                     </div>
-                                </div>
-                            }
-                        </div>}
-                </div>
+                                }
+                            </div>}
+                    </div></> }
+
 
                 {status === 9 && driverTask.shift === 3 &&
                     <>
@@ -922,11 +922,6 @@ const DriverEditSubTask = () => {
                             </div>
                         </div>
                         <div className="row mt-3 mb-3">
-                            <div className="col-md-12">
-                                <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
-                                    На шаг назад
-                                </button>
-                            </div>
                             <div className="col-md-12">
                                 <button type="submit" onClick={createSubTask} className="btn btn-success mt-3">
                                     Продолжить

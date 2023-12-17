@@ -392,36 +392,31 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
-                    <div className="form-group col-md-6">
-                        <label className="bold-label">Грузоотправитель (1)</label>
-                        {isEdit && <Autocomplete
-                            options={clients}
-                            disablePortal
-                            onChange={(e, newvalue) => { setClient(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.clientName}`}
-                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
-                        <label>{client && client.clientName}</label>
+                    <div className="form-row">
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label className="bold-label">Дата начала</label>
+                            <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => updateStartDate(date)} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label className="bold-label">Срок выполнения</label>
+                            <DatePicker disabled dateFormat="dd.MM.yyyy" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
+                        </div>
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Грузополучатель (2)</label>
+                        <label className="bold-label">Адрес погрузки (8)</label>
                         {isEdit && <Autocomplete
-                            options={clients}
+                            options={addresses}
                             disablePortal
-                            onChange={(e, newvalue) => { setGp(newvalue) }}
+                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
                             sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.clientName}`}
-                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
-                        <label>{gp && gp.clientName}</label>
-                    </div>
+                            getOptionLabel={(option) => `${option.textAddress}`}
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
-                    <div className="form-group col-md-6">
-                        {isEdit && <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
-                            Добавить юр.лицо
-                        </button>}
+                        <label>{addressA && addressA.textAddress}</label>
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -442,6 +437,59 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                                     Добавить тип груза
                                 </button></>}
 
+                    </div>
+
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <div className="form-group col-md-6">
+                        <label className="bold-label">Грузоотправитель (1)</label>
+                        {isEdit && <Autocomplete
+                            options={clients}
+                            disablePortal
+                            onChange={(e, newvalue) => { setClient(newvalue); updateCustomer(newvalue); }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.clientName}`}
+                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
+                        <label>{client && client.clientName}</label>
+                    </div>
+
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <div className="form-group col-md-6">
+                        <label className="bold-label">Грузополучатель (2)</label>
+                        {isEdit && <Autocomplete
+                            options={clients}
+                            disablePortal
+                            onChange={(e, newvalue) => { setGp(newvalue); updateCustomer(newvalue); }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.clientName}`}
+                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
+                        <label>{gp && gp.clientName}</label>
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        {isEdit && <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
+                            Добавить юр.лицо
+                        </button>}
+                    </div>
+
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <div className="form-group col-md-6">
+                        <label className="bold-label">Адрес выгрузки (10)</label>
+                        {isEdit && <Autocomplete
+                            options={addresses}
+                            disablePortal
+                            onChange={(e, newvalue) => { updateAddressInName(newvalue); setAddressB(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.textAddress}`}
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
+
+                        <label>{addressB && addressB.textAddress}</label>
+
+                        {isEdit && <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                            Добавить адрес
+                        </button>}
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -469,53 +517,6 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         </select>
                     </div>
 
-                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
-
-                    <div className="form-group col-md-6">
-                        <label className="bold-label">Прием груза (8)</label>
-                        {isEdit && <Autocomplete 
-                            options={addresses}
-                            disablePortal
-                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
-
-                        <label>{addressA && addressA.textAddress}</label>
-                    </div>
-
-                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
-
-                    <div className="form-group col-md-6">
-                        <label className="bold-label">Выдача груза (10)</label>
-                        {isEdit && <Autocomplete
-                            options={addresses}
-                            disablePortal
-                            onChange={(e, newvalue) => { updateAddressInName(newvalue); setAddressB(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
-
-                        <label>{addressB && addressB.textAddress}</label>
-
-                        {isEdit && <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
-                            Добавить адрес
-                        </button>}
-                    </div>
-                </div>
-
-                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
-
-                <div className="form-row">
-                    <div className="input-group mb-3 col-md-6 pl-1">
-                        <label className="bold-label">Дата начала</label>
-                        <DatePicker disabled={!isEdit} dateFormat="dd.MM.yyyy" locale="ru" selected={startDate} onChange={(date) => updateStartDate(date)} />
-                    </div>
-
-                    <div className="input-group mb-3 col-md-6 pl-1">
-                        <label className="bold-label">Срок выполнения</label>
-                        <DatePicker disabled dateFormat="dd.MM.yyyy" locale="ru" selected={endDate} onChange={(date) => setEndDate(date)} />
-                    </div>
                 </div>
 
                 <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
