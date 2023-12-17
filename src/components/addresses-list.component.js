@@ -24,7 +24,6 @@ const AddressesList = () => {
     useEffect(() => {
         !cancelled && setLoading(true);
 
-        let id = JSON.parse(localStorage.getItem("user"));
         ApiService.getAddresses()
             .then(({ data }) => {
                 setList(data);
@@ -35,19 +34,9 @@ const AddressesList = () => {
         return () => cancelled = true
     }, [sortBy, dir, reload]);
 
-    useBack(({ location }) => {
-        alert("BACK");
-    });
 
     const handleClickOpen = (address) => {
         setOpen(true);
-        var lastItem =
-        {
-            id: address.id,
-        }
-
-        localStorage.setItem("address", JSON.stringify(lastItem));
-
         setSelectedAddress(address);
     };
 
