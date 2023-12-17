@@ -60,7 +60,7 @@ const DriversList = () => {
             name: "Процент",
             sortBy: "percent",
             selector: (row, index) => row.percentage,
-            sortable: false
+            sortable: true
         },
         {
             name: "Авто",
