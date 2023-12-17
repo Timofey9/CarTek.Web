@@ -435,7 +435,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Прием груза (8)</label>
+                        <label>Адрес погрузки (8)</label>
                         <Autocomplete
                             className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
                             options={addresses}
@@ -487,7 +487,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             className={checkObjectKeys(gp) ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
-                            onChange={(e, newvalue) => { setGp(newvalue); updateCustomer() }}
+                            onChange={(e, newvalue) => { setGp(newvalue); updateCustomer(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
@@ -502,7 +502,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
 
 
                     <div className="form-group col-md-6">
-                        <label>Выдача груза (10)</label>
+                        <label>Адрес выгрузки (10)</label>
 
                         <Autocomplete
                             className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
@@ -514,6 +514,10 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />
 
                         <label>{addressB && addressB.textAddress}</label>
+
+                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                            Добавить адрес
+                        </button>
                     </div>
 
                     <div className="form-group col-md-6">

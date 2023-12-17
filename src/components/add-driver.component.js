@@ -136,6 +136,17 @@ function DriverForm() {
             <h1>Водитель</h1>
             <div className="form-row">
                 <div className="form-group col-md-6">
+                    <label htmlFor="firstName">Фамилия</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        form="profile-form"
+                        onChange={(e) => setLastName(e.target.value)}
+                        value={lastName}
+                    />
+                </div>
+
+                <div className="form-group col-md-6">
                     <label htmlFor="firstName">Имя</label>
                     <input
                         type="text"
@@ -154,16 +165,7 @@ function DriverForm() {
                         onChange={(e) => setMiddleName(e.target.value)}
                         value={middleName}/>
                 </div>
-                <div className="form-group col-md-6">
-                    <label htmlFor="firstName">Фамилия</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        form="profile-form"
-                        onChange={(e) => setLastName(e.target.value)}
-                        value={lastName}
-                    />
-                </div>
+
             </div>
             <div className="form-row">
                 <div className="form-group col-md-6">

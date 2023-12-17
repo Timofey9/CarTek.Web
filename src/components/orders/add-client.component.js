@@ -85,7 +85,6 @@ function ClientForm({client, handleClose }) {
                 ApiService.createClient(newClient)
                     .then(({ data }) => {
                         alert(data.message);
-                        handleClose();
                     }).
                     catch((error) => {
                         setMessage(error.response.data.message);

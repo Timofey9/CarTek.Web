@@ -57,6 +57,12 @@ const DriversList = () => {
             sortable: false
         },
         {
+            name: "Процент",
+            sortBy: "percent",
+            selector: (row, index) => row.percentage,
+            sortable: false
+        },
+        {
             name: "Авто",
             sortBy: "carName",
             selector: (row, index) => row.carName,
@@ -86,6 +92,7 @@ const DriversList = () => {
                         <select className="col-md-9" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
                             <option value="lastname">Фамилия</option>
                             <option value="phone">Телефон</option>
+                            <option value="percent">Процент</option>
                         </select>
                     </div>
                     <div className="row mt-3">

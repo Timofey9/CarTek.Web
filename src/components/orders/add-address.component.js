@@ -39,7 +39,6 @@ function AddressForm({ address, handleClose }) {
             ApiService.updateAddress(newAddress)
                 .then(({ data }) => {
                     alert(data.message);
-                    handleClose();
                 }).
                 catch((error) => {
                     setMessage(error.response.data.message);
@@ -49,7 +48,6 @@ function AddressForm({ address, handleClose }) {
                 ApiService.createAddress(newAddress)
                     .then(({ data }) => {
                         alert(data.message);
-                        handleClose();
                     }).
                     catch((error) => {
                         setMessage(error.response.data.message);

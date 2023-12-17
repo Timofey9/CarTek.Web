@@ -328,6 +328,11 @@ class ApiService {
         return await res;
     }
 
+    async SubmitDriverSubTaskAsync(data) {
+        var res = await this.post(`drivers/subtasktn`, data, { 'Content-Type': 'multipart/form-data' });
+        return await res;
+    }
+
     async startTn(data) {
         var res = await this.post(`drivers/starttn`, data, { 'Content-Type': 'multipart/form-data' });
         return await res;

@@ -78,6 +78,7 @@ const DriverEditTask = () => {
     const [pickupDepartureDate, setPickupDepartureDate] = useState(new Date());
     const [pickupDepartureTime, setPickupDepartureTime] = useState("");
     const [continueWork, setContinueWork] = useState(false);
+    const [rerender, setrerender] = useState(0);
     const [validated, setValidated] = useState(true);
     const [transporter, setTransporter] = useState("ООО \"КарТэк\"");
 
@@ -104,6 +105,7 @@ const DriverEditTask = () => {
         if (ctrl.value) {
             ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
         }
+        setContinueWork(true);
     }
 
     const clearFileInputById = (id) => {
@@ -303,7 +305,7 @@ const DriverEditTask = () => {
         };
 
         formData.append("DriverTaskId", driverTask.id);
-        formData.append("UpdatedStatus", status + 1);
+        formData.append("UpdatedStatus", status);
         formData.append("Note", note);
 
         ApiService.SubmitNoteAsync(formData)
@@ -378,7 +380,7 @@ const DriverEditTask = () => {
 
         if (status === 7 && validate()) {
             formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',','.'));
-            formData.append("UnloadVolume2", unloadVolume2);
+            formData.append("UnloadVolume2", unloadVolume2 && unloadVolume.replace(',', '.'));
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
             formData.append("LocationBId", addressB.id);
@@ -882,7 +884,8 @@ const DriverEditTask = () => {
                                         <label>Объем выгрузки</label>
                                         <input
                                             className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                            type="text"
+                                            type="number"
+                                            step="0.1"
                                             form="profile-form"
                                             onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
                                             value={unloadVolume2} />

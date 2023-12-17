@@ -24,6 +24,7 @@ const AddressesList = () => {
     useEffect(() => {
         !cancelled && setLoading(true);
 
+        let id = JSON.parse(localStorage.getItem("user"));
         ApiService.getAddresses()
             .then(({ data }) => {
                 setList(data);
@@ -34,9 +35,19 @@ const AddressesList = () => {
         return () => cancelled = true
     }, [sortBy, dir, reload]);
 
+    useBack(({ location }) => {
+        alert("BACK");
+    });
 
     const handleClickOpen = (address) => {
         setOpen(true);
+        var lastItem =
+        {
+            id: address.id,
+        }
+
+        localStorage.setItem("address", JSON.stringify(lastItem));
+
         setSelectedAddress(address);
     };
 
@@ -75,7 +86,7 @@ const AddressesList = () => {
             selector: (row, index) => <div>{row.textAddress}</div>,
             minWidth: '1em',
             sortable: true,
-            wrap:true
+            wrap: true
         },
         {
             name: "Координаты",
@@ -86,7 +97,7 @@ const AddressesList = () => {
         },
         {
             name: "Редактировать",
-            selector: (row, index) => <Button onClick={(e) => handleClickOpen(row)} variant="outlined"><i className="fa fa-edit" aria-hidden="true"></i></Button>,
+            selector: (row, index) => <Button id={row.id} onClick={(e) => handleClickOpen(row)} variant="outlined"><i className="fa fa-edit" aria-hidden="true"></i></Button>,
             sortable: false,
             minWidth: '1em'
         }

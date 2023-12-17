@@ -16,6 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import "react-datepicker/dist/react-datepicker.css";
@@ -63,6 +64,8 @@ const DriverEditSubTask = () => {
     const [material, setMaterial] = useState({});
     const [addressA, setAddressA] = useState({});
     const [addressB, setAddressB] = useState({});
+    const [addressAKey, setAddressAKey] = useState(1);
+    const [addressBKey, setAddressBKey] = useState(1);
     const [message, setMessage] = useState("");
     const [tnNumber, setTnNumber] = useState("");
     const [loadVolume, setLoadVolume] = useState("");
@@ -74,9 +77,9 @@ const DriverEditSubTask = () => {
     const [go, setGo] = useState({});
     const [gp, setGp] = useState({});
     const [pickupArrivalDate, setPickupArrivalDate] = useState(new Date());
-    const [pickupArrivalTime, setPickupArrivalTime] = useState("");
     const [pickupDepartureDate, setPickupDepartureDate] = useState(new Date());
-    const [pickupDepartureTime, setPickupDepartureTime] = useState("");
+    const [dropOffArrivalDate, setDropOffArrivalDate] = useState(new Date());
+    const [dropOffDepartureDate, setDropOffDepartureDate] = useState(new Date());
     const [currentSubTask, setCurrentSubTask] = useState({});
     const [hasSubTask, setHasSubTask] = useState(true);
     const [continueWork, setContinueWork] = useState(false);
@@ -88,6 +91,7 @@ const DriverEditSubTask = () => {
     const [openMaterial, setOpenMaterial] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [openEditTn, setOpenEditTn] = useState(false);
+    const [rerender, setrerender] = useState(0);
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
@@ -98,6 +102,39 @@ const DriverEditSubTask = () => {
     const handleConfirmationOpen = () => {
         setConfirmationOpen(true);
     };
+
+    const clearFileInputById = (id) => {
+        var ctrl = document.getElementById(id);
+        try {
+            ctrl.value = null;
+            formData.delete("Files");
+        } catch (ex) { }
+        if (ctrl.value) {
+            ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
+        }
+        setrerender(rerender + 1);
+    }
+
+    const hasFiles = (id) => {
+        var ctrl = document.getElementById(id);
+        return ctrl && ctrl.files.length > 0;
+    }
+
+    const updateVolume = (setter, value) => {
+        var str = value.toString();
+        if (str.length > 2) {
+            if (str[2] === ',' || str[2] === '.'
+                || str[1] === ',' || str[1] === '.') {
+                setter(value);
+            } else {
+                var newString = str.slice(0, 2) + '.' + str.slice(2);
+                setter(newString);
+            }
+
+        } else {
+            setter(value);
+        }
+    }
 
     const handleEditTnClose = () => {
         setOpenEditTn(false);
@@ -170,6 +207,8 @@ const DriverEditSubTask = () => {
             for (var file of e.target.files) {
                 formData.append("Files", file);
             }
+            setContinueWork(true);
+
         }
         catch (e) {
             alert("Прикрепите фото еще раз");
@@ -181,6 +220,7 @@ const DriverEditSubTask = () => {
             for (var file of e.target.files) {
                 formData.append("Files", file);
             }
+            setContinueWork(true);
         }
         catch (e) {
             alert("Прикрепите фото еще раз");
@@ -269,11 +309,11 @@ const DriverEditSubTask = () => {
         };
 
         formData.set("DriverTaskId", driverTask.id);
-        formData.set("UpdatedStatus", status + 1);
+        formData.set("UpdatedStatus", 9);
         formData.append("IsSubtask", true);
         formData.append("SubTaskId", subTaskId);
 
-        if (status === 4 && validate()) {
+        if (validate()) {
             formData.append("MaterialId", material.id);
             formData.append("Number", tnNumber);
             formData.append("GoId", go.id);
@@ -285,65 +325,18 @@ const DriverEditSubTask = () => {
             formData.append("LocationAId", addressA.id);
             formData.append("PickUpArrivalDate", pickupArrivalDate.toUTCString());
             formData.append("PickUpDepartureDate", pickupDepartureDate.toUTCString());
-
-            ApiService.startTn(formData)
-                .then(({ data }) => {
-                    alert("Статус обновлен");
-                    setReload(reload + 1);
-                    setFormData(new FormData());
-                    setPickupArrivalTime("");
-                    setPickupDepartureTime("");
-                    setLoadVolume("");
-                    setNote("");
-                    setShowSpinner(false);
-                })
-                .catch((error) => {
-                    if (error.response.data) {
-                        setError(error.response.data);
-
-                        setShowSpinner(false);
-                    }
-                });
-            return;
-        }
-
-        if (status === 7 && validate()) {
             formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',', '.'));
-            formData.append("UnloadVolume2", unloadVolume2);
+            formData.append("UnloadVolume2", unloadVolume2 && unloadVolume.replace(',', '.'));
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
             formData.append("LocationBId", addressB.id);
-            formData.append("DropOffArrivalDate", pickupArrivalDate.toUTCString());
-            formData.append("DropOffDepartureDate", pickupDepartureDate.toUTCString());
+            formData.append("DropOffArrivalDate", dropOffArrivalDate.toUTCString());
+            formData.append("DropOffDepartureDate", dropOffDepartureDate.toUTCString());
 
-            ApiService.finalizeTn(formData)
+            ApiService.SubmitDriverSubTaskAsync(formData)
                 .then(({ data }) => {
                     alert("Статус обновлен");
-                    setFormData(new FormData());
-                    setTnNumber("");
-                    setNote("");
-                    setReload(reload + 1);
-                    setShowSpinner(false);
-                })
-                .catch((error) => {
-                    if (error.response.data) {
-                        setError(error.response.data);
-
-                        setShowSpinner(false);
-                    }
-                });
-
-            return;
-        }
-
-        if (validate()) {
-            formData.set("DriverTaskId", subTaskId);
-            ApiService.EditDriverSubTaskAsync(formData)
-                .then(({ data }) => {
-                    alert("Статус обновлен");
-                    setFormData(new FormData());
-                    setTnNumber("");
-                    setNote("");
+                    clearForm();
                     setReload(reload + 1);
                     setShowSpinner(false);
                 })
@@ -358,57 +351,79 @@ const DriverEditSubTask = () => {
         setShowSpinner(false);
     }, 500);
 
+    const clearForm = () => {
+        setFormData(new FormData());
+        setTnNumber("");
+        setLoadVolume("");
+        setUnloadVolume("");
+        setLoadVolume2("");
+        setUnloadVolume2("");
+        setUnit("none");
+        setUnit2("none");
+        setUnloadUnit("none");
+        setUnloadUnit2("none");
+        setGp({});
+        setGo({});
+        setMaterial({});
+        setAddressA({});
+        setAddressB({});
+        setValidated(false);
+        setAddressAKey(addressAKey + 1);
+        setAddressBKey(addressBKey + 1);
+        clearFileInputById("imageFileInputTN");
+        clearFileInputById("imageFileInputTN2");
+        setNote("");
+    }
+
     const validate = () => {
         setValidated(true);
         var isValid = true;
-        if (status === 4) {
-            if (tnNumber.length === 0) {
-                isValid = false;
-            }
-
-            if (Object.keys(go).length === 0) {
-                isValid = false;
-            }
-
-            if (Object.keys(gp).length === 0) {
-                isValid = false;
-            }
-
-            if (Object.keys(material).length === 0) {
-                isValid = false;
-            }
-
-            if (loadVolume.length === 0) {
-                isValid = false;
-            }
-
-            if (unit === "none") {
-                isValid = false;
-            }
-
-            if (Object.keys(addressA).length === 0) {
-                isValid = false;
-            }
+        if (tnNumber.length === 0) {
+            isValid = false;
         }
 
-        if (status === 7) {
-            if (Object.keys(addressB).length === 0) {
-                isValid = false;
-            }
-
-            if (unloadVolume.length === 0) {
-                isValid = false;
-            }
-
-            if (unloadUnit === "none") {
-                isValid = false;
-            }
-
-
-            if (Object.keys(addressB).length === 0) {
-                isValid = false;
-            }
+        if (Object.keys(go).length === 0) {
+            isValid = false;
         }
+
+        if (Object.keys(gp).length === 0) {
+            isValid = false;
+        }
+
+        if (Object.keys(material).length === 0) {
+            isValid = false;
+        }
+
+        if (loadVolume.length === 0) {
+            isValid = false;
+        }
+
+        if (unit === "none") {
+            isValid = false;
+        }
+
+        if (Object.keys(addressA).length === 0) {
+            isValid = false;
+        }
+
+
+        if (Object.keys(addressB).length === 0) {
+            isValid = false;
+        }
+
+        if (unloadVolume.length === 0) {
+            isValid = false;
+        }
+
+        if (unloadUnit === "none") {
+            isValid = false;
+        }
+
+
+        if (Object.keys(addressB).length === 0) {
+            isValid = false;
+        }
+
         return isValid;
     }
 
@@ -439,26 +454,26 @@ const DriverEditSubTask = () => {
 
     useEffect(() => {
         setLoading(true);
-            ApiService.getSubTask(subTaskId)
-                .then(({ data }) => {
-                    setCurrentSubTask(data);
-                    setDriverTask(data.driverTask);
-                    setDriver(data.driverTask.driver);
-                    setOrder(data.driverTask.order);                   
-                    setStatus(data.status);
-                    setNotes(data.notes);
-                    setCar(data.driverTask.car);
-                    setCustomer(data.driverTask.orderCustomer);
+        ApiService.getSubTask(subTaskId)
+            .then(({ data }) => {
+                setCurrentSubTask(data);
+                setDriverTask(data.driverTask);
+                setDriver(data.driverTask.driver);
+                setOrder(data.driverTask.order);
+                setStatus(data.status);
+                setNotes(data.notes);
+                setCar(data.driverTask.car);
+                setCustomer(data.driverTask.orderCustomer);
 
-                    if (data.status === 4 || data.status === 7) {
-                        scrollToTop();
-                    }
+                if (data.status === 4 || data.status === 7) {
+                    scrollToTop();
+                }
 
-                }).
-                catch((error) => {
-                    setError(error.response.data);
-                });
-        
+            }).
+            catch((error) => {
+                setError(error.response.data);
+            });
+
         setLoading(false);
     }, [reload]);
 
@@ -576,311 +591,283 @@ const DriverEditSubTask = () => {
 
                 </dl>
 
-                {status === 4 &&
+                <div className="form-row">
+                    <div className="form-group col-md-6">
+                        <label>Номер ТН</label>
+                        <input
+                            className={validated && tnNumber.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                            type="text"
+                            form="profile-form"
+                            onChange={(e) => setTnNumber(e.target.value)}
+                            value={tnNumber} />
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <label>Грузоотправитель (1)</label>
+                        <Autocomplete
+                            className={checkObjectKeys(go) ? "not-valid-input-border" : ""}
+                            options={clients}
+                            disablePortal
+                            key={addressBKey}
+                            onChange={(e, newvalue) => { setGo(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.clientName}`}
+                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <label>Грузополучатель (2)</label>
+                        <Autocomplete
+                            className={checkObjectKeys(gp) ? "not-valid-input-border" : ""}
+                            options={clients}
+                            key={addressBKey}
+                            disablePortal
+                            onChange={(e, newvalue) => { setGp(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.clientName}`}
+                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                        {/*    {driverTask.order.client.name}*/}
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
+                            Добавить юр.лицо
+                        </button>
+                    </div>
+
                     <div className="form-row">
-                        <div className="form-group col-md-6">
-                            <label>Номер ТН</label>
-                            <input
-                                className={validated && tnNumber.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
-                                form="profile-form"
-                                onChange={(e) => setTnNumber(e.target.value)}
-                                value={tnNumber} />
-                        </div>
+                        <label>Тип груза (3)</label>
+                        <Autocomplete
+                            renderOption={(props, item) => (<li {...props} key={item.id}>{item.name}</li>)}
+                            className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
+                            options={materialsList}
+                            disablePortal
+                            key={addressBKey}
+                            onChange={(e, newvalue) => { setMaterial(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.name}`}
+                            renderInput={(params) => <TextField {...params} label="Список материалов" />} />
 
-                        <div className="form-group col-md-6">
-                            <label>Грузоотправитель (1)</label>
-                            <Autocomplete
-                                className={checkObjectKeys(go) ? "not-valid-input-border" : ""}
-                                options={clients}
-                                disablePortal
-                                onChange={(e, newvalue) => { setGo(newvalue) }}
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.clientName}`}
-                                renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                        </div>
+                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
+                            Добавить тип груза
+                        </button>
+                    </div>
 
-                        <div className="form-group col-md-6">
-                            <label>Грузополучатель (2)</label>
-                            <Autocomplete
-                                className={checkObjectKeys(gp) ? "not-valid-input-border" : ""}
-                                options={clients}
-                                disablePortal
-                                onChange={(e, newvalue) => { setGp(newvalue) }}
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.clientName}`}
-                                renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                            {/*    {driverTask.order.client.name}*/}
-                        </div>
+                    <div className="form-group col-md-6">
+                        <label>Объем загрузки</label>
+                        <input
+                            className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                            type="number"
+                            step="0.1"
+                            form="profile-form"
+                            onChange={(e) => updateVolume(setLoadVolume,e.target.value)}
+                            value={loadVolume} />
+                    </div>
 
-                        <div className="form-group col-md-6">
-                            <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
-                                Добавить юр.лицо
-                            </button>
-                        </div>
+                    <div className="form-group col-md-6">
+                        <FormControl>
+                            <FormLabel id="radio-buttons-group-label">Ед. измерения</FormLabel>
+                            <RadioGroup row
+                                className={validated && unit === "none" ? "not-valid-input-border" : ""}
+                                aria-labelledby="radio-buttons-group-label"
+                                name="radio-buttons-group"
+                                value={unit}
+                                onChange={(e) => setUnit(e.target.value)}>
+                                <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
+                            </RadioGroup>
+                        </FormControl>
+                    </div>
 
-                        <div className="form-row">
-                            <label>Тип груза (3)</label>
-                            <Autocomplete
-                                renderOption={(props, item) => (<li {...props} key={item.id}>{item.name}</li>)}
-                                className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
-                                options={materialsList}
-                                disablePortal
-                                onChange={(e, newvalue) => { setMaterial(newvalue) }}
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.name}`}
-                                renderInput={(params) => <TextField {...params} label="Список материалов" />} />
+                    <div className="form-group col-md-6">
+                        <Accordion>
+                            <AccordionSummary
+                                aria-controls="panel1a-content"
+                                id="panel1a-header">
+                                <Typography>Также в другой ед. измерения</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <div className="form-group col-md-6">
+                                    <label>Объем загрузки</label>
+                                    <input
+                                        className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        type="number"
+                                        step="0.1"
+                                        form="profile-form"
+                                        onChange={(e) => updateVolume(setLoadVolume2,e.target.value)}
+                                        value={loadVolume2} />
+                                </div>
 
-                            <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
-                                Добавить тип груза
-                            </button>
-                        </div>
+                                <div className="form-group col-md-6">
+                                    <FormControl>
+                                        <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
+                                        <RadioGroup row
+                                            className={validated && unit2 === "none" ? "not-valid-input-border" : ""}
+                                            aria-labelledby="buttons-group-label"
+                                            name="buttons-group"
+                                            value={unit2}
+                                            onChange={(e) => setUnit2(e.target.value)}>
+                                            <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                            <FormControlLabel value="1" control={<Radio />} label="Тонны" />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </div>
+                            </AccordionDetails>
+                        </Accordion>
+                    </div>
 
-                        <div className="form-group col-md-6">
-                            <label>Объем загрузки</label>
-                            <input
-                                className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="number"
-                                step="0.1"
-                                form="profile-form"
-                                onChange={(e) => setLoadVolume(e.target.value)}
-                                value={loadVolume} />
-                        </div>
+                    <div className="form-group col-md-6">
+                        <label>Адрес погрузки (8)</label>
+                        <Autocomplete
+                            className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
+                            options={addresses}
+                            disablePortal
+                            key={addressAKey}
+                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.textAddress}`}
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
 
-                        <div className="form-group col-md-6">
-                            <FormControl>
-                                <FormLabel id="radio-buttons-group-label">Ед. измерения</FormLabel>
-                                <RadioGroup row
-                                    className={validated && unit === "none" ? "not-valid-input-border" : ""}
-                                    aria-labelledby="radio-buttons-group-label"
-                                    name="radio-buttons-group"
-                                    value={unit}
-                                    onChange={(e) => setUnit(e.target.value)}>
-                                    <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                    <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                </RadioGroup>
-                            </FormControl>
-                        </div>
+                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                            Добавить адрес
+                        </button>
+                    </div>
 
-                        <div className="form-group col-md-6">
-                            <Accordion>
-                                <AccordionSummary
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header">
-                                    <Typography>Также в другой ед. измерения</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <div className="form-group col-md-6">
-                                        <label>Объем загрузки</label>
-                                        <input
-                                            className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                            type="number"
-                                            step="0.1"
-                                            form="profile-form"
-                                            onChange={(e) => setLoadVolume2(e.target.value)}
-                                            value={loadVolume2} />
-                                    </div>
+                    <div className="input-group mb-3 col-md-6 pl-1">
+                        <label>Дата прибытия на адрес погрузки</label>
+                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
+                    </div>
 
-                                    <div className="form-group col-md-6">
-                                        <FormControl>
-                                            <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
-                                            <RadioGroup row
-                                                className={validated && unit2 === "none" ? "not-valid-input-border" : ""}
-                                                aria-labelledby="buttons-group-label"
-                                                name="buttons-group"
-                                                value={unit2}
-                                                onChange={(e) => setUnit2(e.target.value)}>
-                                                <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </div>
-                                </AccordionDetails>
-                            </Accordion>
-                        </div>
+                    <div className="input-group mb-3 col-md-6 pl-1">
+                        <label>Дата выезда с адреса погрузки</label>
+                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
+                    </div>
 
-                        <div className="form-group col-md-6">
-                            <label>Адрес погрузки (8)</label>
-                            <Autocomplete
-                                className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
-                                options={addresses}
-                                disablePortal
-                                onChange={(e, newvalue) => { setAddressA(newvalue) }}
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.textAddress}`}
-                                renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                </div>
 
-                            <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
-                                Добавить адрес
-                            </button>
-                        </div>
+                <div className="form-row">
+                    <div className="form-group col-md-6">
+                        <label>Объем выгрузки</label>
+                        <input
+                            className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                            type="number"
+                            step="0.1"
+                            form="profile-form"
+                            onChange={(e) => updateVolume(setUnloadVolume,e.target.value)}
+                            value={unloadVolume} />
+                    </div>
 
-                        <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата прибытия на адрес погрузки</label>
-                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
-                        </div>
+                    <div className="form-group col-md-6">
+                        <FormControl>
+                            <FormLabel id="radio-label">Ед. измерения</FormLabel>
+                            <RadioGroup row
+                                className={validated && unloadUnit === "none" ? "not-valid-input-border" : ""}
+                                aria-labelledby="radio-label"
+                                name="radio-buttons"
+                                value={unloadUnit}
+                                onChange={(e) => setUnloadUnit(e.target.value)}>
+                                <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
+                            </RadioGroup>
+                        </FormControl>
+                    </div>
 
-                        <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата выезда с адреса погрузки</label>
-                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
-                        </div>
+                    <div className="form-group col-md-6">
+                        <Accordion>
+                            <AccordionSummary
+                                aria-controls="panel2a-content"
+                                id="panel2a-header">
+                                <Typography>Также в другой ед. измерения</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <div className="form-group col-md-6">
+                                    <label>Объем выгрузки</label>
+                                    <input
+                                        className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        type="number"
+                                        step="0.1"
+                                        form="profile-form"
+                                        onChange={(e) => updateVolume(setUnloadVolume2,e.target.value)}
+                                        value={unloadVolume2} />
+                                </div>
 
-                    </div>}
+                                <div className="form-group col-md-6">
+                                    <FormControl>
+                                        <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
+                                        <RadioGroup row
+                                            className={validated && unloadUnit2 === "none" ? "not-valid-input-border" : ""}
+                                            aria-labelledby="buttons-group-label"
+                                            name="buttons-group"
+                                            value={unloadUnit2}
+                                            onChange={(e) => setUnloadUnit2(e.target.value)}>
+                                            <FormControlLabel value="0" control={<Radio />} label="M3" />
+                                            <FormControlLabel value="1" control={<Radio />} label="Тонны" />
+                                        </RadioGroup>
+                                    </FormControl>
+                                </div>
+                            </AccordionDetails>
+                        </Accordion>
+                    </div>
 
-                {status === 7 &&
-                    <div className="form-row">
-                        <div className="form-group col-md-6">
-                            <label>Объем выгрузки</label>
-                            <input
-                                className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="number"
-                                step="0.1"
-                                form="profile-form"
-                                onChange={(e) => setUnloadVolume(e.target.value)}
-                                value={unloadVolume} />
-                        </div>
+                    <div className="form-group col-md-6">
+                        <label>Адрес выгрузки (10)</label>
+                        <Autocomplete
+                            className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
+                            options={addresses}
+                            disablePortal
+                            key={addressBKey}
+                            onChange={(e, newvalue) => { setAddressB(newvalue) }}
+                            sx={{ width: 300 }}
+                            getOptionLabel={(option) => `${option.textAddress}`}
+                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                    </div>
 
-                        <div className="form-group col-md-6">
-                            <FormControl>
-                                <FormLabel id="radio-label">Ед. измерения</FormLabel>
-                                <RadioGroup row
-                                    className={validated && unloadUnit === "none" ? "not-valid-input-border" : ""}
-                                    aria-labelledby="radio-label"
-                                    name="radio-buttons"
-                                    value={unloadUnit}
-                                    onChange={(e) => setUnloadUnit(e.target.value)}>
-                                    <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                    <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                </RadioGroup>
-                            </FormControl>
-                        </div>
+                    <div className="input-group mb-3 col-md-6 pl-1">
+                        <label>Дата прибытия на адрес выгрузки</label>
+                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy"
+                            selected={dropOffArrivalDate} onChange={(date) => { setDropOffArrivalDate(date) }} />
+                    </div>
 
-                        <div className="form-group col-md-6">
-                            <Accordion>
-                                <AccordionSummary
-                                    aria-controls="panel2a-content"
-                                    id="panel2a-header">
-                                    <Typography>Также в другой ед. измерения</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <div className="form-group col-md-6">
-                                        <label>Объем выгрузки</label>
-                                        <input
-                                            className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                            type="text"
-                                            form="profile-form"
-                                            onChange={(e) => setUnloadVolume2(e.target.value)}
-                                            value={unloadVolume2} />
-                                    </div>
+                    <div className="input-group mb-3 col-md-6 pl-1">
+                        <label>Дата выезда с адреса выгрузки</label>
+                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffDepartureDate} onChange={(date) => { setDropOffDepartureDate(date) }} />
+                    </div>
 
-                                    <div className="form-group col-md-6">
-                                        <FormControl>
-                                            <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
-                                            <RadioGroup row
-                                                className={validated && unloadUnit2 === "none" ? "not-valid-input-border" : ""}
-                                                aria-labelledby="buttons-group-label"
-                                                name="buttons-group"
-                                                value={unloadUnit2}
-                                                onChange={(e) => setUnloadUnit2(e.target.value)}>
-                                                <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </div>
-                                </AccordionDetails>
-                            </Accordion>
-                        </div>
-
-                        <div className="form-group col-md-6">
-                            <label>Адрес выгрузки (10)</label>
-                            <Autocomplete
-                                className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
-                                options={addresses}
-                                disablePortal
-                                onChange={(e, newvalue) => { setAddressB(newvalue) }}
-                                sx={{ width: 300 }}
-                                getOptionLabel={(option) => `${option.textAddress}`}
-                                renderInput={(params) => <TextField {...params} label="Список адресов" />} />
-                        </div>
-
-                        <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата прибытия на адрес выгрузки</label>
-                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy"
-                                selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
-                        </div>
-
-                        <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата выезда с адреса выгрузки</label>
-                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
-                        </div>
-
-                    </div>}
+                </div>
                 <div>
-                    {status === 7 &&
-                        <>
-                            <div className="row mt-3 mb-3">
-                                <div className="col-md-9">
-                                    <div className="alert alert-danger" role="alert">
-                                        ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
-                                        <div className="row">
-                                            <div className="col-md-12">
-                                                <input type="file" id="files" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
-                                            </div>
+                    <>
+                        <div className="row mt-3 mb-3">
+                            <div className="col-md-9">
+                                <div className="alert alert-danger" role="alert">
+                                    ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            {hasFiles("imageFileInputTN") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN")} aria-label="delete">
+                                                <i className="fa fa-cancel"></i>  </IconButton>}
+                                            <input type="file" id="imageFileInputTN" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="row mt-3 mb-3">
-                                <div className="col-md-9">
-                                    <div className="alert alert-danger" role="alert">
-                                        ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
-                                        <div className="row">
-                                            <div className="col-md-12">
-                                                <input type="file" id="files2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
-                                            </div>
+                        <div className="row mt-3 mb-3">
+                            <div className="col-md-9">
+                                <div className="alert alert-danger" role="alert">
+                                    ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            {hasFiles("imageFileInputTN2") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN2")} aria-label="delete">
+                                                <i className="fa fa-cancel" aria-hidden="true"></i>  </IconButton>}
+                                            <input type="file" id="imageFileInputTN2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </>}
+                        </div>
+                    </>
                 </div>
                 <div className="row mt-3">
-                    <div className="col-md-3">
-                        <Box sx={{ width: '100%' }}>
-                            <Stepper orientation="vertical" activeStep={status}>
-                                {constStatuses.map((label, index) => {
-                                    const stepProps = {};
-                                    const labelProps = {};
-                                    return (
-                                        <Step key={label} {...stepProps} expanded={true}>
-                                            <StepLabel {...labelProps}>{label}</StepLabel>
-                                            <StepContent>
-                                                {notes.filter((n) => n.status === index).map((note, noteindex) => {
-                                                    let showLinks = false;
-                                                    let links;
-                                                    if (note.s3Links.length > 0) {
-                                                        links = JSON.parse(note.s3Links);
-                                                        showLinks = true
-                                                    }
-                                                    return (
-                                                        <div key={noteindex}>
-                                                            <div>{new Date(note.dateCreated).toLocaleString('ru-Ru')}</div>
-                                                            <Typography>{note.text}</Typography>
-                                                            {showLinks && links.map((link, linkindex) => {
-                                                                const fullLink = "https://storage.yandexcloud.net/" + link;
-                                                                return (<div key={linkindex}><a target="_blank" href={fullLink}>Изображение {linkindex + 1}</a></div>);
-                                                            })}
-                                                        </div>
-                                                    )
-                                                })}
-                                            </StepContent>
-                                        </Step>
-                                    );
-                                })}
-                            </Stepper>
-                        </Box>
-                    </div>
                     {status <= 8 &&
                         <div className="col-md-9">
                             <div className="row">
@@ -906,18 +893,6 @@ const DriverEditSubTask = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {status > 0 &&
-                                <div className="row">
-                                    <div className="col-md-12">
-                                        <div className="col-md-3">
-                                            <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
-                                                На шаг назад
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>}
-
 
                             <div className="row mb-5">
                                 <div className="col-md-12">
@@ -946,12 +921,12 @@ const DriverEditSubTask = () => {
                                 </div>
                             </div>
                         </div>
-                    <div className="row mt-3 mb-3">
-                        <div className="col-md-12">
+                        <div className="row mt-3 mb-3">
+                            <div className="col-md-12">
                                 <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
                                     На шаг назад
                                 </button>
-                        </div>
+                            </div>
                             <div className="col-md-12">
                                 <button type="submit" onClick={createSubTask} className="btn btn-success mt-3">
                                     Продолжить
