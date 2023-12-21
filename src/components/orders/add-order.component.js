@@ -214,6 +214,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
         if (clonedOrder !== undefined) {
             setOrderName(clonedOrder.name);
             setServiceType(clonedOrder.service);
+
             if (addresses.length > 0) {
                 var locA = addresses.find(t => t.id == clonedOrder.locationAId);
                 setAddressA(locA);
@@ -221,6 +222,10 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                 var locB = addresses.find(t => t.id == clonedOrder.locationBId);
                 setAddressB(locB);
             }
+
+            var clonedCustomer = clonedOrder.service === '0' ? clonedOrder.client : clonedOrder.gp;
+
+            updateCustomer(clonedCustomer);
 
             setClient(clonedOrder.client);
             setGp(clonedOrder.gp);
