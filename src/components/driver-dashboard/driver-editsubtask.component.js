@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../../services/cartekApiService";
-import Box from '@mui/material/Box';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import StepContent from '@mui/material/StepContent';
-import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -56,8 +50,8 @@ const DriverEditSubTask = () => {
     const [formData, setFormData] = useState(new FormData());
     const [notes, setNotes] = useState([]);
     const [reload, setReload] = useState(0);
-    const [unit, setUnit] = useState("none");
-    const [unit2, setUnit2] = useState("none");
+    const [unit, setUnit] = useState(0);
+    const [unit2, setUnit2] = useState(1);
     const [materialsList, setMaterialsList] = useState([]);
     const [addresses, setAddresses] = useState([]);
     const [clients, setClients] = useState([]);
@@ -72,8 +66,8 @@ const DriverEditSubTask = () => {
     const [loadVolume2, setLoadVolume2] = useState("");
     const [unloadVolume, setUnloadVolume] = useState("");
     const [unloadVolume2, setUnloadVolume2] = useState("");
-    const [unloadUnit, setUnloadUnit] = useState("none");
-    const [unloadUnit2, setUnloadUnit2] = useState("none");
+    const [unloadUnit, setUnloadUnit] = useState(0);
+    const [unloadUnit2, setUnloadUnit2] = useState(1);
     const [go, setGo] = useState({});
     const [gp, setGp] = useState({});
     const [pickupArrivalDate, setPickupArrivalDate] = useState(new Date());
@@ -460,6 +454,7 @@ const DriverEditSubTask = () => {
                 setDriverTask(data.driverTask);
                 setDriver(data.driverTask.driver);
                 setOrder(data.driverTask.order);
+                setDataFromOrder(data.driverTask);
                 setStatus(data.status);
                 setNotes(data.notes);
                 setCar(data.driverTask.car);
@@ -476,6 +471,15 @@ const DriverEditSubTask = () => {
 
         setLoading(false);
     }, [reload]);
+
+    const setDataFromOrder = (data) => {
+        var order = data.order
+        setGo(order.client);
+        setGp(order.gp);
+        setAddressA(data.locationA);
+        setAddressB(data.locationB);
+        setMaterial(order.material)
+    }
 
     useEffect(() => {
         setLoading(true);
@@ -590,7 +594,14 @@ const DriverEditSubTask = () => {
 
 
                 </dl>
-                {status < 9 && <>                <div className="form-row">
+                {status < 9 && <>
+                    <div className="form-row">
+                        <div className="form-group col-md-8">
+                            <div className="alert alert-info" role="alert">
+                                Данные ТН предзаполняются по информации из заявки. В случае необходимости, вы можете их изменить
+                            </div>
+                        </div>
+
                     <div className="form-group col-md-6">
                         <label>Номер ТН</label>
                         <input
@@ -607,6 +618,8 @@ const DriverEditSubTask = () => {
                             className={checkObjectKeys(go) ? "not-valid-input-border" : ""}
                             options={clients}
                             disablePortal
+                            defaultValue={go}
+                            value={go}
                             key={addressBKey}
                             onChange={(e, newvalue) => { setGo(newvalue) }}
                             sx={{ width: 300 }}
@@ -621,6 +634,8 @@ const DriverEditSubTask = () => {
                             options={clients}
                             key={addressBKey}
                             disablePortal
+                            defaultValue={gp}
+                            value={gp}
                             onChange={(e, newvalue) => { setGp(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
@@ -641,6 +656,8 @@ const DriverEditSubTask = () => {
                             className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
                             options={materialsList}
                             disablePortal
+                            defaultValue={material}
+                            value={material}
                             key={addressBKey}
                             onChange={(e, newvalue) => { setMaterial(newvalue) }}
                             sx={{ width: 300 }}
@@ -654,65 +671,31 @@ const DriverEditSubTask = () => {
 
                     <div className="form-group col-md-6">
                         <label>Объем загрузки</label>
-                        <input
-                            className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                            type="number"
-                            step="0.1"
-                            form="profile-form"
-                            onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
-                            value={loadVolume} />
-                    </div>
 
-                    <div className="form-group col-md-6">
-                        <FormControl>
-                            <FormLabel id="radio-buttons-group-label">Ед. измерения</FormLabel>
-                            <RadioGroup row
-                                className={validated && unit === "none" ? "not-valid-input-border" : ""}
-                                aria-labelledby="radio-buttons-group-label"
-                                name="radio-buttons-group"
-                                value={unit}
-                                onChange={(e) => setUnit(e.target.value)}>
-                                <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                            </RadioGroup>
-                        </FormControl>
-                    </div>
-
-                    <div className="form-group col-md-6">
-                        <Accordion>
-                            <AccordionSummary
-                                aria-controls="panel1a-content"
-                                id="panel1a-header">
-                                <Typography>Также в другой ед. измерения</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <div className="form-group col-md-6">
-                                    <label>Объем загрузки</label>
-                                    <input
-                                        className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                        type="number"
-                                        step="0.1"
-                                        form="profile-form"
-                                        onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
-                                        value={loadVolume2} />
-                                </div>
-
-                                <div className="form-group col-md-6">
-                                    <FormControl>
-                                        <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
-                                        <RadioGroup row
-                                            className={validated && unit2 === "none" ? "not-valid-input-border" : ""}
-                                            aria-labelledby="buttons-group-label"
-                                            name="buttons-group"
-                                            value={unit2}
-                                            onChange={(e) => setUnit2(e.target.value)}>
-                                            <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                            <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                        </RadioGroup>
-                                    </FormControl>
-                                </div>
-                            </AccordionDetails>
-                        </Accordion>
+                        <div className="row">
+                            <div className="col-md-6">
+                                <label>M3</label>
+                                <input
+                                    placeholder="М3"
+                                    className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                    type="number"
+                                    step="0.1"
+                                    form="profile-form"
+                                    onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
+                                    value={loadVolume} />
+                            </div>
+                            <div className="col-md-6">
+                                <label>Тонны</label>
+                                <input
+                                    placeholder="Тонны"
+                                    className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                    type="number"
+                                    step="0.1"
+                                    form="profile-form"
+                                    onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
+                                    value={loadVolume2} />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="form-group col-md-6">
@@ -722,6 +705,8 @@ const DriverEditSubTask = () => {
                             options={addresses}
                             disablePortal
                             key={addressAKey}
+                            defaultValue={addressA}
+                            value={addressA}
                             onChange={(e, newvalue) => { setAddressA(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.textAddress}`}
@@ -747,65 +732,31 @@ const DriverEditSubTask = () => {
                     <div className="form-row">
                         <div className="form-group col-md-6">
                             <label>Объем выгрузки</label>
-                            <input
-                                className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="number"
-                                step="0.1"
-                                form="profile-form"
-                                onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
-                                value={unloadVolume} />
-                        </div>
 
-                        <div className="form-group col-md-6">
-                            <FormControl>
-                                <FormLabel id="radio-label">Ед. измерения</FormLabel>
-                                <RadioGroup row
-                                    className={validated && unloadUnit === "none" ? "not-valid-input-border" : ""}
-                                    aria-labelledby="radio-label"
-                                    name="radio-buttons"
-                                    value={unloadUnit}
-                                    onChange={(e) => setUnloadUnit(e.target.value)}>
-                                    <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                    <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                </RadioGroup>
-                            </FormControl>
-                        </div>
-
-                        <div className="form-group col-md-6">
-                            <Accordion>
-                                <AccordionSummary
-                                    aria-controls="panel2a-content"
-                                    id="panel2a-header">
-                                    <Typography>Также в другой ед. измерения</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <div className="form-group col-md-6">
-                                        <label>Объем выгрузки</label>
-                                        <input
-                                            className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                            type="number"
-                                            step="0.1"
-                                            form="profile-form"
-                                            onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
-                                            value={unloadVolume2} />
-                                    </div>
-
-                                    <div className="form-group col-md-6">
-                                        <FormControl>
-                                            <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
-                                            <RadioGroup row
-                                                className={validated && unloadUnit2 === "none" ? "not-valid-input-border" : ""}
-                                                aria-labelledby="buttons-group-label"
-                                                name="buttons-group"
-                                                value={unloadUnit2}
-                                                onChange={(e) => setUnloadUnit2(e.target.value)}>
-                                                <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                                <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                            </RadioGroup>
-                                        </FormControl>
-                                    </div>
-                                </AccordionDetails>
-                            </Accordion>
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <label>M3</label>
+                                    <input
+                                        placeholder="М3"
+                                        className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        type="number"
+                                        step="0.1"
+                                        form="profile-form"
+                                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
+                                        value={unloadVolume} />
+                                </div>
+                                <div className="col-md-6">
+                                    <label>Тонны</label>
+                                    <input
+                                        placeholder="Тонны"
+                                        className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        type="number"
+                                        step="0.1"
+                                        form="profile-form"
+                                        onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
+                                        value={unloadVolume2} />
+                                </div>
+                            </div>
                         </div>
 
                         <div className="form-group col-md-6">
@@ -815,11 +766,45 @@ const DriverEditSubTask = () => {
                                 options={addresses}
                                 disablePortal
                                 key={addressBKey}
+                                defaultValue={addressB}
+                                value={addressB}
                                 onChange={(e, newvalue) => { setAddressB(newvalue) }}
                                 sx={{ width: 300 }}
                                 getOptionLabel={(option) => `${option.textAddress}`}
                                 renderInput={(params) => <TextField {...params} label="Список адресов" />} />
                         </div>
+
+                        <div className="form-row">
+                            <div className="form-group col-md-6">
+                                <label>Объем выгрузки</label>
+
+                                <div className="row">
+                                    <div className="col-md-6">
+                                        <label>M3</label>
+                                        <input
+                                            placeholder="М3"
+                                            className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                            type="number"
+                                            step="0.1"
+                                            form="profile-form"
+                                            onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
+                                            value={unloadVolume} />
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <label>Тонны</label>
+                                        <input
+                                            placeholder="Тонны"
+                                            className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                            type="number"
+                                            step="0.1"
+                                            form="profile-form"
+                                            onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
+                                            value={unloadVolume2} />
+                                    </div>
+                                </div>
+                            </div>
+
 
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата прибытия на адрес выгрузки</label>
@@ -830,11 +815,10 @@ const DriverEditSubTask = () => {
                         <div className="input-group mb-3 col-md-6 pl-1">
                             <label>Дата выезда с адреса выгрузки</label>
                             <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffDepartureDate} onChange={(date) => { setDropOffDepartureDate(date) }} />
+                            </div>
                         </div>
-
-                    </div>
                     <div>
-                        <>
+                        
                             <div className="row mt-3 mb-3">
                                 <div className="col-md-9">
                                     <div className="alert alert-danger" role="alert">
@@ -864,7 +848,7 @@ const DriverEditSubTask = () => {
                                     </div>
                                 </div>
                             </div>
-                        </>
+                        
                     </div>
                     <div className="row mt-3">
                         {status <= 8 &&
@@ -909,7 +893,8 @@ const DriverEditSubTask = () => {
                                     </div>
                                 }
                             </div>}
-                    </div></> }
+                            </div>
+                        </div></> }
 
 
                 {status === 9 && driverTask.shift === 3 &&

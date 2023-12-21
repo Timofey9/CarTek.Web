@@ -20,10 +20,10 @@ registerLocale('ru', ru);
 function EditTn({ driverTaskId, isSubTask, handleClose }) {
     const [error, setError] = useState("");
     const [reload, setReload] = useState(0);
-    const [unit, setUnit] = useState("none");
-    const [unit2, setUnit2] = useState("none");
-    const [unloadUnit, setUnloadUnit] = useState("none");
-    const [unloadUnit2, setUnloadUnit2] = useState("none");
+    const [unit, setUnit] = useState(0);
+    const [unit2, setUnit2] = useState(1);
+    const [unloadUnit, setUnloadUnit] = useState(0);
+    const [unloadUnit2, setUnloadUnit2] = useState(1);
     const [gp, setGp] = useState({});
     const [go, setGo] = useState({});
     const [material, setMaterial] = useState({});
@@ -306,62 +306,31 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 </div>
 
                 <div className="form-group col-md-6">
-                    <label>Объем загрузки</label>
-                    <input
-                        type="number"
-                        step="0.1"
-                        form="profile-form"
-                        onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
-                        value={loadVolume} />
-                </div>
+                    <label className="bold-label">Объем загрузки</label>
 
-                <div className="form-group col-md-6">
-                    <FormControl>
-                        <FormLabel id="radio-buttons-group-label">Ед. измерения</FormLabel>
-                        <RadioGroup row
-                            aria-labelledby="radio-buttons-group-label"
-                            name="radio-buttons-group"
-                            value={unit}
-                            onChange={(e) => setUnit(e.target.value)}>
-                            <FormControlLabel value="0" control={<Radio />} label="M3" />
-                            <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                        </RadioGroup>
-                    </FormControl>
-                </div>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <label>M3</label>
+                            <input
+                                placeholder="М3"
+                                type="number"
+                                step="0.1"
+                                form="profile-form"
+                                onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
+                                value={loadVolume} />
+                        </div>
 
-                <div className="form-group col-md-6">
-                    <Accordion>
-                        <AccordionSummary
-                            aria-controls="panel1a-content"
-                            id="panel1a-header">
-                            <Typography>Также в другой ед. измерения</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div className="form-group col-md-6">
-                                <label>Объем загрузки</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    form="profile-form"
-                                    onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
-                                    value={loadVolume2} />
-                            </div>
-
-                            <div className="form-group col-md-6">
-                                <FormControl>
-                                    <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
-                                    <RadioGroup row
-                                        aria-labelledby="buttons-group-label"
-                                        name="buttons-group"
-                                        value={unit2}
-                                        onChange={(e) => setUnit2(e.target.value)}>
-                                        <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                        <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                    </RadioGroup>
-                                </FormControl>
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
+                        <div className="col-md-6">
+                            <label>Тонны</label>
+                            <input
+                                placeholder="Тонны"
+                                type="number"
+                                step="0.1"
+                                form="profile-form"
+                                onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
+                                value={loadVolume2} />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="form-group col-md-6">
@@ -379,12 +348,12 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 </div>
 
                 <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата прибытия на адрес погрузки</label>
+                    <label className="bold-label">Дата прибытия на адрес погрузки</label>
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalTime} onChange={(date) => { setPickupArrivalTime(date) }} />
                 </div>
 
                 <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата выезда с адреса погрузки</label>
+                    <label className="bold-label">Дата выезда с адреса погрузки</label>
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureTime} onChange={(date) => { setPickupDepartureTime(date) }} />
                 </div>
 
@@ -403,71 +372,40 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
 
 
                 <div className="form-group col-md-6">
-                    <label>Объем выгрузки</label>
-                    <input
-                        type="number"
-                        step="0.1"
-                        form="profile-form"
-                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
-                        value={unloadVolume} />
-                </div>
+                    <label className="bold-label">Объем выгрузки</label>
 
-                <div className="form-group col-md-6">
-                    <FormControl>
-                        <FormLabel id="radio-buttons-group-label">Ед. измерения</FormLabel>
-                        <RadioGroup row
-                            aria-labelledby="radio-buttons-group-label"
-                            name="radio-buttons-group"
-                            value={unloadUnit}
-                            onChange={(e) => setUnloadUnit(e.target.value)}>
-                            <FormControlLabel value="0" control={<Radio />} label="M3" />
-                            <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                        </RadioGroup>
-                    </FormControl>
-                </div>
+                    <div className="row">
+                        <div className="col-md-6">
+                            <label>M3</label>
+                            <input
+                                placeholder="М3"
+                                type="number"
+                                step="0.1"
+                                form="profile-form"
+                                onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
+                                value={unloadVolume} />
+                        </div>
 
-                <div className="form-group col-md-6">
-                    <Accordion>
-                        <AccordionSummary
-                            aria-controls="panel1a-content"
-                            id="panel1a-header">
-                            <Typography>Также в другой ед. измерения</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <div className="form-group col-md-6">
-                                <label>Объем выгрузки</label>
-                                <input
-                                    type="number"
-                                    step="0.1"
-                                    form="profile-form"
-                                    onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
-                                    value={unloadVolume2} />
-                            </div>
-
-                            <div className="form-group col-md-6">
-                                <FormControl>
-                                    <FormLabel id="buttons-group-label">Ед. измерения</FormLabel>
-                                    <RadioGroup row
-                                        aria-labelledby="buttons-group-label"
-                                        name="buttons-group"
-                                        value={unloadUnit2}
-                                        onChange={(e) => setUnloadUnit2(e.target.value)}>
-                                        <FormControlLabel value="0" control={<Radio />} label="M3" />
-                                        <FormControlLabel value="1" control={<Radio />} label="Тонны" />
-                                    </RadioGroup>
-                                </FormControl>
-                            </div>
-                        </AccordionDetails>
-                    </Accordion>
+                        <div className="col-md-6">
+                            <label>Тонны</label>
+                            <input
+                                placeholder="Тонны"
+                                type="number"
+                                step="0.1"
+                                form="profile-form"
+                                onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
+                                value={unloadVolume2} />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата прибытия на адрес выгрузки</label>
+                    <label className="bold-label">Дата прибытия на адрес выгрузки</label>
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffArrivalTime} onChange={(date) => { setDropOffArrivalTime(date) }} />
                 </div>
 
                 <div className="input-group mb-3 col-md-6 pl-1">
-                    <label>Дата выезда с адреса выгрузки</label>
+                    <label className="bold-label">Дата выезда с адреса выгрузки</label>
                     <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffDepartureTime} onChange={(date) => { setDropOffDepartureTime(date) }} />
                 </div>
 
