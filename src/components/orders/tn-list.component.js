@@ -9,6 +9,8 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { saveAs } from 'file-saver';
 import ViewTn from "./view-tn";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import EditOrderForm from './view-order.component';
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
@@ -38,6 +40,7 @@ const TnsList = () => {
     const [subTaskId, setSubTaskId] = useState(0);
     const [taskId, setTaskId] = useState(0);
     const [subTaskTnOpen, setSubTaskTnOpen] = useState(false);
+    const [showSpinner, setShowSpinner] = useState(false);
 
 
     const handleClickOpen = (row) => {
@@ -73,7 +76,7 @@ const TnsList = () => {
     };
 
     useEffect(() => {
-        setLoading(true);
+        setShowSpinner(true);
         let user = JSON.parse(localStorage.getItem("user"));
 
         if (user) {
@@ -93,8 +96,8 @@ const TnsList = () => {
             const { totalNumber, list } = data;
             setTotalNumber(totalNumber);
             setTns(list);
+            setShowSpinner(false);
         });
-
         setLoading(false);
     }, [pageSize, pageNumber, searchBy, reload]);
 
@@ -134,7 +137,7 @@ const TnsList = () => {
         },
         {
             name: "Заказчик",
-            selector: (row, index) => <div>{row.customer.clientName}</div>,
+            selector: (row, index) => <div>{row.customer && row.customer.clientName}</div>,
             wrap: true
         },
         {
@@ -261,6 +264,14 @@ const TnsList = () => {
 
             </div>
         </div>
+
+        <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={showSpinner}
+        >
+            <CircularProgress color="inherit" />
+        </Backdrop>
+
 
         <Dialog
             fullScreen

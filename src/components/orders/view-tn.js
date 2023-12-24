@@ -137,7 +137,7 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
             </div>
 
             <div className="form-row">
-                {s3Links.length > 0 &&
+                {s3Links && s3Links.length > 0 &&
                     <div className="form-group col-md-6">
                         <label className="bold-label">Фото</label>
                         {s3Links.map((link, linkindex) => {

@@ -111,7 +111,6 @@ const MyTasksList = () => {
 
     const navigate = useNavigate();
 
-
     const ExpandedComponent = ({ data }) => <pre>
         <DataTable
             columns={columnsSubTasks}
