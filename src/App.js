@@ -27,6 +27,7 @@ import CarForm from "./components/add-car.component";
 import TrailerForm from "./components/add-trailer.component";
 import OrdersList from "./components/orders/orders-list.component";
 import OrderForm from "./components/orders/add-order.component";
+import TnsList from "./components/orders/tn-list.component";
 import CarsWork from "./components/orders/task-distribution.component";
 import MyTasksList from "./components/driver-dashboard/my-tasks.component";
 import DriverDashboard from "./components/driver-dashboard/driver-dashboard.component";
@@ -214,6 +215,7 @@ class App extends Component {
 
                         <Route exact path="/admin" element={<RequireAuth currentUser={currentUser}><RequireAdmin><BoardAdmin /></RequireAdmin></RequireAuth>} />
                         <Route exact path="/admin/user/" element={<RequireAuth currentUser={currentUser}><RequireAdmin><UserForm /></RequireAdmin></RequireAuth>} />
+                        <Route exact path="/admin/tns/" element={<RequireAuth currentUser={currentUser}><RequireAdmin><TnsList /></RequireAdmin></RequireAuth>} />
                         <Route exact path="/admin/user/:login" element={<RequireAuth currentUser={currentUser}><RequireAdmin><UserForm /></RequireAdmin></RequireAuth>} />
                         <Route exact path="/admin/users" element={<RequireAuth currentUser={currentUser}><RequireAdmin> <UsersList /> </RequireAdmin></RequireAuth>} />
                         <Route exact path="/admin/drivers" element={<RequireAuth currentUser={currentUser}><RequireAdmin> <DriversList /> </RequireAdmin></RequireAuth>} />

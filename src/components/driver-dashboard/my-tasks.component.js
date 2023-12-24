@@ -25,7 +25,7 @@ const columnsSubTasks = [
     },
     {
         name: "Статус",
-        selector: (row, index) => constStatuses[row.status],
+        selector: (row, index) => <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
         center: true,
         wrap: true,
         conditionalCellStyles: [
@@ -49,19 +49,19 @@ const columnsSubTasks = [
                 }
             },
             {
-                when: row => row.isCanceled,
+                when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
                 style: {
-                    backgroundColor: '#696969',
-                    color: 'white',
+                    backgroundColor: '#ffefac',
                     '&:hover': {
                         cursor: 'pointer',
                     }
                 }
             },
             {
-                when: row => row.status !== 0 && row.status !== 9 && row.status !== 10,
+                when: row => row.isCanceled,
                 style: {
-                    backgroundColor: '#ffefac',
+                    backgroundColor: '#696969',
+                    color: 'white',
                     '&:hover': {
                         cursor: 'pointer',
                     }

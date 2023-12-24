@@ -320,7 +320,7 @@ const DriverEditSubTask = () => {
             formData.append("PickUpArrivalDate", pickupArrivalDate.toUTCString());
             formData.append("PickUpDepartureDate", pickupDepartureDate.toUTCString());
             formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',', '.'));
-            formData.append("UnloadVolume2", unloadVolume2 && unloadVolume.replace(',', '.'));
+            formData.append("UnloadVolume2", unloadVolume2 && unloadVolume2.replace(',', '.'));
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
             formData.append("LocationBId", addressB.id);
@@ -343,6 +343,37 @@ const DriverEditSubTask = () => {
 
         }
         setShowSpinner(false);
+    }, 500);
+
+    const cancelTask = useDebouncedCallback((event) => {
+        setShowSpinner(true);
+        ApiService.CancelSubTask({ driverTaskId: subTaskId })
+            .then(({ data }) => {
+                alert("Статус обновлен");
+                setFormData(new FormData());
+                setTnNumber("");
+                setNote("");
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                if (error.response.data) {
+                    setShowSpinner(false);
+                }
+            });
+
+        setShowSpinner(false);
+    }, 500);
+
+    const restoreTask = useDebouncedCallback((event) => {
+        ApiService.RestoreSubTask({ driverTaskId: subTaskId })
+            .then(({ data }) => {
+                alert("Статус обновлен");
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                setError(error.response.data.message);
+            });
+
     }, 500);
 
     const clearForm = () => {
@@ -544,9 +575,16 @@ const DriverEditSubTask = () => {
                         </h1>
                     </div>
                     <div className="col-md-2">
-                        <button disabled={status < 4} form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleEditTnOpen(e) }}>
+                        <button disabled={status < 4} form="profile-form" className="btn btn-success mt-2 mr-10" onClick={(e) => { handleEditTnOpen(e) }}>
                             ТН
                         </button>
+                        {!currentSubTask.isCanceled ?
+                            <button disabled={status >= 10} form="profile-form" className="btn btn-danger mt-2" onClick={(e) => { cancelTask(e) }}>
+                                Отменить задачу
+                            </button>
+                            :
+                            <button onClick={() => restoreTask()} className="btn btn-success mt-2">Возобновить</button>
+                        }
                     </div>
                 </div>
 
@@ -774,49 +812,6 @@ const DriverEditSubTask = () => {
                                 renderInput={(params) => <TextField {...params} label="Список адресов" />} />
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group col-md-6">
-                                <label>Объем выгрузки</label>
-
-                                <div className="row">
-                                    <div className="col-md-6">
-                                        <label>M3</label>
-                                        <input
-                                            placeholder="М3"
-                                            className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                            type="number"
-                                            step="0.1"
-                                            form="profile-form"
-                                            onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
-                                            value={unloadVolume} />
-                                    </div>
-
-                                    <div className="col-md-6">
-                                        <label>Тонны</label>
-                                        <input
-                                            placeholder="Тонны"
-                                            className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                            type="number"
-                                            step="0.1"
-                                            form="profile-form"
-                                            onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
-                                            value={unloadVolume2} />
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата прибытия на адрес выгрузки</label>
-                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy"
-                                selected={dropOffArrivalDate} onChange={(date) => { setDropOffArrivalDate(date) }} />
-                        </div>
-
-                        <div className="input-group mb-3 col-md-6 pl-1">
-                            <label>Дата выезда с адреса выгрузки</label>
-                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={dropOffDepartureDate} onChange={(date) => { setDropOffDepartureDate(date) }} />
-                            </div>
-                        </div>
                     <div>
                         
                             <div className="row mt-3 mb-3">

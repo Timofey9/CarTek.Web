@@ -313,6 +313,16 @@ class ApiService {
         return res;
     }
 
+    CancelSubTask(data) {
+        var res = this.post(`order/canceldriversubtask`, data);
+        return res;
+    }
+
+    RestoreSubTask(data) {
+        var res = this.post(`order/restoredriversubtask`, data);
+        return res;
+    }
+
     async SubmitNoteAsync(data) {
         var res = await this.post(`drivers/postnote`, data, { 'Content-Type': 'multipart/form-data' });
         return await res;
@@ -361,6 +371,11 @@ class ApiService {
     getOrdersBetweenDates(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`order/getordersbetweendates/?${query}`);
+    }
+
+    getTnsListBetweenDates(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`tn/gettnslist/?${query}`);
     }
 
     getAllActiveOrders(params) {

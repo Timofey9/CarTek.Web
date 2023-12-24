@@ -293,6 +293,19 @@ const DriverEditTask = () => {
     }, 500);
 
 
+
+    const restoreTask = useDebouncedCallback((event) => {
+        ApiService.RestoreTask({ driverTaskId: driverTaskId })
+            .then(({ data }) => {
+                alert("Статус обновлен");
+                setReload(reload + 1);
+            })
+            .catch((error) => {
+                setError(error.response.data.message);
+            });
+
+    }, 500);
+
     const handleSubmitNote = useDebouncedCallback((event) => {
         event.preventDefault();
         setShowSpinner(true);
@@ -376,7 +389,7 @@ const DriverEditTask = () => {
 
         if (status === 7 && validate()) {
             formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',','.'));
-            formData.append("UnloadVolume2", unloadVolume2 && unloadVolume.replace(',', '.'));
+            formData.append("UnloadVolume2", unloadVolume2 && unloadVolume2.replace(',', '.'));
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
             formData.append("LocationBId", addressB.id);
@@ -626,9 +639,13 @@ const DriverEditTask = () => {
                         <button disabled={status < 4} form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleEditTnOpen(e) }}>
                             ТН
                         </button>
-                        <button disabled={status >= 10} form="profile-form" className="btn btn-danger mt-2" onClick={(e) => { cancelTask(e) }}>
-                            Отменить задачу
-                        </button>
+                        {!driverTask.isCanceled ?
+                            <button disabled={status >= 10} form="profile-form" className="btn btn-danger mt-2" onClick={(e) => { cancelTask(e) }}>
+                                Отменить задачу
+                            </button>
+                            :
+                            <button onClick={() => restoreTask()} className="btn btn-success mt-2">Возобновить</button>
+                        }
                     </div>
                 </div>
 

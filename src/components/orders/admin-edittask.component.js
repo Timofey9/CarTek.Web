@@ -305,7 +305,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                                         <button onClick={() => setConfirmationOpen(true)} className="btn btn-danger mr-10">Удалить</button>
 
                                     {!driverTask.isCanceled ? <button onClick={() => cancelTask()} className="btn btn-secondary mr-10">Отменить</button> :
-                                        <button onClick={() => restoreTask()} className="btn btn-success mr-10">Восстановить</button>}
+                                        <button onClick={() => restoreTask()} className="btn btn-success mr-10">Возобновить</button>}
                                     </>
                                 }
 
