@@ -19,7 +19,7 @@ class Profile extends Component {
           </h3>
         </header>
             <p>
-                <strong>Роль:</strong> {currentUser.identity.isAdmin ? "Администратор" : "Механик"}
+                <strong>Роль:</strong> {currentUser.identity && getRoleString(currentUser.identity)}
             </p>
         <p>
           <strong>Телефон:</strong> {currentUser.identity.phone}
@@ -27,6 +27,25 @@ class Profile extends Component {
       </div>
     );
   }
+}
+
+function getRoleString(identity) {
+    if (identity.isAdmin) {
+        return "Администратор";
+    } else
+        if (identity.isDispatcher) {
+            return "Диспетчер";
+        } else
+            if (identity.isInitialBookkeeper) {
+                return "Бухгалтер первички";
+            } else
+                if (identity.isSalaryBookkeeper) {
+                    return "Бухгалтер ЗП";
+                }else
+                if (identity.isLogistManager) {
+                    return "Менеджер-логист";
+                } else
+                    return "Механик";
 }
 
 function mapStateToProps(state) {

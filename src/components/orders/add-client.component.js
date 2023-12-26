@@ -18,7 +18,6 @@ function ClientForm({client, handleClose }) {
     const [fixedPrice, setFixedPrice] = useState();
     const [isFixedPrice, setIsFixedPrice] = useState(false);
 
-    const [density, setDensity] = useState();
     const [isDensity, setIsDensity] = useState(false);
 
     useEffect(() => {
@@ -30,12 +29,6 @@ function ClientForm({client, handleClose }) {
             setFixedPrice(client.fixedPrice);
             if (client.fixedPrice > 0) {
                 setIsFixedPrice(true);
-            }
-
-            setDensity(client.density);
-
-            if (client.density > 0) {
-                setIsDensity(true);
             }
 
             setIsClient(true);
@@ -63,10 +56,6 @@ function ClientForm({client, handleClose }) {
 
         if (isFixedPrice) {
             newClient.fixedPrice = fixedPrice;
-        }
-
-        if (isDensity) {
-            newClient.density = density;
         }
 
         if (isClient) {
@@ -177,20 +166,6 @@ function ClientForm({client, handleClose }) {
                 <div className="form-group col-md-6">
                     <FormControlLabel required control={<Checkbox checked={isDensity}
                         onChange={(e) => setIsDensity(e.target.checked)} />} label="Применять насыпной коэффициент" />
-                </div>
-            </div>
-            <div className="form-row">
-                <div className="form-group col-md-6">
-                    <label>Насыпной коэффициент</label>
-                    <input
-                        disabled={!isDensity}
-                        type="number"
-                        step="0.1"
-                        className="form-control"
-                        form="profile-form"
-                        onChange={(e) => setDensity(e.target.value)}
-                        value={density}
-                    />
                 </div>
             </div>
 

@@ -281,7 +281,7 @@ const OrdersList = () => {
                 </ButtonGroup>,
             center: true,
             wrap: true,
-            omit: localUser.identity && (localUser.identity.isDispatcher || localUser.identity.isInitialBookkeeper || localUser.identity.isSalaryBookkeeper)
+            omit: localUser.identity && (localUser.identity.isDispatcher)
         }
     ];
 
@@ -461,7 +461,8 @@ const OrdersList = () => {
                             {localUser.identity && !localUser.identity.isDispatcher &&
                                 <>
                                     <Button onClick={(e) => { e.preventDefault(); downloadTnsFile(); }}>Реестр ТН</Button>
-                                    <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>
+                                    {localUser.identity && !localUser.identity.isLogistManager &&
+                                    <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>}
                                 </>
                             }
                             <Button onClick={(e) => { e.preventDefault(); downloadFile(); }}>Заявки</Button>

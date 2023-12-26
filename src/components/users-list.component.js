@@ -80,7 +80,9 @@ const UsersList = () => {
         }else
         if (user.isSalaryBookkeeper) {
             return "Бухгалтер ЗП";
-        } else {
+        } else if (user.isLogistManager) {
+            return "Менеджер-логист";
+        } else{
             return "Механик";
         }
     }

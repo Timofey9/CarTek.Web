@@ -37,6 +37,9 @@ class UserForm extends Component {
                     if (data.isSalaryBookkeeper) {
                         this.setState({ role: '4' });
                     }
+                    if (data.isLogistManager) {
+                        this.setState({ role: '5' });
+                    }
                 })
                 .catch((error) => {
                     this.setState({ loading: false, error })
@@ -77,6 +80,7 @@ class UserForm extends Component {
                     isDispatcher: this.state.role === '2',
                     isInitialBookkeeper: this.state.role === '3',
                     isSalaryBookkeeper: this.state.role === '4',
+                    isLogistManager: this.state.role === '5',
                 };
                 const { login } = this.props.params;
                 if (login) {
@@ -318,6 +322,7 @@ class UserForm extends Component {
                             <FormControlLabel value="2" control={<Radio />} label="Диспетчер" />
                             <FormControlLabel value="3" control={<Radio />} label="Бухгалтер первички" />
                             <FormControlLabel value="4" control={<Radio />} label="Бухгалтер ЗП" />
+                            <FormControlLabel value="5" control={<Radio />} label="Менеджер-логист" />
                         </RadioGroup>
                     </FormControl>
                 </div>

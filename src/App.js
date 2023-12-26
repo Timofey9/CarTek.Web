@@ -75,7 +75,7 @@ class App extends Component {
             this.setState({
                 currentUser: user,
                 showAdminBoard: user.identity.isAdmin,
-                isDispatcher: user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper,
+                isDispatcher: user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper || user.identity.isLogistManager,
                 showDriver: user.isDriver
             });
         }
@@ -132,6 +132,12 @@ class App extends Component {
                                     <li className="nav-item">
                                         <Link to={"/admin/workload"} className="nav-link">
                                             Задачи
+                                        </Link>
+                                    </li>
+
+                                    <li className="nav-item">
+                                        <Link to={"/admin/tns"} className="nav-link">
+                                            Реестр ТН
                                         </Link>
                                     </li>
                                 </>)}
@@ -255,7 +261,7 @@ function RequireAdmin({ currentUser, children }) {
     if (user === null) {
         return <Navigate to="/login" />;
     }
-    let hasAdminPrivileges = user.identity.isAdmin || user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper;
+    let hasAdminPrivileges = user.identity.isAdmin || user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper || user.identity.isLogistManager;
     return isAuthenticated && hasAdminPrivileges ? children : <Navigate to="/" />;
 }
 
