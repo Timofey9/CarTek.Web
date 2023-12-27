@@ -56,6 +56,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [applyChanges, setApplyChanges] = useState(true);
     const [orderShift, setOrderShift] = useState(0);
     const [customer, setCustomer] = useState(0);
+    const [density, setDensity] = useState("");
 
     const shiftToShortString = (shift) => {
         switch (shift) {
@@ -184,7 +185,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setMileage(data.mileage);
                 setGp(data.gp);
                 setOrderShift(data.shift.toString());
-
+                setDensity(data.density);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -315,7 +316,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             service: serviceType,
             mileage: mileage,
             price: price,
-            materialPrice: materialPrice
+            materialPrice: materialPrice,
+            density: density
         };
 
         if (startDateChanged && !applyChanges) {
@@ -515,6 +517,21 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             <option value="0">М3</option>
                             <option value="1">тонны</option>
                         </select>
+                    </div>
+
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <div className="form-group col-md-6">
+                        <label>Насыпной коэффициент</label>
+                        <input
+                            type="number"
+                            step="0.1"
+                            disabled={!isEdit}
+                            className="form-control"
+                            form="profile-form"
+                            onChange={(e) => setDensity(e.target.value)}
+                            value={density}
+                        />
                     </div>
 
                 </div>

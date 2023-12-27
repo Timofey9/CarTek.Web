@@ -54,21 +54,28 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [isOrderCreated, setIsOrderCreated] = useState(false);
     const [orderShift, setOrderShift] = useState("");
     const [customer, setCustomer] = useState({});
-
+    const [density, setDensity] = useState(1);
+    const [unitString, setUnitString] = useState("");
     const handleClickOpen = () => {
         setOpen(true);
     };
 
     const unitToString = (unit) => {
         switch (unit) {
-            case 0:
+            case '0':
                 return "m3"
-            case 1:
+            case '1':
                 return "тн";
             default:
                 return "";
         }
     }
+
+    const updateUnit = (unit) => {
+        setUnitString(unitToString(unit));
+        setLoadUnit(unit);
+    }
+
 
     const updateCustomer = (value) => {
         if (serviceType === "0") {
@@ -228,6 +235,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             updateCustomer(clonedCustomer);
 
             setClient(clonedOrder.client);
+            setDensity(clonedOrder.density);
             setGp(clonedOrder.gp);
             setMaterial(clonedOrder.material);
             setCarCount(clonedOrder.carCount);
@@ -355,7 +363,8 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             service: serviceType,
             mileage: mileage,
             price: price,
-            materialPrice: materialPrice
+            materialPrice: materialPrice,
+            density: density
         };
 
         if (validate()) {
@@ -539,11 +548,23 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
 
                     <div className="form-group col-md-6">
                         <label>Единица измерения</label>
-                        <select className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => setLoadUnit(e.target.value)}>
+                        <select className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => updateUnit(e.target.value)}>
                             <option value="none">Единица измерения</option>
                             <option value="0">М3</option>
                             <option value="1">тонны</option>
                         </select>
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <label>Насыпной коэффициент</label>
+                        <input
+                            type="number"
+                            step="0.1"
+                            className="form-control"
+                            form="profile-form"
+                            onChange={(e) => setDensity(e.target.value)}
+                            value={density}
+                        />
                     </div>
 
                 </div>
@@ -571,7 +592,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Себестоимость перевозки руб/{customer && unitToString(customer.clientUnit)}</label>
+                        <label>Себестоимость перевозки руб/{unitString}</label>
                         <input
                             type="text"
                             className={validated && price.length === 0 ? "form-control not-valid-input-border" : "form-control"}

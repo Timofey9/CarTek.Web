@@ -79,7 +79,7 @@ const DriverEditTask = () => {
     const [openMaterial, setOpenMaterial] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [openEditTn, setOpenEditTn] = useState(false);
-
+    const [density, setDensity] = useState(0);
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
     const frequentlyUsed = ['ООО "КарТэк"', 'ЛСР Базовые'];
     let { driverTaskId } = useParams();
@@ -678,10 +678,10 @@ const DriverEditTask = () => {
                     <dt className="col-sm-3">Заказчик: </dt>
                     <dd className="col-sm-9">{customer.clientName}</dd>
 
-                    {customer.density &&
+                    {order.density &&
                     <>
                         <dt className="col-sm-3">Насыпной коэффициент: </dt>
-                        <dd className="col-sm-9">{customer.density}</dd>
+                        <dd className="col-sm-9">{order.density}</dd>
                     </>}
 
                     <dt className="col-sm-3">Себестоимость перевозки:</dt>
@@ -850,7 +850,7 @@ const DriverEditTask = () => {
                             <label>Объем выгрузки</label>
 
                             <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-md-5">
                                     <label>M3</label>
                                     <input
                                         placeholder="М3"
@@ -862,7 +862,7 @@ const DriverEditTask = () => {
                                         value={unloadVolume} />
                                 </div>
 
-                                <div className="col-md-6">
+                                <div className="col-md-5">
                                     <label>Тонны</label>
                                     <input
                                         placeholder="Тонны"
@@ -872,6 +872,10 @@ const DriverEditTask = () => {
                                         form="profile-form"
                                         onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
                                         value={unloadVolume2} />
+                                </div>
+
+                                <div className="col-md-2">
+                                    <button className="btn btn-success">Пересчитать</button>
                                 </div>
                             </div>
                         </div>
