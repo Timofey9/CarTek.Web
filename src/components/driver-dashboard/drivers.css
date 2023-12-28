@@ -14,3 +14,9 @@
     border: solid 2px red !important;
     border-radius: 3px;
 }
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

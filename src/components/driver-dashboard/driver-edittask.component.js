@@ -292,6 +292,18 @@ const DriverEditTask = () => {
         setShowSpinner(false);
     }, 500);
 
+    const convertVolumes = (volume1, volume2, setter1, setter2) => {
+        //volume1 - в м3
+        //volume2 - в тн
+
+        if (volume1 > 0) {
+            setter2(volume1 * order.density);
+        } else
+            if (volume2 > 0) {
+                console.log(volume2 / order.density);
+                setter1(volume2 / order.density)
+        }
+    } 
 
 
     const restoreTask = useDebouncedCallback((event) => {
@@ -388,7 +400,7 @@ const DriverEditTask = () => {
         }
 
         if (status === 7 && validate()) {
-            formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',','.'));
+            formData.append("UnloadVolume", unloadVolume && unloadVolume.replace(',', '.'));
             formData.append("UnloadVolume2", unloadVolume2 && unloadVolume2.replace(',', '.'));
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
@@ -419,24 +431,24 @@ const DriverEditTask = () => {
             return;
         }
 
-            if (validate()) {
-                ApiService.EditDriverTaskAsync(formData)
-                    .then(({ data }) => {
-                        alert("Статус обновлен");
-                        setFormData(new FormData());
-                        setTnNumber("");
-                        setNote("");
-                        setReload(reload + 1);
+        if (validate()) {
+            ApiService.EditDriverTaskAsync(formData)
+                .then(({ data }) => {
+                    alert("Статус обновлен");
+                    setFormData(new FormData());
+                    setTnNumber("");
+                    setNote("");
+                    setReload(reload + 1);
+                    setShowSpinner(false);
+                })
+                .catch((error) => {
+                    if (error.response.data) {
+                        setError(error.response.data);
                         setShowSpinner(false);
-                    })
-                    .catch((error) => {
-                        if (error.response.data) {
-                            setError(error.response.data);
-                            setShowSpinner(false);
-                        }
-                    });
-            }
-        
+                    }
+                });
+        }
+
         setShowSpinner(false);
     }, 500);
 
@@ -679,24 +691,22 @@ const DriverEditTask = () => {
                     <dd className="col-sm-9">{customer.clientName}</dd>
 
                     {order.density &&
-                    <>
-                        <dt className="col-sm-3">Насыпной коэффициент: </dt>
-                        <dd className="col-sm-9">{order.density}</dd>
-                    </>}
+                        <>
+                            <dt className="col-sm-3">Насыпной коэффициент: </dt>
+                            <dd className="col-sm-9">{order.density}</dd>
+                        </>}
 
                     <dt className="col-sm-3">Себестоимость перевозки:</dt>
                     <dd className="col-sm-9">{driverTask.price}</dd>
 
                     <dt className="col-sm-3">Транспорт :</dt>
-                    <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>)})}</dd>
+                    <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>) })}</dd>
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
 
                     <dt className="col-sm-3">Комментарий по задаче:</dt>
                     <dd className="col-sm-9">{driverTask.adminComment}</dd>
-
-
                 </dl>
                 {status === 4 &&
                     <div className="form-row">
@@ -769,7 +779,7 @@ const DriverEditTask = () => {
                         <div className="form-row">
                             <label>Тип груза (3)</label>
                             <Autocomplete
-                                renderOption={(props, item) => ( <li {...props} key={item.id}>{item.name}</li>)}
+                                renderOption={(props, item) => (<li {...props} key={item.id}>{item.name}</li>)}
                                 className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
                                 options={materialsList}
                                 defaultValue={material}
@@ -789,7 +799,7 @@ const DriverEditTask = () => {
                             <label>Объем загрузки</label>
 
                             <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-md-5">
                                     <label>M3</label>
                                     <input
                                         placeholder="М3"
@@ -800,7 +810,18 @@ const DriverEditTask = () => {
                                         onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
                                         value={loadVolume} />
                                 </div>
-                                <div className="col-md-6">
+
+                                {order.density && order.density !== 0 &&
+                                    <div className="col-md-2 center">
+                                        <div className="mt-4">
+                                            <button onClick={(e) => convertVolumes(loadVolume, loadVolume2, setLoadVolume, setLoadVolume2)} className="btn btn-success">
+                                                <i class="fa fa-arrows-h" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div className="col-md-5">
                                     <label>Тонны</label>
                                     <input
                                         placeholder="Тонны"
@@ -862,6 +883,16 @@ const DriverEditTask = () => {
                                         value={unloadVolume} />
                                 </div>
 
+                                {order.density && order.density !== 0 &&
+                                    <div className="col-md-2 center">
+                                        <div className="mt-4">
+                                            <button onClick={(e) => convertVolumes(unloadVolume, unloadVolume2, setUnloadVolume, setUnloadVolume2)} className="btn btn-success">
+                                                <i class="fa fa-arrows-h" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }                             
+
                                 <div className="col-md-5">
                                     <label>Тонны</label>
                                     <input
@@ -874,9 +905,6 @@ const DriverEditTask = () => {
                                         value={unloadVolume2} />
                                 </div>
 
-                                <div className="col-md-2">
-                                    <button className="btn btn-success">Пересчитать</button>
-                                </div>
                             </div>
                         </div>
 
@@ -910,34 +938,34 @@ const DriverEditTask = () => {
                     {status === 7 &&
                         <>
                             <div className="row mt-3 mb-3">
-                            <div className="col-md-9">
-                                <div className="alert alert-danger" role="alert">
-                                    ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            <input type="file" id="imageFileInputTN" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
-                                            {hasFiles("imageFileInputTN") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN")} aria-label="delete">
-                                                <i className="fa fa-cancel" aria-hidden="true"></i>  </IconButton>}
+                                <div className="col-md-9">
+                                    <div className="alert alert-danger" role="alert">
+                                        ПРИКРЕПИТЬ ФОТО C 1 СТОРОНЫ
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <input type="file" id="imageFileInputTN" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile(e)}></input>
+                                                {hasFiles("imageFileInputTN") && <IconButton onClick={(e) => clearFileInputById("imageFileInputTN")} aria-label="delete">
+                                                    <i className="fa fa-cancel" aria-hidden="true"></i>  </IconButton>}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                                          
-                        <div className="row mt-3 mb-3">
-                            <div className="col-md-9">
-                                <div className="alert alert-danger" role="alert">
-                                    ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            <input type="file" id="imageFileInputTN2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
-                                            {hasFiles("imageFileInputTN2") &&
-                                                <IconButton onClick={(e) => clearFileInputById("imageFileInputTN2")} aria-label="delete">
-                                                    <i className="fa fa-xmark" aria-hidden="true"></i>  </IconButton>}
+
+                            <div className="row mt-3 mb-3">
+                                <div className="col-md-9">
+                                    <div className="alert alert-danger" role="alert">
+                                        ПРИКРЕПИТЬ ФОТО СО 2 СТОРОНЫ
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <input type="file" id="imageFileInputTN2" accept=".jpg, .png, .PNG ,.jpeg" multiple onChange={(e) => selectFile2(e)}></input>
+                                                {hasFiles("imageFileInputTN2") &&
+                                                    <IconButton onClick={(e) => clearFileInputById("imageFileInputTN2")} aria-label="delete">
+                                                        <i className="fa fa-xmark" aria-hidden="true"></i>  </IconButton>}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
                             </div>
                         </>}
                 </div>
@@ -992,15 +1020,15 @@ const DriverEditTask = () => {
                                 <div className="row">
                                     <div className="col-md-12">
                                         <label htmlFor="files">Прикрепить фотографии</label>
-                                        {hasFiles("imageFileInput") && 
+                                        {hasFiles("imageFileInput") &&
                                             <IconButton onClick={(e) => clearFileInputById("imageFileInput")} aria-label="delete">
-                                            <i className="fa fa-close" aria-hidden="true"></i>  </IconButton>}
+                                                <i className="fa fa-close" aria-hidden="true"></i>  </IconButton>}
 
                                         <input type="file" id="imageFileInput" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
 
                                     </div>
                                 </div>}
-  
+
 
                             <div className="row">
                                 <div className="col-md-12">
@@ -1031,7 +1059,7 @@ const DriverEditTask = () => {
                                     </button>
                                 </div>
                             </div>
- 
+
                             {error &&
                                 <div className="row d-flex justify-content-center mt-3">
                                     <div className="alert alert-danger mt-2" role="alert">
@@ -1044,7 +1072,7 @@ const DriverEditTask = () => {
 
                 {status === 9 && driverTask.shift === 3 && driverTask.subTasksCount < 1 &&
                     <>
-                    <div className="row">
+                        <div className="row">
                             <div className="col-md-12">
                                 <button type="submit" onClick={handleConfirmationOpen} className="btn btn-danger mt-3">
                                     На шаг назад
@@ -1126,7 +1154,7 @@ const DriverEditTask = () => {
             </DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    Вы хотите вернуться на предыдущий шаг. Нажмите "Продолжить" 
+                    Вы хотите вернуться на предыдущий шаг. Нажмите "Продолжить"
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
