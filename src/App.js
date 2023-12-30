@@ -33,7 +33,7 @@ import MyTasksList from "./components/driver-dashboard/my-tasks.component";
 import DriverDashboard from "./components/driver-dashboard/driver-dashboard.component";
 import DriverEditTask from "./components/driver-dashboard/driver-edittask.component";
 import DriverEditSubTask from "./components/driver-dashboard/driver-editsubtask.component";
-
+import MessagesList from "./components/information-messages"
 import AdminEditTask from "./components/orders/admin-edittask.component";
 import NotificationsList from "./components/driver-dashboard/notification-list.component";
 import AddressesList from "./components/addresses-list.component";
@@ -201,6 +201,7 @@ class App extends Component {
                         <Route exact path="/user" element={<RequireAuth currentUser={currentUser}><BoardUser /></RequireAuth>} />
                         <Route exact path="/cars" element={<RequireAuth currentUser={currentUser}><CarsList /></RequireAuth>} />
                         <Route exact path="/driver-dashboard" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><DriverDashboard /></RequireAuth>} />
+                        <Route exact path="/driver-dashboard/messages" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><MessagesList /></RequireAuth>} />
                         <Route exact path="/driver-dashboard/mytasks" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><MyTasksList /></RequireAuth>} />
                         <Route exact path="/driver/notifications" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><NotificationsList /></RequireAuth>} />
                         <Route exact path="/driver-dashboard/task/:driverTaskId" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><DriverEditTask /></RequireAuth>} />
@@ -233,6 +234,7 @@ class App extends Component {
                         <Route exact path="/admin/addresses" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <AddressesList /> </RequireAdmin> </RequireAuth>} />
                         <Route exact path="/admin/clients" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <ClientsList /> </RequireAdmin> </RequireAuth>} />
                         <Route exact path="/admin/materials" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <MaterialsList /> </RequireAdmin> </RequireAuth>} />
+                        <Route exact path="/admin/messages" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <MessagesList /> </RequireAdmin> </RequireAuth>} />
                         <Route exact path="/admin/drivertask/:driverTaskId" element={<RequireAuth currentUser={currentUser}> <RequireAdmin> <AdminEditTask /> </RequireAdmin> </RequireAuth>} />
                     </Routes>
                 </div>

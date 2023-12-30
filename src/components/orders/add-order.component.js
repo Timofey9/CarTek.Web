@@ -54,7 +54,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [isOrderCreated, setIsOrderCreated] = useState(false);
     const [orderShift, setOrderShift] = useState("");
     const [customer, setCustomer] = useState({});
-    const [density, setDensity] = useState(1);
+    const [density, setDensity] = useState();
     const [unitString, setUnitString] = useState("");
     const handleClickOpen = () => {
         setOpen(true);
@@ -76,6 +76,21 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
         setLoadUnit(unit);
     }
 
+    const updateVolume = (setter, value) => {
+        var str = value.toString();
+        if (str.length > 1) {
+            if (str[1] === ',' || str[1] === '.'
+                || str[0] === ',' || str[0] === '.') {
+                setter(value);
+            } else {
+                var newString = str.slice(0, 1) + '.' + str.slice(1);
+                setter(newString);
+            }
+
+        } else {
+            setter(value);
+        }
+    }
 
     const updateCustomer = (value) => {
         if (serviceType === "0") {
@@ -562,7 +577,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             step="0.1"
                             className="form-control"
                             form="profile-form"
-                            onChange={(e) => setDensity(e.target.value)}
+                            onChange={(e) => updateVolume(setDensity, e.target.value)}
                             value={density}
                         />
                     </div>

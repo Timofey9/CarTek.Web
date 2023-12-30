@@ -9,7 +9,11 @@ const DriverDashboard = () => {
                 </div>
                 <div className="col-md-3 pb-3">
                     <Link to="/driver/notifications" className="w-100 btn btn-secondary">Уведомления</Link>
-                </div>
+                 </div>
+
+            <div className="col-md-3 pb-3">
+                <Link to="/driver-dashboard/messages" className="w-100 btn btn-secondary">Доска сообщений</Link>
+            </div>
             </div>
         </div>
 };

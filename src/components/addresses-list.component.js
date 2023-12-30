@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import AddressForm from "./orders/add-address.component"
 import DataTable from 'react-data-table-component';
@@ -20,9 +20,17 @@ const AddressesList = () => {
     const [selectedAddress, setSelectedAddress] = useState({});
     const [reload, setReload] = useState(0);
     const [filterText, setFilterText] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams({});
+
+    const setParams = (id) => {
+        let params = { id: id }
+        setSearchParams(params);
+    }
 
     useEffect(() => {
         !cancelled && setLoading(true);
+
+        var id = searchParams.getAll("id").length > 0 ? searchParams.getAll("id")[0] : 0;
 
         ApiService.getAddresses()
             .then(({ data }) => {
@@ -30,6 +38,10 @@ const AddressesList = () => {
                 !cancelled && setTotalNumber(totalNumber);
                 !cancelled && setLoading(false);
             });
+
+        if (id > 0) {
+            document.getElementById(id).scrollIntoView();
+        }
 
         return () => cancelled = true
     }, [sortBy, dir, reload]);
@@ -86,7 +98,7 @@ const AddressesList = () => {
         },
         {
             name: "Редактировать",
-            selector: (row, index) => <Button id={row.id} onClick={(e) => handleClickOpen(row)} variant="outlined"><i className="fa fa-edit" aria-hidden="true"></i></Button>,
+            selector: (row, index) => <Button id={row.id} onClick={(e) => { setParams(row.id); handleClickOpen(row) }} variant="outlined"><i className="fa fa-edit" aria-hidden="true"></i></Button>,
             sortable: false,
             minWidth: '1em'
         }

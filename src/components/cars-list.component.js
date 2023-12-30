@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 
@@ -14,7 +14,8 @@ const CarsList = () => {
     const [dir, setDir] = useState("asc");
     const [totalNumber, setTotalNumber] = useState(15);
     const [pageSize, setPageSize] = useState(15);
-    const [pageNumber, setPageNumber] = useState(1);
+    const [searchParams, setSearchParams] = useSearchParams({});
+    const [pageNumber, setPageNumber] = useState(searchParams.getAll("page").length > 0 ? searchParams.getAll("page")[0] : 1);
     const [cars, setCars] = useState([]);
     const [reload, setReload] = useState(0);
     const [user, setUser] = useState({});
@@ -22,7 +23,13 @@ const CarsList = () => {
 
     const search = () => {
         setReload(reload + 1);
+        setParams();
     };
+
+    const setParams = () => {
+        let params = { page: pageNumber, searchBy: searchBy, searchString: searchString };
+        setSearchParams(params);
+    }
 
     useEffect(() => {
         !cancelled && setLoading(true);
@@ -49,6 +56,11 @@ const CarsList = () => {
 
         return () => cancelled = true
     }, [sortBy, dir, pageSize, pageNumber, reload]);
+
+    useEffect(() => {
+        setParams();
+    }, [sortBy, dir, pageSize, pageNumber, reload]);
+
 
     const columns = [
         {
@@ -103,6 +115,12 @@ const CarsList = () => {
             },
         }
     };
+
+    const paginationComponentOptions = {
+        rowsPerPageText: 'На странице',
+        rangeSeparatorText: 'из',
+    };
+
     return <>
         <form>
             <div className="row">
@@ -124,7 +142,7 @@ const CarsList = () => {
                     </div>
                 </div>
                 <div className="form-group col-md-5">
-                    {user.identity && user.identity.isAdmin && <Link to="/admin/cars/add" type="submit" className="pull-right btn btn-success mb-2">Добавить тягач</Link>}
+                    {user.identity && user.identity.isAdmin && <Link onClick={(d) => setParams()} to="/admin/cars/add" type="submit" className="pull-right btn btn-success mb-2">Добавить тягач</Link>}
                 </div>
             </div>
         </form>
@@ -145,6 +163,8 @@ const CarsList = () => {
                     defaultSortAsc
                     progressPending={loading}
                     paginationTotalRows={totalNumber}
+                    paginationDefaultPage={pageNumber}
+                    paginationComponentOptions={paginationComponentOptions}
                     customStyles={customStyles}
                     onSort={(column, direction) => {
                         !cancelled && setSortBy(column.sortBy);
@@ -156,6 +176,7 @@ const CarsList = () => {
                         !cancelled && setPageNumber(page);
                     }}
                     onRowClicked={(row, event) => {
+                        setParams();
                         navigate(`/cars/car/${row.id}`);
                     }}
                     onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {

@@ -398,7 +398,6 @@ class ApiService {
         return res;
     }
 
-
     creatematerial(data) {
         var res = this.post(`utils/creatematerial`, data);
         return res;
@@ -436,6 +435,19 @@ class ApiService {
         return this.delete(`utils/deleteclient/${id}`);
     }
 
+    createinformationmessage(data) {
+        var res = this.post(`utils/createmessage`, data);
+        return res;
+    }
+
+    deleteinformationmessage(id) {
+        return this.delete(`utils/deleteinformationmessage/${id}`);
+    }
+
+    getInfromationMessages() {
+        var res = this.get(`utils/getinformationmessages`);
+        return res;
+    }
 
     getAddresses() {
         var res = this.get(`utils/getaddresses`);
@@ -596,9 +608,19 @@ class ApiService {
         return this.post("drivers/createdriver", data);
     };
 
+
+    fireDriver = (data) => {
+        return this.post("drivers/firedriver", data);
+    };
+
     getDrivers(params) {
         const query = new URLSearchParams(params).toString();
         return this.get(`drivers/getdrivers/?${query}`);
+    }
+
+    getAllDriversWithFired(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`drivers/getalldriverswithfired/?${query}`);
     }
 
     getAllDrivers() {

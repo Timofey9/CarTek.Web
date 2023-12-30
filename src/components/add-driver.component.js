@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 function DriverForm() {
     const [driver, setDriver] = useState({});
@@ -19,6 +21,8 @@ function DriverForm() {
     const [error, setError] = useState("");
     const [notificationShown, setNotificationShown] = useState(false);
     const [percentage, setPercentage] = useState("");
+    const [isFired, setIsFired] = useState(false);
+    const [isFiredCheck, setIsFiredCheck] = useState(true);
     const navigate = useNavigate();
 
     let { driverId } = useParams();
@@ -53,6 +57,7 @@ function DriverForm() {
                     setPhone(data.phone);
                     setLogin(data.login);
                     setPercentage(data.percentage);
+                    setIsFired(data.isFired);
                 }).
                 catch((error) => {
                     setError(error.response.data);
@@ -73,7 +78,8 @@ function DriverForm() {
                 phone: phone,
                 carId: carId,
                 login: login,
-                percentage: percentage ? percentage.toString().replace(',','.') : 0
+                isFired: isFired,
+                percentage: percentage ? percentage.toString().replace(',', '.') : 0
             };
 
             if (driverId) {
@@ -117,7 +123,20 @@ function DriverForm() {
         }
     }
 
-    function validate(){
+    function fireDriver(event) {
+        event.preventDefault();
+        ApiService.fireDriver({ driverId: driverId })
+            .then(({ data }) => {
+                setLoading(false);
+                alert("Водитель уволен");
+            })
+            .catch((error) => {
+                setError(error.response.data.message);
+                setLoading(false);
+            })
+    }
+
+    function validate() {
         if (password.trim() === '' ||
             firstName.trim() === '' ||
             lastName.trim() === '') {
@@ -163,7 +182,7 @@ function DriverForm() {
                         className="form-control"
                         form="profile-form"
                         onChange={(e) => setMiddleName(e.target.value)}
-                        value={middleName}/>
+                        value={middleName} />
                 </div>
 
             </div>
@@ -207,6 +226,11 @@ function DriverForm() {
                         value={percentage} />
                 </div>
 
+                {isFired && <div className="form-group col-md-6">
+                    <FormControlLabel required control={<Checkbox checked={isFiredCheck}
+                        onChange={(e) => setIsFiredCheck(e.target.checked)} />} label="Уволен" />
+                </div>}
+
                 {driver.car ? <div className="form-group col-md-6">
                     <label htmlFor="car">Текущий тягач: {driver.car.brand} {driver.car.model}, гос.номер {driver.car.plate}</label>
                 </div> : <></>}
@@ -224,7 +248,7 @@ function DriverForm() {
                     renderInput={(params) => <TextField {...params} label="Список тягачей" />} />
             </div>}
 
-            {error && 
+            {error &&
                 <div className="row d-flex justify-content-center mt-3">
                     <div className="alert alert-danger mt-2" role="alert">
                         {error}
@@ -232,21 +256,25 @@ function DriverForm() {
                 </div>
             }
 
-            <div className="row mb-2">
-                <div className="col-md-3"></div>
+            <div className="row mt-3 mb-3">
                 <div className="col-md-6">
                     <div className="row">
                         {driverId &&
-                            <div className="col-md-2">
-                                <button className="btn btn-danger" onClick={(e) => { deleteDriver(e) }}>
-                                    Удалить
-                                </button>
-                            </div>}
-                        <div className="col-md-2">
-                            <Link to="/admin/drivers" className="btn btn-warning mr-1">
-                                Отмена
-                            </Link>
-                        </div>
+                            <>
+                                <div className="col-md-2">
+                                    <button className="btn btn-danger mr-3" onClick={(e) => { deleteDriver(e) }}>
+                                        Удалить
+                                    </button>
+                                </div>
+
+                                {!isFired && <div className="col-md-2">
+                                    <button className="btn btn-warning mr-3" onClick={(e) => { fireDriver(e) }}>
+                                        Уволить
+                                    </button>
+                                </div>}
+
+                            </>
+                        }
                         <div className="col-md-2">
                             <button type="submit" form="profile-form" className="btn btn-success" onClick={(e) => { handleSubmit(e) }}>
                                 Сохранить

@@ -203,7 +203,7 @@ const OrdersList = () => {
 
         setLoading(false);
 
-    }, [sortBy, dir, pageSize, pageNumber, searchBy, searchString, reload]);
+    }, [sortBy, dir, pageSize, pageNumber, reload]);
 
     const conditionalRowStyles = [
         {
@@ -441,6 +441,7 @@ const OrdersList = () => {
                             <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
                                 <option value="clientName">Заказчик</option>
                                 <option value="material">Тип груза</option>
+                                <option value="address">Адрес</option>
                                 <option value="service">Услуга</option>
                             </select>
                         </div>

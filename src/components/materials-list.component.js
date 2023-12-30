@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate,useSearchParams } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 import Button from '@mui/material/Button';
@@ -20,6 +20,12 @@ const MaterialsList = () => {
     const [reload, setReload] = useState(0);
     const [open, setOpen] = useState(false);
     const [filterText, setFilterText] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams({});
+
+    const setParams = (id) => {
+        let params = { id: id }
+        setSearchParams(params);
+    }
 
     const handleClickOpen = (material) => {
         setOpen(true);
@@ -55,12 +61,19 @@ const MaterialsList = () => {
     useEffect(() => {
         !cancelled && setLoading(true);
 
+        var id = searchParams.getAll("id").length > 0 ? searchParams.getAll("id")[0] : 0;
+
         ApiService.getMaterials()
             .then(({ data }) => {
                 setList(data);
                 !cancelled && setTotalNumber(totalNumber);
                 !cancelled && setLoading(false);
             });
+
+
+        if (id > 0) {
+            document.getElementById(id).scrollIntoView();
+        }
 
         return () => cancelled = true
     }, [sortBy, dir, reload]);
@@ -75,7 +88,7 @@ const MaterialsList = () => {
         },
         {
             name: "Редактировать",
-            selector: (row, index) => <Button onClick={(e) => handleClickOpen(row)} variant="outlined"><i className="fa fa-edit" aria-hidden="true"></i></Button>,
+            selector: (row, index) => <Button onClick={(e) => { setParams(row.id); handleClickOpen(row) }} variant="outlined"><i className="fa fa-edit" aria-hidden="true"></i></Button>,
             sortable: false,
             minWidth: '1em'
         }
