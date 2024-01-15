@@ -484,53 +484,54 @@ const OrdersList = () => {
         <div className="row">
 
             <div className="col-md-12">
-                <TransformWrapper
-                    initialScale={1}
-                    minScale={0.5}
-                    maxScale={1}
-                    wheel={{wheelDisabled : "True"}}
-                    initialPositionX={0}
-                    initialPositionY={0}
-                >
-                    {({ zoomOut, resetTransform, ...rest }) => (
-                        <React.Fragment>
-                            <TransformComponent>
-                        <DataTable
-                            columns={columns}
-                            responsive
-                            noHeader
-                            striped="true"
-                            highlightOnHover
-                            sortServer
-                            paginationServer
-                            defaultSortFieldId={1}
-                            defaultSortAsc
-                            conditionalRowStyles={conditionalRowStyles}
-                            noDataComponent="Заявок за указанный период не найдено"
-                            progressPending={loading}
-                            paginationTotalRows={totalNumber}
-                            customStyles={customStyles}
-                            onSort={(column, direction) => {
-                                !cancelled && setSortBy(column.sortBy);
-                                !cancelled && setDir(direction);
-                            }}
-                            data={orders}
-                            pagination
-                            expandableRows
-                            expandableRowDisabled={rowPreDisabled}
-                            expandableRowsComponent={ExpandedComponent}
-                            onChangePage={(page, totalRows) => {
-                                !cancelled && setPageNumber(page);
-                            }}
-                            onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
-                                !cancelled && setPageSize(currentRowsPerPage);
-                            }}
-                            paginationPerPage={pageSize}
-                    />
-                            </TransformComponent>
-                        </React.Fragment>
-                    )}
-                </TransformWrapper>
+                <div>
+                    <TransformWrapper
+                        initialScale={1}
+                        minScale={0.5}
+                        maxScale={1}
+                        wheel={{ wheelDisabled: "True" }}
+                        initialPositionX={0}
+                        initialPositionY={0}>
+                        {({ zoomOut, resetTransform, ...rest }) => (
+                            <React.Fragment>
+                                <TransformComponent>
+                                    <DataTable
+                                        columns={columns}
+                                        responsive
+                                        noHeader
+                                        striped="true"
+                                        highlightOnHover
+                                        sortServer
+                                        paginationServer
+                                        defaultSortFieldId={1}
+                                        defaultSortAsc
+                                        conditionalRowStyles={conditionalRowStyles}
+                                        noDataComponent="Заявок за указанный период не найдено"
+                                        progressPending={loading}
+                                        paginationTotalRows={totalNumber}
+                                        customStyles={customStyles}
+                                        onSort={(column, direction) => {
+                                            !cancelled && setSortBy(column.sortBy);
+                                            !cancelled && setDir(direction);
+                                        }}
+                                        data={orders}
+                                        pagination
+                                        expandableRows
+                                        expandableRowDisabled={rowPreDisabled}
+                                        expandableRowsComponent={ExpandedComponent}
+                                        onChangePage={(page, totalRows) => {
+                                            !cancelled && setPageNumber(page);
+                                        }}
+                                        onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
+                                            !cancelled && setPageSize(currentRowsPerPage);
+                                        }}
+                                        paginationPerPage={pageSize}
+                                    />
+                                </TransformComponent>
+                            </React.Fragment>
+                        )}
+                    </TransformWrapper>
+                </div>
             </div>
         </div>
 
