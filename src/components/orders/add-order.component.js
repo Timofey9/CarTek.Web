@@ -61,7 +61,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     };
 
     const unitToString = (unit) => {
-        switch (unit) {
+        switch (unit.toString()) {
             case '0':
                 return "m3"
             case '1':
@@ -259,6 +259,8 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             setPrice(clonedOrder.price ?? 0);
             setMaterialPrice(clonedOrder.materialPrice  ?? 0);
             setVolume(clonedOrder.volume ?? 0);
+            setLoadUnit(clonedOrder.loadUnit);
+            setUnitString(unitToString(clonedOrder.loadUnit));
             setOrderShift(clonedOrder.shift.toString() ?? '0');
         }
     }, [addresses]);

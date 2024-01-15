@@ -3,6 +3,11 @@ label {
   margin-top: 10px;
 }
 
+.bold-label {
+    display: block;
+    margin: 5px;
+    font-weight: bold
+}
 
 hr.solid {
     margin-top: 5px;

@@ -78,7 +78,7 @@ function DriverForm() {
                 phone: phone,
                 carId: carId,
                 login: login,
-                isFired: isFired,
+                isFired: isFiredCheck,
                 percentage: percentage ? percentage.toString().replace(',', '.') : 0
             };
 

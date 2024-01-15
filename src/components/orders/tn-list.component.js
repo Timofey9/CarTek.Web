@@ -211,6 +211,8 @@ const TnsList = () => {
                             <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
                                 <option value="tnNumber">Номер ТН</option>
                                 <option value="customer">Заказчик</option>
+                                <option value="loadAddress">Адрес погрузки</option>
+                                <option value="unloadAddress">Адрес выгрузки</option>
                             </select>
                         </div>
                         <div className="mb-3 col-md-4 pl-1">
