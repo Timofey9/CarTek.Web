@@ -14,3 +14,8 @@
     border: solid 2px red;
     border-radius: 3px;
 }
+
+.align-left {
+    display: flex !important;
+    justify-content: left !important;
+}

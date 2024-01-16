@@ -16,7 +16,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
-
 const TnsList = () => {
     let cancelled = false;
     const [loading, setLoading] = useState(true);
@@ -42,7 +41,6 @@ const TnsList = () => {
     const [subTaskTnOpen, setSubTaskTnOpen] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
 
-
     const handleClickOpen = (row) => {
         if (row.driverTaskId !== undefined) {
             setTaskId(row.driverTaskId);
@@ -57,7 +55,6 @@ const TnsList = () => {
         setOpen(false);
         setReload(reload + 1);
     };
-
 
     const handleSubTaskTnClose = () => {
         setSubTaskTnOpen(false);
@@ -99,7 +96,7 @@ const TnsList = () => {
             setShowSpinner(false);
         });
         setLoading(false);
-    }, [pageSize, pageNumber, searchBy, reload]);
+    }, [pageSize, pageNumber, searchBy, searchString, reload]);
 
     const search = () => {
         setReload(reload + 1);
@@ -116,7 +113,6 @@ const TnsList = () => {
         });
     };
 
-
     const downloadSalariesFile = () => {
         ApiService.getSalariesReport({
             startDate: startDate.toUTCString(),
@@ -127,7 +123,6 @@ const TnsList = () => {
             saveAs(url, "реестр_зп.xlsx");
         });
     };
-
 
     const columns = [
         {
@@ -140,6 +135,12 @@ const TnsList = () => {
             selector: (row, index) => <div>{row.customer && row.customer.clientName}</div>,
             wrap: true
         },
+        //{
+        //    name: "Заявка",
+        //    selector: (row, index) => <div className='align-left'><Button onClick={(e) => handleClickOpenEditOrder(row.orderId)}>{row.orderName}</Button></div>,
+        //    wrap: true,
+        //    grow: 2
+        //},
         {
             name: "Адрес погрузки",
             selector: (row, index) => row.locationA,
@@ -156,6 +157,59 @@ const TnsList = () => {
             wrap: true
         },
         {
+            name: "Проверена",
+            selector: (row, index) => <div>{row.isVerified ? "Да" : "Нет"}</div>,
+            wrap: true,
+            conditionalCellStyles: [
+                {
+                    when: row => row.isVerified,
+                    style: {
+                        backgroundColor: '#d1ffbd',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                },
+                {
+                    when: row => !row.isVerified,
+                    style: {
+                        backgroundColor: '#ff726f',
+                        color: 'white',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            name: "Оригинал",
+            selector: (row, index) => <div>{row.isOriginalReceived ? "Да" : "Нет"}</div>,
+            wrap: true,
+            compact: true,
+            conditionalCellStyles: [
+                {
+                    when: row => row.isOriginalReceived,
+                    style: {
+                        backgroundColor: '#d1ffbd',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                },
+                {
+                    when: row => !row.isOriginalReceived,
+                    style: {
+                        backgroundColor: '#ff726f',
+                        color: 'white',
+                        '&:hover': {
+                            cursor: 'pointer',
+                        }
+                    }
+                }
+            ]
+        },
+        {
             name: "Действия",
             selector: (row, index) =>
                 <ButtonGroup orientation="vertical" size="medium" variant="contained" aria-label="small button group">
@@ -164,7 +218,7 @@ const TnsList = () => {
                 </ButtonGroup>,
             center: true,
             wrap: true,
-            omit: localUser.identity && (localUser.identity.isDispatcher || localUser.identity.isInitialBookkeeper || localUser.identity.isSalaryBookkeeper)
+            omit: localUser.identity && (localUser.identity.isDispatcher || localUser.identity.isSalaryBookkeeper)
         }
     ];
 
@@ -173,12 +227,12 @@ const TnsList = () => {
             style: {
                 fontSize: '14px',
                 fontWeight: 'bold'
-            },
+            }
         },
         cells: {
             style: {
                 fontSize: '14px'
-            },
+            }
         }
     };
 

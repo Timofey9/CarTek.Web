@@ -39,13 +39,9 @@ import NotificationsList from "./components/driver-dashboard/notification-list.c
 import AddressesList from "./components/addresses-list.component";
 import ClientsList from "./components/clients-list.component";
 import MaterialsList from "./components/materials-list.component";
-
 import { logout } from "./actions/auth";
 import { clearMessage } from "./actions/message";
-
 import { history } from './helpers/history';
-
-// import AuthVerify from "./common/auth-verify";
 import EventBus from "./common/EventBus";
 import UsersList from "./components/users-list.component";
 import CarComponent from "./components/car.component";
@@ -140,6 +136,13 @@ class App extends Component {
                                             Реестр ТН
                                         </Link>
                                     </li>
+
+                                    {currentUser.identity.isInitialBookkeeper && 
+                                        <li className="nav-item">
+                                            <Link to={"/admin/clients"} className="nav-link">
+                                                Юр. лица
+                                            </Link>
+                                        </li>}
                                 </>)}
 
                             {!showDriver && !isDispatcher && (
