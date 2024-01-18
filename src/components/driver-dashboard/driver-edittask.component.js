@@ -82,6 +82,8 @@ const DriverEditTask = () => {
     const [density, setDensity] = useState(0);
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
     const frequentlyUsed = ['ООО "КарТэк"', 'ЛСР Базовые'];
+    const [showUnitsError, setShowUnitsError] = useState(false);
+
     let { driverTaskId } = useParams();
 
     const navigate = useNavigate();
@@ -115,7 +117,8 @@ const DriverEditTask = () => {
         return ctrl && ctrl.files.length > 0;
     }
 
-    const updateVolume = (setter, value) => {
+    const updateVolume = (setter, value, type) => {
+        value = checkUnit(value, type);
         var str = value.toString();
         if (str.length > 2) {
             if (str[2] === ',' || str[2] === '.'
@@ -125,10 +128,20 @@ const DriverEditTask = () => {
                 var newString = str.slice(0, 2) + '.' + str.slice(2);
                 setter(newString);
             }
-
         } else {
             setter(value);
         }
+    }
+
+    const checkUnit = (value, unit) =>
+    {
+        if (unit === 'm3' && value > 38.99) {
+            //return 38.99;
+        }
+        if (unit === 't' && value > 10 && value < 39) {
+            //return 39;
+        }
+        return value;
     }
 
     const handleConfirmationOpen = () => {
@@ -300,7 +313,6 @@ const DriverEditTask = () => {
             setter2(volume1 * order.density);
         } else
             if (volume2 > 0) {
-                console.log(volume2 / order.density);
                 setter1(volume2 / order.density)
         }
     } 
@@ -801,13 +813,19 @@ const DriverEditTask = () => {
                             <div className="row">
                                 <div className="col-md-5">
                                     <label>M3</label>
+                                    {loadVolume > 39 &&
+                                        <div class="alert alert-danger" role="alert">
+                                            Проверьте кол-во!
+                                        </div>
+                                    }
                                     <input
                                         placeholder="М3"
-                                        className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        className={(validated && loadVolume.length === 0) ? "form-control not-valid-input-border" : "form-control"}
                                         type="number"
                                         step="0.1"
+                                        max="38.99"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
+                                        onChange={(e) => updateVolume(setLoadVolume, e.target.value, 'm3')}
                                         value={loadVolume} />
                                 </div>
 
@@ -823,13 +841,19 @@ const DriverEditTask = () => {
 
                                 <div className="col-md-5">
                                     <label>Тонны</label>
+                                    {(loadVolume2 > 10 && loadVolume2 < 39) &&
+                                        <div class="alert alert-danger" role="alert">
+                                            Проверьте кол-во!
+                                        </div>
+                                    }
                                     <input
                                         placeholder="Тонны"
-                                        className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        className={(validated && loadVolume2.length === 0) || (loadVolume2 > 10 && loadVolume2 < 39) ? "form-control not-valid-input-border" : "form-control"}
                                         type="number"
                                         step="0.1"
+                                        min="39"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
+                                        onChange={(e) => updateVolume(setLoadVolume2, e.target.value, 't')}
                                         value={loadVolume2} />
                                 </div>
                             </div>
@@ -875,11 +899,11 @@ const DriverEditTask = () => {
                                     <label>M3</label>
                                     <input
                                         placeholder="М3"
-                                        className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        className={(validated && loadVolume.length === 0) || unloadVolume > 38.99 ? "form-control not-valid-input-border" : "form-control"}
                                         type="number"
                                         step="0.1"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
+                                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value,'m3')}
                                         value={unloadVolume} />
                                 </div>
 
@@ -897,14 +921,13 @@ const DriverEditTask = () => {
                                     <label>Тонны</label>
                                     <input
                                         placeholder="Тонны"
-                                        className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        className={(validated && unloadVolume2.length === 0) || (unloadVolume2 > 10 && unloadVolume2 < 39) ? "form-control not-valid-input-border" : "form-control"}
                                         type="number"
                                         step="0.1"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
+                                        onChange={(e) => updateVolume(setUnloadVolume2, e.target.value, 't')}
                                         value={unloadVolume2} />
                                 </div>
-
                             </div>
                         </div>
 

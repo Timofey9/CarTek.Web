@@ -147,7 +147,7 @@ const TnsList = () => {
             wrap: true,
         },
         {
-            name: "Адрем выгрузки",
+            name: "Адрес выгрузки",
             selector: (row, index) => row.locationB,
             wrap: true,
         },

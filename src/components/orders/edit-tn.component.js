@@ -16,7 +16,6 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import ru from 'date-fns/locale/ru';
 import { useDebouncedCallback } from 'use-debounce';
 registerLocale('ru', ru);
-
 function EditTn({ driverTaskId, isSubTask, handleClose }) {
     const [error, setError] = useState("");
     const [reload, setReload] = useState(0);
