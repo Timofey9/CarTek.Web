@@ -22,7 +22,7 @@ function DriverForm() {
     const [notificationShown, setNotificationShown] = useState(false);
     const [percentage, setPercentage] = useState("");
     const [isFired, setIsFired] = useState(false);
-    const [isFiredCheck, setIsFiredCheck] = useState(true);
+    const [isFiredCheck, setIsFiredCheck] = useState(false);
     const navigate = useNavigate();
 
     let { driverId } = useParams();
@@ -58,6 +58,7 @@ function DriverForm() {
                     setLogin(data.login);
                     setPercentage(data.percentage);
                     setIsFired(data.isFired);
+                    setIsFiredCheck(data.isFired);
                 }).
                 catch((error) => {
                     setError(error.response.data);
