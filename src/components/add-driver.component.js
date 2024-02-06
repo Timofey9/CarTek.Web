@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -17,12 +17,16 @@ function DriverForm() {
     const [carId, setCarId] = useState(0);
     const [phone, setPhone] = useState();
     const [login, setLogin] = useState();
-    const [selectedItem, setSelectedItem] = useState(0);
     const [error, setError] = useState("");
     const [notificationShown, setNotificationShown] = useState(false);
     const [percentage, setPercentage] = useState("");
     const [isFired, setIsFired] = useState(false);
     const [isFiredCheck, setIsFiredCheck] = useState(false);
+    const [isExternal, setIsExternal] = useState(false);
+    const [externalOrgs, setExternalOrgs] = useState([]);
+    const [selectedOrgId, setSelectedOrgId] = useState(0);
+    const [externalTransporter, setExternalTransporter] = useState({});
+
     const navigate = useNavigate();
 
     let { driverId } = useParams();
@@ -33,8 +37,8 @@ function DriverForm() {
         ApiService.getAllCars()
             .then(({ data }) => {
                 setCars(data);
-            }).
-            catch((error) => {
+            })
+            .catch((error) => {
                 setError(error.response.data);
             });
 
@@ -46,6 +50,9 @@ function DriverForm() {
         setLoading(true);
 
         if (driverId) {
+
+            let driverData;
+
             ApiService.getDriver(driverId)
                 .then(({ data }) => {
                     setDriver(data);
@@ -59,9 +66,18 @@ function DriverForm() {
                     setPercentage(data.percentage);
                     setIsFired(data.isFired);
                     setIsFiredCheck(data.isFired);
+                    setIsExternal(data.isExternal);
+                    setSelectedOrgId(data.externalTransporterId);
+                    driverData = data;
                 }).
                 catch((error) => {
                     setError(error.response.data);
+                });
+
+            ApiService.getExternalTransporters()
+                .then(({ data }) => {
+                    setExternalOrgs(data);
+                    setExternalTransporter(data.find((element) => element.id === driverData.externalTransporterId))
                 });
         }
         setLoading(false);
@@ -80,8 +96,13 @@ function DriverForm() {
                 carId: carId,
                 login: login,
                 isFired: isFiredCheck,
-                percentage: percentage ? percentage.toString().replace(',', '.') : 0
+                percentage: percentage ? percentage.toString().replace(',', '.') : 0,
+                isExternal: isExternal
             };
+
+            if (externalTransporter.id !== undefined) {
+                newDriver.externalTransporterId = externalTransporter.id;
+            }
 
             if (driverId) {
                 ApiService.updateDriver(driverId, newDriver)
@@ -121,6 +142,17 @@ function DriverForm() {
                     setError(error.response.data.message);
                     setLoading(false);
                 })
+        }
+    }
+
+    function updateIsExternal(event) {
+        setIsExternal(event.target.checked);
+
+        if (event.target.checked) {
+            ApiService.getExternalTransporters()
+                .then(({ data }) => {
+                    setExternalOrgs(data);
+                });
         }
     }
 
@@ -226,6 +258,25 @@ function DriverForm() {
                         onChange={(e) => setPercentage(e.target.value)}
                         value={percentage} />
                 </div>
+
+                <div className="form-group col-md-6">
+                    <FormControlLabel required control={<Checkbox checked={isExternal}
+                        onChange={(e) => updateIsExternal(e)} />} label="Наемный водитель" />
+                </div>
+
+                {isExternal && <div className="form-row">
+                    <label>Выберите перевозчика</label>
+                    <Autocomplete
+                        defaultValue={externalTransporter}
+                        value={externalTransporter}
+                        options={externalOrgs}
+                        disablePortal
+                        onChange={(e, newvalue) => { setExternalTransporter(newvalue) }}
+                        id="combo-box-demo"
+                        sx={{ width: 300 }}
+                        getOptionLabel={(option) => `${option.name}`}
+                        renderInput={(params) => <TextField {...params} label="Список перевозчиков" />} />
+                </div>}
 
                 {isFired && <div className="form-group col-md-6">
                     <FormControlLabel required control={<Checkbox checked={isFiredCheck}

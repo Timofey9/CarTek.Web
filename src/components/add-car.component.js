@@ -3,6 +3,8 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import ApiService from "../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 function CarForm() {
     const [driver, setDriver] = useState({});
@@ -17,6 +19,10 @@ function CarForm() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [notificationShown, setNotificationShown] = useState(false);
+    const [isExternal, setIsExternal] = useState(false);
+    const [externalOrgs, setExternalOrgs] = useState([]);
+    const [selectedOrgId, setSelectedOrgId] = useState(0);
+    const [externalTransporter, setExternalTransporter] = useState({});
 
     const navigate = useNavigate();
 
@@ -40,6 +46,9 @@ function CarForm() {
         setLoading(true);
 
         if (carPlate) {
+
+            let carData;
+
             ApiService.getCar(carPlate)
                 .then(({ data }) => {
                     setCar(data);
@@ -48,14 +57,25 @@ function CarForm() {
                     setModel(data.model);
                     setAxelsCount(data.axelsCount);
                     setDriver(data.driver);
+                    setIsExternal(data.isExternal);
+                    setSelectedOrgId(data.externalTransporterId);
+                    carData = data;
                 }).
                 catch((error) => {
                     if (error.response.data.message) {
                         setMessage(error.response.data.message);
                     }
                 });
+
+            ApiService.getExternalTransporters()
+                .then(({ data }) => {
+                    setExternalOrgs(data);
+                    setExternalTransporter(data.find((element) => element.id === carData.externalTransporterId))
+                });
         }
+
         setLoading(false);
+
     }, []);
 
     function deleteCar(event) {
@@ -78,6 +98,16 @@ function CarForm() {
         }
     }
 
+    function updateIsExternal(event) {
+        setIsExternal(event.target.checked);
+
+        if (event.target.checked) {
+            ApiService.getExternalTransporters()
+                .then(({ data }) => {
+                    setExternalOrgs(data);
+                });
+        }
+    }
 
     function handleSubmit(event) {
         event.preventDefault();
@@ -88,8 +118,13 @@ function CarForm() {
             brand: brand,
             model: model,
             axelsCount: axelsCount,
-            trailerId: trailerId
+            trailerId: trailerId,
+            isExternal: isExternal
         };
+
+        if (externalTransporter.id !== undefined) {
+            newCar.externalTransporterId = externalTransporter.id;
+        }
 
         if (carPlate) {
             ApiService.updateCar(car.id, newCar)
@@ -186,6 +221,24 @@ function CarForm() {
                     renderInput={(params) => <TextField {...params} label="Список полуприцепов" />} />
             </div>}
 
+            <div className="form-group col-md-6">
+                <FormControlLabel required control={<Checkbox checked={isExternal}
+                    onChange={(e) => updateIsExternal(e)} />} label="Наемный транспорт" />
+            </div>
+
+            {isExternal && <div className="form-row">
+                <label>Выберите перевозчика</label>
+                <Autocomplete
+                    defaultValue={externalTransporter}
+                    value={externalTransporter}
+                    options={externalOrgs}
+                    disablePortal
+                    onChange={(e, newvalue) => { setExternalTransporter(newvalue) }}
+                    id="combo-box-demo"
+                    sx={{ width: 300 }}
+                    getOptionLabel={(option) => `${option.name}`}
+                    renderInput={(params) => <TextField {...params} label="Список перевозчиков" />} />
+            </div>}
 
             {message && (
                 <div className="form-group">

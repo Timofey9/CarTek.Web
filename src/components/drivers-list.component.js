@@ -46,7 +46,7 @@ const DriversList = () => {
                 !cancelled && setCars(list);
             });
         return () => cancelled = true
-    }, [sortBy, dir, pageSize, pageNumber, reload]);
+    }, [searchString,sortBy, dir, pageSize, pageNumber, reload]);
 
     useEffect(() => {
         setParams();
@@ -75,6 +75,11 @@ const DriversList = () => {
             name: "Авто",
             sortBy: "carName",
             selector: (row, index) => row.carName,
+            sortable: false
+        },
+        {
+            name: "Наемный",
+            selector: (row, index) => row.isExternal ? <div>Да</div> : <div></div>,
             sortable: false
         },
         {

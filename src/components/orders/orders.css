@@ -10,6 +10,11 @@
     margin-left: 0.8em;
 }
 
+.ml-5 {
+    margin-left: 5px;
+}
+
+
 .not-valid-input-border {
     border: solid 2px red;
     border-radius: 3px;

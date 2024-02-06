@@ -267,6 +267,7 @@ const TnsList = () => {
                                 <option value="customer">Заказчик</option>
                                 <option value="loadAddress">Адрес погрузки</option>
                                 <option value="unloadAddress">Адрес выгрузки</option>
+                                <option value="driver">Водитель</option>
                             </select>
                         </div>
                         <div className="mb-3 col-md-4 pl-1">

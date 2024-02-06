@@ -2,15 +2,6 @@ import React, { useEffect, useState } from 'react';
 import ApiService from "../../services/cartekApiService";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ru from 'date-fns/locale/ru';
@@ -44,6 +35,8 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
     const [addresses, setAddresses] = useState([]);
     const [formData, setFormData] = useState(new FormData());
     const [transporter, setTransporter] = useState("");
+
+    const [externalTransporterId, setExternalTransporterId] = useState();
 
     const updateVolume = (setter, value) => {
         var str = value.toString();
@@ -118,6 +111,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
         formData.append("DropOffArrivalDate", dropOffArrivalTime.toUTCString());
         formData.append("DropOffDepartureDate", dropOffDepartureTime.toUTCString());
         formData.append("Transporter", transporter);
+        formData.append("TransporterId", externalTransporterId);
 
         ApiService.updateTn(formData)
             .then(({ data }) => {

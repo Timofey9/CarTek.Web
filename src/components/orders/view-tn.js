@@ -39,6 +39,7 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
     const [openEditSubTn, setOpenEditSubTn] = useState(false);
     const [s3Links, setS3Links] = useState([]);
     const [transporter, setTransporter] = useState("");
+    const [transporterId, setTransporterId] = useState("");
 
     useEffect(() => {
         setLoading(true);
@@ -64,6 +65,7 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
                 setDropOffArrivalTime(data.dropOffArrivalTime);
                 setDropOffDepartureTime(data.dropOffDepartureTime);
                 setS3Links(data.s3Links);
+                setTransporterId(data.transporterId);
 
                 if (data.transporter && data.transporter.length > 0) {
                     setTransporter(data.transporter);

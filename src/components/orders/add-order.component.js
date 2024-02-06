@@ -12,12 +12,14 @@ import ClientForm from './add-client.component'
 import AddressForm from './add-address.component'
 import MaterialForm from './add-material.component'
 import Divider from '@mui/material/Divider';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import "./orders.css";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
 registerLocale('ru', ru);
 
-function OrderForm({clonedOrder, handleCloseOrderForm }) {
+function OrderForm({ clonedOrder, handleCloseOrderForm }) {
     const [clients, setClients] = useState([]);
     const [client, setClient] = useState({});
     const [gp, setGp] = useState({});
@@ -56,9 +58,22 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     const [customer, setCustomer] = useState({});
     const [density, setDensity] = useState();
     const [unitString, setUnitString] = useState("");
+    const [isExternal, setIsExternal] = useState(false);
+    const [externalOrgs, setExternalOrgs] = useState([]);
+    const [externalTransporter, setExternalTransporter] = useState({});
+    const [transporterPrice, setTransporterPrice] = useState();
+    const [discount, setDiscount] = useState(0);
+    const [driverPrice, setDriverPrice] = useState();
+
     const handleClickOpen = () => {
         setOpen(true);
     };
+
+    const updateDiscount = (price1, price2) => {
+        var disc = price1 - price2;
+
+        setDiscount(disc);
+    }
 
     const unitToString = (unit) => {
         switch (unit.toString()) {
@@ -121,7 +136,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             default:
                 return shift;
         }
-    } 
+    }
 
     const updateShiftInName = (newShift) => {
         var newS = shiftToShortString(newShift);
@@ -133,7 +148,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             var newName2 = orderName + " " + shiftToShortString(newShift);
             setOrderName(newName2)
         }
-    }   
+    }
 
     const updateAddressInName = (newAddress) => {
         if (newAddress === null) {
@@ -178,15 +193,15 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
         setValidated(true);
         let valid = true;
 
-        if (serviceType === "none"){
-            valid = false;
-        }   
-
-        if (Object.keys(client).length === 0){
+        if (serviceType === "none") {
             valid = false;
         }
 
-        if (Object.keys(gp).length === 0){
+        if (Object.keys(client).length === 0) {
+            valid = false;
+        }
+
+        if (Object.keys(gp).length === 0) {
             valid = false;
         }
 
@@ -233,6 +248,16 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
     }, [reload]);
 
     useEffect(() => {
+        setLoading(true);
+        ApiService.getExternalTransporters()
+            .then(({ data }) => {
+                setExternalOrgs(data);
+            });
+
+        setLoading(false);
+    }, [reload]);
+
+    useEffect(() => {
         if (clonedOrder !== undefined) {
             setOrderName(clonedOrder.name);
             setServiceType(clonedOrder.service);
@@ -257,11 +282,15 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             setNote(clonedOrder.note);
             setMileage(clonedOrder.mileage ?? 0);
             setPrice(clonedOrder.price ?? 0);
-            setMaterialPrice(clonedOrder.materialPrice  ?? 0);
+            setMaterialPrice(clonedOrder.materialPrice ?? 0);
             setVolume(clonedOrder.volume ?? 0);
             setLoadUnit(clonedOrder.loadUnit);
             setUnitString(unitToString(clonedOrder.loadUnit));
             setOrderShift(clonedOrder.shift.toString() ?? '0');
+            setExternalTransporter(clonedOrder.externalTransporter);
+            setTransporterPrice(clonedOrder.transporterPrice);
+            setIsExternal(clonedOrder.isExternal);
+            setDriverPrice(clonedOrder.driverPrice);
         }
     }, [addresses]);
 
@@ -359,7 +388,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
 
     function handleSubmit(event) {
         event.preventDefault();
-        setMessage("");        
+        setMessage("");
 
         const newOrder = {
             name: orderName,
@@ -381,8 +410,19 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
             mileage: mileage,
             price: price,
             materialPrice: materialPrice,
-            density: density
+            density: density,
         };
+
+        if (isExternal) {
+            newOrder.isExternal = isExternal;
+            newOrder.externalPrice = transporterPrice;
+            newOrder.externalTransporterId = externalTransporter.id;
+            newOrder.discount = discount;
+        }
+        else {
+            newOrder.driverPrice = driverPrice;
+            newOrder.discount = price - driverPrice;
+        }
 
         if (validate()) {
             ApiService.createOrder(newOrder)
@@ -507,7 +547,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             onChange={(e, newvalue) => { setClient(newvalue); updateCustomer(newvalue) }}
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
-                            isOptionEqualToValue={(o,v) => o === v.clientName} 
+                            isOptionEqualToValue={(o, v) => o === v.clientName}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
                         {client && client.clientName}
                     </div>
@@ -609,14 +649,62 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Себестоимость перевозки руб/{unitString}</label>
+                        <label>Себестоимость перевозки КарТэк руб/{unitString}</label>
                         <input
                             type="text"
                             className={validated && price.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                             form="profile-form"
-                            onChange={(e) => setPrice(e.target.value)}
+                            onChange={(e) => { setPrice(e.target.value); updateDiscount(e.target.value, transporterPrice); }}
                             value={price} />
                     </div>
+
+                    {isExternal &&
+                        <>
+                            <div className="form-row">
+                                <label>Выберите перевозчика</label>
+                                <Autocomplete
+                                    options={externalOrgs}
+                                    disablePortal
+                                    onChange={(e, newvalue) => { setExternalTransporter(newvalue) }}
+                                    id="combo-box-demo"
+                                    sx={{ width: 300 }}
+                                    getOptionLabel={(option) => `${option.name}`}
+                                    renderInput={(params) => <TextField {...params} label="Список перевозчиков" />} />
+                            </div>
+
+                            <div className="form-group col-md-6">
+                                <label>Себестоимость перевозки {externalTransporter.name}</label>
+                                <input
+                                    type="text"
+                                    className={validated && transporterPrice.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                    form="profile-form"
+                                    onChange={(e) => { setTransporterPrice(e.target.value); updateDiscount(price, e.target.value); }}
+                                    value={transporterPrice} />
+                            </div>
+
+                            <div className="form-group col-md-6">
+                                <label>Дисконт</label>
+                                <input
+                                    type="text"
+                                    disabled
+                                    className="form-control"
+                                    form="profile-form"
+                                    value={discount} />
+                            </div>
+                        </>
+                    }
+
+                    {!isExternal &&
+                        <div className="form-group col-md-6">
+                            <label>Себестоимость перевозки (Водитель)</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => { setDriverPrice(e.target.value); }}
+                                value={driverPrice} />
+                        </div>
+                    }
 
                     <div className="form-group col-md-6">
                         <label>Себестоимость материала</label>
@@ -624,8 +712,13 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                             type="text"
                             className="form-control"
                             form="profile-form"
-                            onChange={(e) => setMaterialPrice(e.target.value)}
+                            onChange={(e) => { setMaterialPrice(e.target.value);  }}
                             value={materialPrice} />
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <FormControlLabel required control={<Checkbox checked={isExternal}
+                            onChange={(e) => setIsExternal(e.target.checked)} />} label="Наемный перевозчик" />
                     </div>
 
                     <div className="form-group col-md-6">
@@ -679,7 +772,7 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                                             onChange={(e, newvalue) => { task.driver = newvalue }}
                                             sx={{ width: 300 }}
                                             isOptionEqualToValue={(option, value) => option.fullName === value.fullName}
-                                            getOptionLabel={(option) => `${option.fullName}`}
+                                            getOptionLabel={(option) => `${option.isExternal ? option.fullName + "(наём)" : option.fullName}`}
                                             renderInput={(params) => <TextField {...params} label="Список водителей" />} />
                                     </div>
 
@@ -707,7 +800,8 @@ function OrderForm({clonedOrder, handleCloseOrderForm }) {
                                     </div>
 
                                     <div key={"shift" + index} className="col-md-6">
-                                        <ShiftRadioButtonGroup value={task.shift} onChange={(event) => {task.shift = event.target.value; setReload(reload + 1);
+                                        <ShiftRadioButtonGroup value={task.shift} onChange={(event) => {
+                                            task.shift = event.target.value; setReload(reload + 1);
                                         }} />
                                     </div>
                                 </div>

@@ -57,6 +57,12 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [orderShift, setOrderShift] = useState(0);
     const [customer, setCustomer] = useState(0);
     const [density, setDensity] = useState("");
+    const [isExternal, setIsExternal] = useState(false);
+    const [externalTransporter, setExternalTransporter] = useState({});
+    const [transporterPrice, setTransporterPrice] = useState(0);
+    const [externalTransporters, setExternalTransporters] = useState([]);
+    const [discount, setDiscount] = useState(0);
+    const [driverPrice, setDriverPrice] = useState();
 
     const shiftToShortString = (shift) => {
         switch (shift) {
@@ -186,8 +192,13 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setGp(data.gp);
                 setOrderShift(data.shift.toString());
                 setDensity(data.density);
-            }).
-            catch((error) => {
+                setIsExternal(data.isExternal);
+                setExternalTransporter(data.externalTransporter);
+                setTransporterPrice(data.externalPrice);
+                setDiscount(data.discount);
+                setDriverPrice(data.driverPrice);
+            })
+            .catch((error) => {
                 if (error.response.data.message) {
                     setMessage(error.response.data.message);
                 }
@@ -201,9 +212,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
         ApiService.getAllDrivers()
             .then(({ data }) => {
                 setDrivers(data);
-
-            }).
-            catch((error) => {
+            })
+            .catch((error) => {
                 if (error.response.data.message) {
                     setMessage(error.response.data.message);
                 }
@@ -217,8 +227,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
         ApiService.getAllCars()
             .then(({ data }) => {
                 setCars(data);
-            }).
-            catch((error) => {
+            })
+            .catch((error) => {
                 if (error.response.data.message) {
                     setMessage(error.response.data.message);
                 }
@@ -229,11 +239,25 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
     useEffect(() => {
         setLoading(true);
+        ApiService.getExternalTransporters()
+            .then(({ data }) => {
+                setExternalTransporters(data);
+            })
+            .catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        setLoading(true);
         ApiService.getMaterials()
             .then(({ data }) => {
                 setMaterialsList(data);
-            }).
-            catch((error) => {
+            })
+            .catch((error) => {
                 if (error.response.data.message) {
                     setMessage(error.response.data.message);
                 }
@@ -246,8 +270,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
         ApiService.getClients()
             .then(({ data }) => {
                 setClients(data);
-            }).
-            catch((error) => {
+            })
+            .catch((error) => {
                 if (error.response.data.message) {
                     setMessage(error.response.data.message);
                 }
@@ -261,8 +285,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
         ApiService.getAddresses()
             .then(({ data }) => {
                 setAddresses(data);
-            }).
-            catch((error) => {
+            })
+            .catch((error) => {
                 if (error.response.data.message) {
                     setMessage(error.response.data.message);
                 }
@@ -276,12 +300,17 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             .then(({ data }) => {
                 alert("Заявка удалена");
                 handleCloseOrderForm();
-            }).
-            catch((error) => {
+            })
+            .catch((error) => {
                 if (error.response.data.message) {
                     setMessage(error.response.data.message);
                 }
             });
+    }
+
+    const updateDiscount = (price1, price2) => {
+        var disc = price1 - price2;
+        setDiscount(disc);
     }
 
     const updateStartDate = (date) => {
@@ -317,8 +346,18 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             mileage: mileage,
             price: price,
             materialPrice: materialPrice,
-            density: density
+            density: density,            
         };
+
+        if (isExternal) {
+            newOrder.isExternal = isExternal;
+            newOrder.externalPrice = transporterPrice;
+            newOrder.externalTransporterId = externalTransporter.id;
+            newOrder.discount = discount;
+        } else {
+            newOrder.driverPrice = driverPrice;
+            newOrder.discount = price - driverPrice;
+        }
 
         if (startDateChanged && !applyChanges) {
             alert("Вы уверены, что хотите заменить дату? Нажмите \"Сохранить\" еще раз, чтобы применить изменения");
@@ -328,8 +367,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             ApiService.updateOrder(orderId, newOrder)
                 .then(({ data }) => {
                     alert(`Заявка обновлена`);
-                }).
-                catch((error) => {
+                })
+                .catch((error) => {
                     if (error.response.data.message) {
                         setMessage(error.response.data.message);
                     }
@@ -418,14 +457,14 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
-                        <label>{addressA && addressA.textAddress}</label>
+                        <label className="ml-5">{addressA && addressA.textAddress}</label>
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-row">
                         <label className="bold-label">Груз (3)</label>
-                        <label>{material && material.name}</label>
+                        <label className="ml-5">{material && material.name}</label>
                         {isEdit &&
                             <><Autocomplete
                                 options={materialsList}
@@ -452,7 +491,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
-                        <label>{client && client.clientName}</label>
+                        <label className="ml-5">{client && client.clientName}</label>
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -466,7 +505,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             sx={{ width: 300 }}
                             getOptionLabel={(option) => `${option.clientName}`}
                             renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />}
-                        <label>{gp && gp.clientName}</label>
+                        <label className="ml-5">{gp && gp.clientName}</label>
                     </div>
 
                     <div className="form-group col-md-6">
@@ -487,7 +526,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                             getOptionLabel={(option) => `${option.textAddress}`}
                             renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
-                        <label>{addressB && addressB.textAddress}</label>
+                        <label className="ml-5">{addressB && addressB.textAddress}</label>
 
                         {isEdit && <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
                             Добавить адрес
@@ -567,17 +606,69 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Себестоимость перевозки руб/{customer && unitToString(customer.clientUnit)}</label>
+                        <label className="bold-label">Себестоимость перевозки КарТэк руб/{customer && unitToString(customer.clientUnit)}</label>
                         <input
                             disabled={!isEdit}
                             type="text"
                             className="form-control"
                             form="profile-form"
-                            onChange={(e) => setPrice(e.target.value)}
+                            onChange={(e) => { setPrice(e.target.value); updateDiscount(e.target.value, transporterPrice); } }
                             value={price} />
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+                    {isExternal &&
+                        <>
+                            <label className="bold-label">Перевозчик</label>
+
+                            {isEdit &&
+                                <Autocomplete
+                                    defaultValue={externalTransporter}
+                                    value={externalTransporter}
+                                    options={externalTransporters}
+                                    disablePortal
+                                    onChange={(e, newvalue) => { setExternalTransporter(newvalue) }}
+                                    id="combo-box-demo2"
+                                    sx={{ width: 300 }}
+                                    getOptionLabel={(option) => `${option.name}`}
+                                    renderInput={(params) => <TextField {...params} label="Список перевозчиков" />} />
+                            }
+                            <label className="ml-5">{externalTransporter && externalTransporter.name}</label>
+
+                            <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                            <label className="bold-label">Себестоимость перевозки {externalTransporter.name}</label>
+                            <input
+                                disabled={!isEdit}
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => { setTransporterPrice(e.target.value); updateDiscount(price, e.target.value); }}
+                                value={transporterPrice} />
+
+                            <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                            <label className="bold-label">Дисконт</label>
+                            <input
+                                disabled
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                value={discount} />
+                        </>
+                    }
+
+                    {!isExternal && 
+                        <div className="form-group col-md-6">
+                            <label className="bold-label">Себестоимость перевозки (Водитель)</label>
+                            <input
+                                disabled={!isEdit}
+                                type="text"
+                                className="form-control"
+                                form="profile-form"
+                                onChange={(e) => setDriverPrice(e.target.value)}
+                                value={driverPrice} />
+                        </div>}
 
                     <div className="form-group col-md-6">
                         <label className="bold-label">Себестоимость материала</label>

@@ -86,6 +86,9 @@ const DriverEditSubTask = () => {
     const [showSpinner, setShowSpinner] = useState(false);
     const [openEditTn, setOpenEditTn] = useState(false);
     const [rerender, setrerender] = useState(0);
+    const [isExternal, setIsExternal] = useState(false);
+    const [isExternalOrder, setIsExternalOrder] = useState(false);
+    const [externalTransporter, setExternalTransporter] = useState({ name: "ООО \"КарТэк\"" });
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
@@ -306,6 +309,11 @@ const DriverEditSubTask = () => {
         formData.set("UpdatedStatus", 9);
         formData.append("IsSubtask", true);
         formData.append("SubTaskId", subTaskId);
+        formData.append("Transporter", externalTransporter.name);
+
+        if (isExternalOrder) {
+            formData.append("TransporterId", externalTransporter.id);
+        }
 
         if (validate()) {
             formData.append("MaterialId", material.id);
@@ -479,6 +487,11 @@ const DriverEditSubTask = () => {
 
     useEffect(() => {
         setLoading(true);
+
+        let user = JSON.parse(localStorage.getItem("user"));
+
+        setIsExternal(user.isExternal);
+
         ApiService.getSubTask(subTaskId)
             .then(({ data }) => {
                 setCurrentSubTask(data);
@@ -504,12 +517,17 @@ const DriverEditSubTask = () => {
     }, [reload]);
 
     const setDataFromOrder = (data) => {
-        var order = data.order
+        var order = data.order;
+        if (data.order.isExternal) {
+            setIsExternalOrder(true);
+            setExternalTransporter(data.order.externalTransporter)
+        }
         setGo(order.client);
         setGp(order.gp);
         setAddressA(data.locationA);
         setAddressB(data.locationB);
         setMaterial(order.material)
+
     }
 
     useEffect(() => {
@@ -578,13 +596,15 @@ const DriverEditSubTask = () => {
                         <button disabled={status < 4} form="profile-form" className="btn btn-success mt-2 mr-10" onClick={(e) => { handleEditTnOpen(e) }}>
                             ТН
                         </button>
-                        {!currentSubTask.isCanceled ?
-                            <button disabled={status >= 10} form="profile-form" className="btn btn-danger mt-2" onClick={(e) => { cancelTask(e) }}>
-                                Отменить задачу
-                            </button>
-                            :
-                            <button onClick={() => restoreTask()} className="btn btn-success mt-2">Возобновить</button>
-                        }
+                        {!isExternal && <div>
+                            {!currentSubTask.isCanceled ?
+                                <button disabled={status >= 10} form="profile-form" className="btn btn-danger mt-2" onClick={(e) => { cancelTask(e) }}>
+                                    Отменить задачу
+                                </button>
+                                :
+                                <button onClick={() => restoreTask()} className="btn btn-success mt-2">Возобновить</button>
+                            }
+                        </div>}
                     </div>
                 </div>
 
@@ -613,16 +633,16 @@ const DriverEditSubTask = () => {
 
                     <dt className="col-sm-3">Услуга: </dt>
                     <dd className="col-sm-9">{order.service === 0 ? "Перевозка" : "Поставка"}</dd>
+                    {!isExternal && <>
+                        <dt className="col-sm-3">Заказчик: </dt>
+                        <dd className="col-sm-9">{customer.clientName}</dd>
 
-                    <dt className="col-sm-3">Заказчик: </dt>
-                    <dd className="col-sm-9">{customer.clientName}</dd>
+                        <dt className="col-sm-3">Себестоимость перевозки:</dt>
+                        <dd className="col-sm-9">{order.price}</dd>
 
-                    <dt className="col-sm-3">Себестоимость перевозки:</dt>
-                    <dd className="col-sm-9">{order.price}</dd>
-
-
-                    <dt className="col-sm-3">Транспорт :</dt>
-                    <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>) })}</dd>
+                        <dt className="col-sm-3">Транспорт :</dt>
+                        <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>) })}</dd>
+                    </>}
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
@@ -640,132 +660,148 @@ const DriverEditSubTask = () => {
                             </div>
                         </div>
 
-                    <div className="form-group col-md-6">
-                        <label>Номер ТН</label>
-                        <input
-                            className={validated && tnNumber.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                            type="text"
-                            form="profile-form"
-                            onChange={(e) => setTnNumber(e.target.value)}
-                            value={tnNumber} />
-                    </div>
+                        <div className="form-group col-md-6">
+                            <label>Номер ТН</label>
+                            <input
+                                className={validated && tnNumber.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                type="text"
+                                form="profile-form"
+                                onChange={(e) => setTnNumber(e.target.value)}
+                                value={tnNumber} />
+                        </div>
 
-                    <div className="form-group col-md-6">
-                        <label>Грузоотправитель (1)</label>
-                        <Autocomplete
-                            className={checkObjectKeys(go) ? "not-valid-input-border" : ""}
-                            options={clients}
-                            disablePortal
-                            defaultValue={go}
-                            value={go}
-                            key={addressBKey}
-                            onChange={(e, newvalue) => { setGo(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.clientName}`}
-                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                    </div>
+                        <div className="form-group col-md-6">
+                            <label>Грузоотправитель (1)</label>
+                            <Autocomplete
+                                className={checkObjectKeys(go) ? "not-valid-input-border" : ""}
+                                options={clients}
+                                disablePortal
+                                defaultValue={go}
+                                value={go}
+                                key={addressBKey}
+                                onChange={(e, newvalue) => { setGo(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.clientName}`}
+                                renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                        </div>
 
-                    <div className="form-group col-md-6">
-                        <label>Грузополучатель (2)</label>
-                        <Autocomplete
-                            className={checkObjectKeys(gp) ? "not-valid-input-border" : ""}
-                            options={clients}
-                            key={addressBKey}
-                            disablePortal
-                            defaultValue={gp}
-                            value={gp}
-                            onChange={(e, newvalue) => { setGp(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.clientName}`}
-                            renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
-                        {/*    {driverTask.order.client.name}*/}
-                    </div>
-
-                    <div className="form-group col-md-6">
-                        <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
-                            Добавить юр.лицо
-                        </button>
-                    </div>
-
-                    <div className="form-row">
-                        <label>Тип груза (3)</label>
-                        <Autocomplete
-                            renderOption={(props, item) => (<li {...props} key={item.id}>{item.name}</li>)}
-                            className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
-                            options={materialsList}
-                            disablePortal
-                            defaultValue={material}
-                            value={material}
-                            key={addressBKey}
-                            onChange={(e, newvalue) => { setMaterial(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.name}`}
-                            renderInput={(params) => <TextField {...params} label="Список материалов" />} />
-
-                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
-                            Добавить тип груза
-                        </button>
-                    </div>
-
-                    <div className="form-group col-md-6">
-                        <label>Объем загрузки</label>
-
-                        <div className="row">
-                            <div className="col-md-6">
-                                <label>M3</label>
-                                <input
-                                    placeholder="М3"
-                                    className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                    type="number"
-                                    step="0.1"
-                                    form="profile-form"
-                                    onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
-                                    value={loadVolume} />
+                        <div className="form-group col-md-6">
+                            <label>Грузополучатель (2)</label>
+                            <Autocomplete
+                                className={checkObjectKeys(gp) ? "not-valid-input-border" : ""}
+                                options={clients}
+                                key={addressBKey}
+                                disablePortal
+                                defaultValue={gp}
+                                value={gp}
+                                onChange={(e, newvalue) => { setGp(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.clientName}`}
+                                renderInput={(params) => <TextField {...params} label="Список юр.лиц" />} />
+                            {/*    {driverTask.order.client.name}*/}
+                        </div>
+                        {!isExternal &&
+                            <div className="form-group col-md-6">
+                                <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
+                                    Добавить юр.лицо
+                                </button>
                             </div>
-                            <div className="col-md-6">
-                                <label>Тонны</label>
-                                <input
-                                    placeholder="Тонны"
-                                    className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                    type="number"
-                                    step="0.1"
-                                    form="profile-form"
-                                    onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
-                                    value={loadVolume2} />
+                        }
+
+                        <div className="form-group col-md-6">
+                            <label>Перевозчик (6)</label>
+
+                            <input
+                                disabled
+                                className={validated && externalTransporter.name.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                type="text"
+                                form="profile-form"
+                                value={externalTransporter.name} />
+                        </div>
+
+                        <div className="form-row">
+                            <label>Тип груза (3)</label>
+                            <Autocomplete
+                                renderOption={(props, item) => (<li {...props} key={item.id}>{item.name}</li>)}
+                                className={checkObjectKeys(material) ? "not-valid-input-border" : ""}
+                                options={materialsList}
+                                disablePortal
+                                defaultValue={material}
+                                value={material}
+                                key={addressBKey}
+                                onChange={(e, newvalue) => { setMaterial(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.name}`}
+                                renderInput={(params) => <TextField {...params} label="Список материалов" />} />
+
+
+                            {!isExternal &&
+                                <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
+                                    Добавить тип груза
+                                </button>}
+                        </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Объем загрузки</label>
+
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <label>M3</label>
+                                    <input
+                                        placeholder="М3"
+                                        className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        type="number"
+                                        step="0.1"
+                                        form="profile-form"
+                                        onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
+                                        value={loadVolume} />
+                                </div>
+                                <div className="col-md-6">
+                                    <label>Тонны</label>
+                                    <input
+                                        placeholder="Тонны"
+                                        className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        type="number"
+                                        step="0.1"
+                                        form="profile-form"
+                                        onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
+                                        value={loadVolume2} />
+                                </div>
                             </div>
                         </div>
+
+                        <div className="form-group col-md-6">
+                            <label>Адрес погрузки (8)</label>
+                            <Autocomplete
+                                className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
+                                options={addresses}
+                                disablePortal
+                                key={addressAKey}
+                                defaultValue={addressA}
+                                value={addressA}
+                                onChange={(e, newvalue) => { setAddressA(newvalue) }}
+                                sx={{ width: 300 }}
+                                getOptionLabel={(option) => `${option.textAddress}`}
+                                renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+
+                            {!isExternal &&
+                                <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                                    Добавить адрес
+                                </button>
+                            }
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата прибытия на адрес погрузки</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
+                        </div>
+
+                        <div className="input-group mb-3 col-md-6 pl-1">
+                            <label>Дата выезда с адреса погрузки</label>
+                            <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
+                        </div>
+
                     </div>
-
-                    <div className="form-group col-md-6">
-                        <label>Адрес погрузки (8)</label>
-                        <Autocomplete
-                            className={checkObjectKeys(addressA) ? "not-valid-input-border" : ""}
-                            options={addresses}
-                            disablePortal
-                            key={addressAKey}
-                            defaultValue={addressA}
-                            value={addressA}
-                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
-
-                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
-                            Добавить адрес
-                        </button>
-                    </div>
-
-                    <div className="input-group mb-3 col-md-6 pl-1">
-                        <label>Дата прибытия на адрес погрузки</label>
-                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupArrivalDate} onChange={(date) => { setPickupArrivalDate(date) }} />
-                    </div>
-
-                    <div className="input-group mb-3 col-md-6 pl-1">
-                        <label>Дата выезда с адреса погрузки</label>
-                        <DatePicker locale="ru" dateFormat="dd.MM.yyyy" selected={pickupDepartureDate} onChange={(date) => { setPickupDepartureDate(date) }} />
-                    </div>
-
-                </div>
 
                     <div className="form-row">
                         <div className="form-group col-md-6">
@@ -812,8 +848,8 @@ const DriverEditSubTask = () => {
                                 renderInput={(params) => <TextField {...params} label="Список адресов" />} />
                         </div>
 
-                    <div>
-                        
+                        <div>
+
                             <div className="row mt-3 mb-3">
                                 <div className="col-md-9">
                                     <div className="alert alert-danger" role="alert">
@@ -843,53 +879,53 @@ const DriverEditSubTask = () => {
                                     </div>
                                 </div>
                             </div>
-                        
-                    </div>
-                    <div className="row mt-3">
-                        {status <= 8 &&
-                            <div className="col-md-9">
-                                <div className="row">
-                                    <div className="col-md-12">
-                                        <textarea id="acceptanceComment" value={note} onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
-                                    </div>
-                                </div>
-                                {status !== 7 &&
+
+                        </div>
+                        <div className="row mt-3">
+                            {status <= 8 &&
+                                <div className="col-md-9">
                                     <div className="row">
                                         <div className="col-md-12">
-                                            <label htmlFor="files">Прикрепить фотографии</label>
-                                            <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
+                                            <textarea id="acceptanceComment" value={note} onChange={(e) => setNote(e.target.value)} rows="5" cols="40"></textarea>
                                         </div>
-                                    </div>}
+                                    </div>
+                                    {status !== 7 &&
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <label htmlFor="files">Прикрепить фотографии</label>
+                                                <input type="file" id="files" accept="image/*" multiple onChange={(e) => selectFile(e)}></input>
+                                            </div>
+                                        </div>}
 
 
-                                <div className="row">
-                                    <div className="col-md-12">
-                                        <div className="col-md-3">
-                                            <button type="submit" onClick={handleSubmitNote} className="btn btn-primary mt-3">
-                                                Отправить комментарий/фото
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <div className="col-md-3">
+                                                <button type="submit" onClick={handleSubmitNote} className="btn btn-primary mt-3">
+                                                    Отправить комментарий/фото
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="row mb-5">
+                                        <div className="col-md-12">
+                                            <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
+                                                {statusToButtonTxt(status)}
                                             </button>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="row mb-5">
-                                    <div className="col-md-12">
-                                        <button type="submit" onClick={handleSubmit} className="btn btn-success mt-3">
-                                            {statusToButtonTxt(status)}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {error &&
-                                    <div className="row d-flex justify-content-center mt-3">
-                                        <div className="alert alert-danger mt-2" role="alert">
-                                            {error}
+                                    {error &&
+                                        <div className="row d-flex justify-content-center mt-3">
+                                            <div className="alert alert-danger mt-2" role="alert">
+                                                {error}
+                                            </div>
                                         </div>
-                                    </div>
-                                }
-                            </div>}
-                            </div>
-                        </div></> }
+                                    }
+                                </div>}
+                        </div>
+                    </div></>}
 
 
                 {status === 9 && driverTask.shift === 3 &&

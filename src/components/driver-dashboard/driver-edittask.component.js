@@ -83,7 +83,9 @@ const DriverEditTask = () => {
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
     const frequentlyUsed = ['ООО "КарТэк"', 'ЛСР Базовые'];
     const [showUnitsError, setShowUnitsError] = useState(false);
-
+    const [isExternal, setIsExternal] = useState(false);
+    const [isExternalOrder, setIsExternalOrder] = useState(false);
+    const [externalTransporter, setExternalTransporter] = useState({ name:"ООО \"КарТэк\""});
     let { driverTaskId } = useParams();
 
     const navigate = useNavigate();
@@ -375,10 +377,13 @@ const DriverEditTask = () => {
         formData.append("DriverTaskId", driverTask.id);
         formData.append("UpdatedStatus", status + 1);
         formData.append("Note", note);
-        formData.append("Transporter", transporter);
+        formData.append("Transporter", externalTransporter.name);
+
+        if (isExternalOrder) {
+            formData.append("TransporterId", externalTransporter.id);
+        }
 
         if (status === 4 && validate()) {
-
             formData.append("MaterialId", material.id);
             formData.append("Number", tnNumber);
             formData.append("GoId", go.id);
@@ -547,6 +552,11 @@ const DriverEditTask = () => {
     useEffect(() => {
         setLoading(true);
         if (driverTaskId) {
+
+            let user = JSON.parse(localStorage.getItem("user"));
+
+            setIsExternal(user.isExternal);
+
             ApiService.getDriverTaskById(driverTaskId)
                 .then(({ data }) => {
                     setDriverTask(data);
@@ -558,7 +568,10 @@ const DriverEditTask = () => {
                     setNotes(data.notes);
                     setCar(data.car);
                     setCustomer(data.orderCustomer);
-
+                    if (data.order.isExternal) {
+                        setIsExternalOrder(true);
+                        setExternalTransporter(data.order.externalTransporter)
+                    }
                     if (data.status === 4 || data.status === 7) {
                         scrollToTop();
                     }
@@ -663,12 +676,16 @@ const DriverEditTask = () => {
                         <button disabled={status < 4} form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleEditTnOpen(e) }}>
                             ТН
                         </button>
-                        {!driverTask.isCanceled ?
-                            <button disabled={status >= 10} form="profile-form" className="btn btn-danger mt-2" onClick={(e) => { cancelTask(e) }}>
-                                Отменить задачу
-                            </button>
-                            :
-                            <button onClick={() => restoreTask()} className="btn btn-success mt-2">Возобновить</button>
+                        {!isExternal &&
+                            <div>
+                                {!driverTask.isCanceled ?
+                                    <button disabled={status >= 10} form="profile-form" className="btn btn-danger mt-2" onClick={(e) => { cancelTask(e) }}>
+                                        Отменить задачу
+                                    </button>
+                                    :
+                                    <button onClick={() => restoreTask()} className="btn btn-success mt-2">Возобновить</button>
+                                }
+                            </div>
                         }
                     </div>
                 </div>
@@ -696,11 +713,15 @@ const DriverEditTask = () => {
                     <dt className="col-sm-3">Место выгрузки: </dt>
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
 
-                    <dt className="col-sm-3">Услуга: </dt>
-                    <dd className="col-sm-9">{order.service === 0 ? "Перевозка" : "Поставка"}</dd>
+                    {!isExternal && <>
+                        <dt className="col-sm-3">Услуга: </dt>
+                        <dd className="col-sm-9">{order.service === 0 ? "Перевозка" : "Поставка"}</dd>
+                    </>}
 
-                    <dt className="col-sm-3">Заказчик: </dt>
-                    <dd className="col-sm-9">{customer.clientName}</dd>
+                    {!isExternal && <>
+                        <dt className="col-sm-3">Заказчик: </dt>
+                        <dd className="col-sm-9">{customer.clientName}</dd>
+                    </>}
 
                     {order.density &&
                         <>
@@ -708,11 +729,13 @@ const DriverEditTask = () => {
                             <dd className="col-sm-9">{order.density}</dd>
                         </>}
 
-                    <dt className="col-sm-3">Себестоимость перевозки:</dt>
-                    <dd className="col-sm-9">{driverTask.price}</dd>
+                    {!isExternal && <>
+                        <dt className="col-sm-3">Себестоимость перевозки:</dt>
+                        <dd className="col-sm-9">{driverTask.price}</dd>
 
-                    <dt className="col-sm-3">Транспорт :</dt>
-                    <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>) })}</dd>
+                        <dt className="col-sm-3">Транспорт :</dt>
+                        <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>) })}</dd>
+                    </>}
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
                     <dd className="col-sm-9">{order.note}</dd>
@@ -774,19 +797,22 @@ const DriverEditTask = () => {
 
                         <div className="form-group col-md-6">
                             <label>Перевозчик (6)</label>
+                            
                             <input
+                                disabled
                                 className={validated && transporter.length === 0 ? "form-control not-valid-input-border" : "form-control"}
                                 type="text"
                                 form="profile-form"
-                                onChange={(e) => setTransporter(e.target.value)}
-                                value={transporter} />
+                                value={externalTransporter.name} />
                         </div>
 
-                        <div className="form-group col-md-6">
-                            <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
-                                Добавить юр.лицо
-                            </button>
-                        </div>
+                        {!isExternal && 
+                            <div className="form-group col-md-6">
+                                <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
+                                    Добавить юр.лицо
+                                </button>
+                            </div>
+                        }
 
                         <div className="form-row">
                             <label>Тип груза (3)</label>
@@ -802,9 +828,11 @@ const DriverEditTask = () => {
                                 getOptionLabel={(option) => `${option.name}`}
                                 renderInput={(params) => <TextField {...params} label="Список материалов" />} />
 
-                            <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
-                                Добавить тип груза
-                            </button>
+                            {!isExternal &&
+                                <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleMaterialOpen(e) }}>
+                                    Добавить тип груза
+                                </button>
+                            }
                         </div>
 
                         <div className="form-group col-md-6">
@@ -872,9 +900,11 @@ const DriverEditTask = () => {
                                 getOptionLabel={(option) => `${option.textAddress}`}
                                 renderInput={(params) => <TextField {...params} label="Список адресов" />} />
 
-                            <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
-                                Добавить адрес
-                            </button>
+                            {!isExternal &&
+                                <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                                    Добавить адрес
+                                </button>
+                            }
                         </div>
 
                         <div className="input-group mb-3 col-md-6 pl-1">

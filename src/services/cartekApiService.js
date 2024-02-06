@@ -388,6 +388,26 @@ class ApiService {
         return res;
     }
 
+    getExternalTransporters() {
+        var res = this.get(`utils/getexternaltransporterslist`);
+        return res;
+    }
+
+    getExternalTransporter(params) {
+        const query = new URLSearchParams(params).toString();
+        return this.get(`utils/getexternaltransporter/?${query}`);
+    }
+
+    createExternalTransporter(data) {
+        var res = this.post(`utils/createexternaltransporter`, data);
+        return res;
+    }
+
+    updateExternalTransporter(data) {
+        var res = this.post(`utils/updateexternaltransporter`, data);
+        return res;
+    }
+
     getClients() {
         var res = this.get(`utils/getclients`);
         return res;

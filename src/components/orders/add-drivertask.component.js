@@ -29,21 +29,41 @@ function DriverTaskForm({order, handleClose}) {
     const [tasksToCreate, setTasksToCreate] = useState([]);
     const [notificationShown, setNotificationShown] = useState(false);
     const [reload, setReload] = useState(0);
+    const [isExternal, setIsExternal] = useState(false);
+    const [externalTransporter, setExternalTransporter] = useState({});
+    const [transporterPrice, setTransporterPrice] = useState(0);
+    const [externalTransporters, setExternalTransporters] = useState([]);
+    const [discount, setDiscount] = useState(0);
 
     const handleShiftChange = (event) => {
         setShift(event.target.value);
     };
 
     useEffect(() => {
-        console.log(order);
         var count = order.carCount - order.driverTasks.length;
         setLoading(true);
         setTasksCount(count);
+        setIsExternal(order.isExternal);
         let array = [];
         for (let i = 0; i < count; i++) {
             array.push({ car: {}, driver: {}, taskDate: new Date(order.startDate), shift: order.shift, orderId: order.id });
         }
         setTasksToCreate(array);
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        setLoading(true);
+        ApiService.getExternalTransporters()
+            .then(({ data }) => {
+                var et = data.find(t => t.id === order.externalTransporterId);
+                setExternalTransporter(et);
+            })
+            .catch((error) => {
+                if (error.response.data.message) {
+                    setMessage(error.response.data.message);
+                }
+            });
         setLoading(false);
     }, []);
 
@@ -111,10 +131,6 @@ function DriverTaskForm({order, handleClose}) {
             });
     }
 
-    function serviceToText(service){
-
-    }
-
     const intToShift = (shift) => {
         switch (shift) {
             case 0:
@@ -153,28 +169,37 @@ function DriverTaskForm({order, handleClose}) {
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Услуга</label>
-                    {order.service === 0 ? "Перевозка" : "Поставка"}
+                    <label className="ml-5">{order.service === 0 ? "Перевозка" : "Поставка"}</label>
                 </div>
 
                 <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Грузоотправитель (1)</label>
-                    <label>{order.client && order.client.clientName}</label>
+                    <label className="ml-5">{order.client && order.client.clientName}</label>
                 </div>
 
                 <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Грузополучатель (2)</label>
-                    <label>{order.gp && order.gp.clientName}</label>
+                    <label className="ml-5">{order.gp && order.gp.clientName}</label>
                 </div>
+
+                <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                {isExternal &&
+                    <div className="form-row">
+                        <label className="bold-label">Перевозчик</label>
+                        <label className="ml-5">{externalTransporter && externalTransporter.name}</label>
+                    </div>
+                }
 
                 <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                 <div className="form-row">
                     <label className="bold-label">Груз (3)</label>
-                    <label>{order.material && order.material.name}</label>
+                    <label className="ml-5">{order.material && order.material.name}</label>
                 </div>
 
                 <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -194,21 +219,21 @@ function DriverTaskForm({order, handleClose}) {
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Единица измерения</label>
-                    {order.loadUnit === 0 ? "m3" : "тонны"}
+                    <label className="ml-5">{order.loadUnit === 0 ? "m3" : "тонны"}</label>
                 </div>
 
                 <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Прием груза (8)</label>
-                    <label>{order.locationA && order.locationA}</label>
+                    <label className="ml-5">{order.locationA && order.locationA}</label>
                 </div>
 
                 <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                 <div className="form-group col-md-6">
                     <label className="bold-label">Выдача груза (10)</label>
-                    <label>{order.locationB && order.locationB}</label>
+                    <label className="ml-5">{order.locationB && order.locationB}</label>
                 </div>
             </div>
 
@@ -216,7 +241,7 @@ function DriverTaskForm({order, handleClose}) {
 
             <div className="form-row">
                 <label className="bold-label">Комментарий по заявке</label>
-                <label>{order.note}</label>
+                <label className="ml-5">{order.note}</label>
             </div>
 
             <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -249,7 +274,7 @@ function DriverTaskForm({order, handleClose}) {
                                     onChange={(e, newvalue) => { task.driver = newvalue }}
                                     sx={{ width: 300 }}
                                     isOptionEqualToValue={(option, value) => option.fullName === value.fullName}
-                                    getOptionLabel={(option) => `${option.fullName}`}
+                                    getOptionLabel={(option) => `${option.isExternal ? option.fullName + "(наём)" : option.fullName}`}
                                     renderInput={(params) => <TextField {...params} label="Список водителей" />} />
                             </div>
 

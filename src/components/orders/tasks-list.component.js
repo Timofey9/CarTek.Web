@@ -5,6 +5,10 @@ import DataTable from 'react-data-table-component';
 import DatePicker, { registerLocale } from "react-datepicker";
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
+import AdminEditTask from "./admin-edittask.component";
+import Dialog from '@mui/material/Dialog';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
 import "react-datepicker/dist/react-datepicker.css";
 import { saveAs } from 'file-saver';
 import ru from 'date-fns/locale/ru';
@@ -70,7 +74,7 @@ const columnsSubTasks = [
     },
 ];
 
-const MyTasksList = () => {
+const FullTasksList = () => {
     let cancelled = false;
     var date = new Date();
     var yesterday = date - 1000 * 60 * 60 * 24 * 2;
@@ -91,10 +95,22 @@ const MyTasksList = () => {
     const [searchString, setSearchString] = useState("");
     const [driverId, setDriverId] = useState(0);
     const [isExternal, setIsExternal] = useState(false);
+    const [openEditTask, setOpenEditTask] = useState(false);
+    const [selectedTaskId, setSelectedTaskId] = useState(0);
 
     const search = () => {
         setReload(reload + 1);
     }
+
+    const handleClickOpenTask = (taskId) => {
+        setSelectedTaskId(taskId);
+        setOpenEditTask(true);
+    }
+
+    const handleCloseTaskForm = () => {
+        setOpenEditTask(false);
+        setReload(reload + 1);
+    };
 
     const intToShift = (shift) => {
         switch (shift) {
@@ -107,7 +123,7 @@ const MyTasksList = () => {
             case 3:
                 return "Сутки (неограниченно)";
         }
-    } 
+    }
 
     const navigate = useNavigate();
 
@@ -119,9 +135,6 @@ const MyTasksList = () => {
             striped='true'
             highlightOnHover
             dense='true'
-            onRowClicked={(row, event) => {
-                navigate(`/driver-dashboard/subtask/${row.id}`);
-            }}
             data={data.subTasks}
         /></pre>;
 
@@ -136,7 +149,7 @@ const MyTasksList = () => {
         setDriverId(user.identity.id);
 
         let request = {
-            driverId: user.identity.id,
+            driverId: 0,
             pageSize: pageSize,
             pageNumber: pageNumber,
             searchBy: searchBy,
@@ -163,11 +176,6 @@ const MyTasksList = () => {
     }, [pageSize, pageNumber, searchBy, searchString, reload]);
 
     const columns = [
-        //{
-        //    name: "Тягач",
-        //    selector: (row, index) => <div>{row.car.plate}</div>,
-        //    center: true,
-        //},
         {
             name: "Дата",
             selector: (row, index) => new Date(row.startDate).toLocaleDateString('ru-Ru', {
@@ -208,12 +216,10 @@ const MyTasksList = () => {
             wrap: true
         },
         {
-            name: "С/ст перевозки",
-            selector: (row, index) => row.price,
+            name: "Открыть",
+            selector: (row, index) => <Button variant="outlined" onClick={e => handleClickOpenTask(row.id)}><i class="fa fa-external-link" aria-hidden="true"></i></Button>,
             center: true,
-            wrap: true,
-            omit: isExternal
-        }
+        },
     ];
 
     const conditionalRowStyles = [
@@ -258,10 +264,9 @@ const MyTasksList = () => {
     ];
 
     const downloadSalariesFile = () => {
-        ApiService.getSalariesReportDriver({
+        ApiService.getSalariesReport({
             startDate: startDate.toUTCString(),
-            endDate: endDate.toUTCString(),
-            driverId: driverId
+            endDate: endDate.toUTCString()
         }).then(response => {
             let url = window.URL
                 .createObjectURL(new Blob([response.data]));
@@ -312,6 +317,7 @@ const MyTasksList = () => {
                             <select className="form-select" onChange={(e) => { setSearchBy(e.target.value) }} value={searchBy}>
                                 <option value="clientName">Заказчик</option>
                                 <option value="material">Тип груза</option>
+                                <option value="driver">Водитель</option>
                             </select>
                         </div>
                         <div className="mb-3 col-md-4 pl-1">
@@ -357,12 +363,22 @@ const MyTasksList = () => {
             onChangeRowsPerPage={(currentRowsPerPage, currentPage) => {
                 !cancelled && setPageSize(currentRowsPerPage);
             }}
-            onRowClicked={(row, event) => {
-                navigate(`/driver-dashboard/task/${row.id}`);
-            }}
             paginationPerPage={pageSize}
         />
+        <Dialog
+            fullScreen
+            open={openEditTask}
+            onClose={handleCloseTaskForm}>
+            <AppBar sx={{ bgcolor: "#F6CC3" }}>
+                <Toolbar variant="outlined">
+                    <Button autoFocus color="inherit" onClick={handleCloseTaskForm}>
+                        Закрыть
+                    </Button>
+                </Toolbar>
+            </AppBar>
+            <AdminEditTask driverTaskId={selectedTaskId} handleCloseTaskForm={handleCloseTaskForm}></AdminEditTask>
+        </Dialog>
     </>;
 };
 
-export default MyTasksList;
+export default FullTasksList;

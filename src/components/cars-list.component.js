@@ -59,7 +59,7 @@ const CarsList = () => {
 
     useEffect(() => {
         setParams();
-    }, [sortBy, dir, pageSize, pageNumber, reload]);
+    }, [searchString, sortBy, dir, pageSize, pageNumber, reload]);
 
 
     const columns = [

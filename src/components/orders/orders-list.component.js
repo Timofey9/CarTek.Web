@@ -15,12 +15,6 @@ import AdminEditTask from "./admin-edittask.component";
 import "./orders.css";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
-import {
-    TransformWrapper,
-    TransformComponent,
-    ReactZoomPanPinchProps,
-    ReactZoomPanPinchContentRef,
-} from "react-zoom-pan-pinch";
 registerLocale('ru', ru);
 
 const rowPreDisabled = row => row.driverTasks < 1;
