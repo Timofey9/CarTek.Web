@@ -111,7 +111,10 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
         formData.append("DropOffArrivalDate", dropOffArrivalTime.toUTCString());
         formData.append("DropOffDepartureDate", dropOffDepartureTime.toUTCString());
         formData.append("Transporter", transporter);
-        formData.append("TransporterId", externalTransporterId);
+
+        if (externalTransporterId !== undefined) {
+            formData.append("TransporterId", externalTransporterId);
+        }
 
         ApiService.updateTn(formData)
             .then(({ data }) => {
