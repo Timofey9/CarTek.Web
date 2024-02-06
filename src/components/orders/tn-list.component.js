@@ -131,6 +131,11 @@ const TnsList = () => {
             wrap: true
         },
         {
+            name: "Водитель",
+            selector: (row, index) => <div>{row.driverInfo}</div>,
+            wrap: true
+        },
+        {
             name: "Заказчик",
             selector: (row, index) => <div>{row.customer && row.customer.clientName}</div>,
             wrap: true
