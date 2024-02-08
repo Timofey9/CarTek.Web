@@ -100,7 +100,7 @@ function DriverForm() {
                 isExternal: isExternal
             };
 
-            if (externalTransporter.id !== undefined) {
+            if (externalTransporter && externalTransporter.id !== undefined) {
                 newDriver.externalTransporterId = externalTransporter.id;
             }
 
