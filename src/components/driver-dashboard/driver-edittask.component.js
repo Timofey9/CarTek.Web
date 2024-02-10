@@ -489,7 +489,7 @@ const DriverEditTask = () => {
                 isValid = false;
             }
 
-            if (loadVolume.length === 0) {
+            if (loadVolume.length === 0 && loadVolume2.length === 0) {
                 isValid = false;
             }
 
@@ -507,7 +507,7 @@ const DriverEditTask = () => {
                 isValid = false;
             }
 
-            if (unloadVolume.length === 0) {
+            if (unloadVolume.length === 0 && unloadVolume2.length === 0) {
                 isValid = false;
             }
 
