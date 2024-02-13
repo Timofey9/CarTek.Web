@@ -224,8 +224,7 @@ const DriverEditSubTask = () => {
             .then(({ data }) => {
                 alert("Подзадача добавлена");
                 navigate(`/driver-dashboard/subtask/${data.message}`);
-                setReload(reload + 1);
-                setContinueWork(true);
+                window.location.reload(); 
             })
             .catch((error) => {
                 if (error.response.data) {
@@ -444,7 +443,6 @@ const DriverEditSubTask = () => {
             isValid = false;
         }
 
-
         return isValid;
     }
 
@@ -621,6 +619,7 @@ const DriverEditSubTask = () => {
 
                     <dt className="col-sm-3">Услуга: </dt>
                     <dd className="col-sm-9">{order.service === 0 ? "Перевозка" : "Поставка"}</dd>
+
                     {!isExternal && <>
                         <dt className="col-sm-3">Заказчик: </dt>
                         <dd className="col-sm-9">{customer.clientName}</dd>

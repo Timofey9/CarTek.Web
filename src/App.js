@@ -139,6 +139,13 @@ class App extends Component {
                                         </Link>
                                     </li>
 
+
+                                    <li className="nav-item">
+                                        <Link to="/admin/taskslist" className="nav-link">
+                                            Все задачи
+                                        </Link>
+                                    </li>
+
                                     {currentUser.identity.isInitialBookkeeper && 
                                         <li className="nav-item">
                                             <Link to={"/admin/clients"} className="nav-link">
