@@ -22,17 +22,8 @@ import AddressForm from '../orders/add-address.component'
 import MaterialForm from '../orders/add-material.component'
 import Backdrop from '@mui/material/Backdrop';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useDebouncedCallback } from 'use-debounce';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
 import EditTn from '../orders/edit-tn.component'
 
 registerLocale('ru', ru);
@@ -315,7 +306,8 @@ const DriverEditSubTask = () => {
             formData.append("TransporterId", externalTransporter.id);
         }
 
-        if (validate()) {
+        if (validate())
+        {
             formData.append("MaterialId", material.id);
             formData.append("Number", tnNumber);
             formData.append("GoId", go.id);
@@ -332,19 +324,19 @@ const DriverEditSubTask = () => {
             formData.append("UnloadUnit", unloadUnit);
             formData.append("UnloadUnit2", unloadUnit2);
             formData.append("LocationBId", addressB.id);
-            formData.append("DropOffArrivalDate", dropOffArrivalDate.toUTCString());
-            formData.append("DropOffDepartureDate", dropOffDepartureDate.toUTCString());
+            formData.append("DropOffArrivalDate", dropOffArrivalDate && dropOffArrivalDate.toUTCString());
+            formData.append("DropOffDepartureDate", dropOffDepartureDate && dropOffDepartureDate.toUTCString());
 
             ApiService.SubmitDriverSubTaskAsync(formData)
                 .then(({ data }) => {
                     alert("Статус обновлен");
                     clearForm();
-                    setReload(reload + 1);
                     setShowSpinner(false);
-                })
+                    setReload(reload + 1);
+                 })
                 .catch((error) => {
                     if (error.response.data) {
-                        setError(error.response.data);
+                        setError(error.response.data.message);
                         setShowSpinner(false);
                     }
                 });
@@ -452,10 +444,6 @@ const DriverEditSubTask = () => {
             isValid = false;
         }
 
-
-        if (Object.keys(addressB).length === 0) {
-            isValid = false;
-        }
 
         return isValid;
     }
