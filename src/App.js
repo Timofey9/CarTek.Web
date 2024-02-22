@@ -139,6 +139,11 @@ class App extends Component {
                                         </Link>
                                     </li>
 
+                                    <li className="nav-item">
+                                        <Link to="/admin/messages" className="nav-link">
+                                            Доска сообщений
+                                        </Link>
+                                    </li>
 
                                     <li className="nav-item">
                                         <Link to="/admin/taskslist" className="nav-link">

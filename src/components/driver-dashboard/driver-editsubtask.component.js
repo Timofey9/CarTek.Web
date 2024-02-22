@@ -516,6 +516,20 @@ const DriverEditSubTask = () => {
 
     }
 
+    const convertVolumes = (volume1, volume2, setter1, setter2) => {
+        //volume1 - в м3
+        //volume2 - в тн
+        let value = 0;
+        if (volume1 > 0) {
+            value = volume1 * order.density;
+            setter2(value.toFixed(2));
+        } else
+            if (volume2 > 0) {
+                value = volume2 / order.density;
+                setter1(value.toFixed(2))
+            }
+    } 
+
     useEffect(() => {
         setLoading(true);
         ApiService.getMaterials()
@@ -732,26 +746,49 @@ const DriverEditSubTask = () => {
                             <label>Объем загрузки</label>
 
                             <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-md-5">
                                     <label>M3</label>
+                                    {loadVolume > 39 &&
+                                        <div class="alert alert-danger" role="alert">
+                                            Проверьте кол-во!
+                                        </div>
+                                    }
                                     <input
                                         placeholder="М3"
-                                        className={validated && loadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        className={(validated && loadVolume.length === 0) ? "form-control not-valid-input-border" : "form-control"}
                                         type="number"
                                         step="0.1"
+                                        max="38.99"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setLoadVolume, e.target.value)}
+                                        onChange={(e) => updateVolume(setLoadVolume, e.target.value, 'm3')}
                                         value={loadVolume} />
                                 </div>
-                                <div className="col-md-6">
+
+                                {order.density && order.density !== 0 &&
+                                    <div className="col-md-2 center">
+                                        <div className="mt-4">
+                                            <button onClick={(e) => convertVolumes(loadVolume, loadVolume2, setLoadVolume, setLoadVolume2)} className="btn btn-success">
+                                                <i class="fa fa-arrows-h" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div className="col-md-5">
                                     <label>Тонны</label>
+                                    {(loadVolume2 > 10 && loadVolume2 < 39) &&
+                                        <div class="alert alert-danger" role="alert">
+                                            Проверьте кол-во!
+                                        </div>
+                                    }
                                     <input
                                         placeholder="Тонны"
-                                        className={validated && loadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        className={(validated && loadVolume2.length === 0) || (loadVolume2 > 10 && loadVolume2 < 39) ? "form-control not-valid-input-border" : "form-control"}
                                         type="number"
                                         step="0.1"
+                                        min="39"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setLoadVolume2, e.target.value)}
+                                        onChange={(e) => updateVolume(setLoadVolume2, e.target.value, 't')}
                                         value={loadVolume2} />
                                 </div>
                             </div>
@@ -795,26 +832,37 @@ const DriverEditSubTask = () => {
                             <label>Объем выгрузки</label>
 
                             <div className="row">
-                                <div className="col-md-6">
+                                <div className="col-md-5">
                                     <label>M3</label>
                                     <input
                                         placeholder="М3"
-                                        className={validated && unloadVolume.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        className={(validated && loadVolume.length === 0) || unloadVolume > 38.99 ? "form-control not-valid-input-border" : "form-control"}
                                         type="number"
                                         step="0.1"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value)}
+                                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value, 'm3')}
                                         value={unloadVolume} />
                                 </div>
-                                <div className="col-md-6">
+
+                                {order.density && order.density !== 0 &&
+                                    <div className="col-md-2 center">
+                                        <div className="mt-4">
+                                            <button onClick={(e) => convertVolumes(unloadVolume, unloadVolume2, setUnloadVolume, setUnloadVolume2)} className="btn btn-success">
+                                                <i class="fa fa-arrows-h" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+
+                                <div className="col-md-5">
                                     <label>Тонны</label>
                                     <input
                                         placeholder="Тонны"
-                                        className={validated && unloadVolume2.length === 0 ? "form-control not-valid-input-border" : "form-control"}
+                                        className={(validated && unloadVolume2.length === 0) || (unloadVolume2 > 10 && unloadVolume2 < 39) ? "form-control not-valid-input-border" : "form-control"}
                                         type="number"
                                         step="0.1"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setUnloadVolume2, e.target.value)}
+                                        onChange={(e) => updateVolume(setUnloadVolume2, e.target.value, 't')}
                                         value={unloadVolume2} />
                                 </div>
                             </div>

@@ -310,12 +310,14 @@ const DriverEditTask = () => {
     const convertVolumes = (volume1, volume2, setter1, setter2) => {
         //volume1 - в м3
         //volume2 - в тн
-
+        let value = 0;
         if (volume1 > 0) {
-            setter2(volume1 * order.density);
+            value = volume1 * order.density;
+            setter2(value.toFixed(2));
         } else
             if (volume2 > 0) {
-                setter1(volume2 / order.density)
+                value = volume2 / order.density;
+                setter1(value.toFixed(2))
         }
     } 
 
