@@ -733,7 +733,7 @@ const DriverEditTask = () => {
 
                     {!isExternal && <>
                         <dt className="col-sm-3">Себестоимость перевозки:</dt>
-                        <dd className="col-sm-9">{driverTask.price}</dd>
+                        <dd className="col-sm-9">{driverTask.driverPrice}</dd>
 
                         <dt className="col-sm-3">Транспорт :</dt>
                         <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>) })}</dd>
