@@ -209,7 +209,7 @@ const MyTasksList = () => {
         },
         {
             name: "С/ст перевозки",
-            selector: (row, index) => row.price,
+            selector: (row, index) => row.driverPrice,
             center: true,
             wrap: true,
             omit: isExternal
