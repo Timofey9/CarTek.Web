@@ -42,7 +42,7 @@ const TnsList = () => {
     const [showSpinner, setShowSpinner] = useState(false);
 
     const handleClickOpen = (row) => {
-        if (row.driverTaskId !== undefined) {
+        if (row.driverTaskId !== 0) {
             setTaskId(row.driverTaskId);
             setOpen(true);
         } else {
