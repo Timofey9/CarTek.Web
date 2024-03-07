@@ -606,7 +606,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Себестоимость перевозки КарТэк руб/{customer && unitToString(customer.clientUnit)}</label>
+                        <label className="bold-label">Себестоимость перевозки КарТэк руб/{gp && unitToString(gp.clientUnit)}</label>
                         <input
                             disabled={!isEdit}
                             type="text"
@@ -637,7 +637,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                             <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
-                            <label className="bold-label">Себестоимость перевозки {externalTransporter.name}</label>
+                        <label className="bold-label">Себестоимость перевозки {externalTransporter.name} руб/{gp && unitToString(gp.clientUnit)} </label>
                             <input
                                 disabled={!isEdit}
                                 type="text"
@@ -660,7 +660,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                     {!isExternal && 
                         <div className="form-group col-md-6">
-                            <label className="bold-label">Себестоимость перевозки (Водитель)</label>
+                            <label className="bold-label">Себестоимость перевозки (Водитель) руб/{gp && unitToString(gp.clientUnit)}</label>
                             <input
                                 disabled={!isEdit}
                                 type="text"
@@ -671,7 +671,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         </div>}
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Себестоимость материала</label>
+                        <label className="bold-label">Себестоимость материала руб/{gp && unitToString(gp.clientUnit)}</label>
                         <input
                             disabled={!isEdit}
                             type="text"

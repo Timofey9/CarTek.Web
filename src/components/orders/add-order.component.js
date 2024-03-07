@@ -76,6 +76,9 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
     }
 
     const unitToString = (unit) => {
+        if (unit === undefined) {
+            return "";
+        }
         switch (unit.toString()) {
             case '0':
                 return "m3"
@@ -84,6 +87,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
             default:
                 return "";
         }
+
     }
 
     const updateUnit = (unit) => {
@@ -649,7 +653,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Себестоимость перевозки КарТэк руб/{unitString}</label>
+                        <label>Себестоимость перевозки КарТэк руб/{gp && unitToString(gp.clientUnit)}</label>
                         <input
                             type="text"
                             className={validated && price.length === 0 ? "form-control not-valid-input-border" : "form-control"}
@@ -696,7 +700,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
 
                     {!isExternal &&
                         <div className="form-group col-md-6">
-                            <label>Себестоимость перевозки (Водитель)</label>
+                            <label>Себестоимость перевозки (Водитель) руб/{gp && unitToString(gp.clientUnit)}</label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -707,7 +711,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                     }
 
                     <div className="form-group col-md-6">
-                        <label>Себестоимость материала</label>
+                        <label>Себестоимость материала руб/{gp && unitToString(gp.clientUnit)}</label>
                         <input
                             type="text"
                             className="form-control"
