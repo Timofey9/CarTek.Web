@@ -7,11 +7,17 @@ import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import AdminEditTask from "./admin-edittask.component";
 import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import "react-datepicker/dist/react-datepicker.css";
 import { saveAs } from 'file-saver';
 import ru from 'date-fns/locale/ru';
+import DialogContent from '@mui/material/DialogContent';
+import Badge from '@mui/material/Badge';
+
+
 registerLocale('ru', ru);
 
 const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена', 'Отменена'];
@@ -96,8 +102,9 @@ const FullTasksList = () => {
     const [driverId, setDriverId] = useState(0);
     const [isExternal, setIsExternal] = useState(false);
     const [openEditTask, setOpenEditTask] = useState(false);
+    const [openLastComment, setOpenLastComment] = useState(false);
     const [selectedTaskId, setSelectedTaskId] = useState(0);
-
+    const [selectedComment, setSelectedComment] = useState({});
     const search = () => {
         setReload(reload + 1);
     }
@@ -110,6 +117,18 @@ const FullTasksList = () => {
     const handleCloseTaskForm = () => {
         setOpenEditTask(false);
         setReload(reload + 1);
+    };
+
+    const handleOpenLastComment = (note) => {
+        if (note && note.text.length > 1) {
+            setSelectedComment(note);
+            setOpenLastComment(true);
+        }
+    }
+
+    const handleCloseLastComment = () => {
+        setOpenLastComment(false);
+        setSelectedComment({});
     };
 
     const intToShift = (shift) => {
@@ -137,8 +156,6 @@ const FullTasksList = () => {
             dense='true'
             data={data.subTasks}
         /></pre>;
-
-
 
     useEffect(() => {
         setLoading(true);
@@ -211,9 +228,16 @@ const FullTasksList = () => {
         },
         {
             name: "Статус",
-            selector: (row, index) => <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
+            selector: (row, index) => row.lastNote && row.lastNote.text.length > 1 ?                   
+                <Button variant="text" onClick={e => handleOpenLastComment(row.lastNote)}>
+                    <Badge variant="dot" color="error" invisible={!row.lastNote || row.lastNote.text.length < 1}>
+                        <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>
+                    </Badge>
+                </Button>
+                : <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
+
             center: true,
-            wrap: true
+            wrap: true,
         },
         {
             name: "Открыть",
@@ -377,6 +401,15 @@ const FullTasksList = () => {
                 </Toolbar>
             </AppBar>
             <AdminEditTask driverTaskId={selectedTaskId} handleCloseTaskForm={handleCloseTaskForm}></AdminEditTask>
+        </Dialog>
+
+        <Dialog
+            open={openLastComment}
+            onClose={handleCloseLastComment}>
+            <DialogTitle>{new Date(selectedComment.dateCreated).toLocaleString('ru-Ru')}</DialogTitle>
+            <DialogContent dividers>
+                <Typography>{selectedComment.text}</Typography>
+            </DialogContent>
         </Dialog>
     </>;
 };

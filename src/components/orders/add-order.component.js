@@ -13,7 +13,11 @@ import AddressForm from './add-address.component'
 import MaterialForm from './add-material.component'
 import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import "./orders.css";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
@@ -27,6 +31,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
     const [addressA, setAddressA] = useState({});
     const [addressB, setAddressB] = useState({});
     const [orderName, setOrderName] = useState("");
+    const [loadTime, setLoadTime] = useState("");
     const [materialsList, setMaterialsList] = useState([]);
     const [material, setMaterial] = useState({});
     const [volume, setVolume] = useState("");
@@ -64,6 +69,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
     const [transporterPrice, setTransporterPrice] = useState();
     const [discount, setDiscount] = useState(0);
     const [driverPrice, setDriverPrice] = useState();
+    const [reportLoadType, setReportLoadType] = useState('1');
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -415,6 +421,8 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
             price: price,
             materialPrice: materialPrice,
             density: density,
+            reportLoadType: reportLoadType,
+            loadTime: loadTime
         };
 
         if (isExternal) {
@@ -577,22 +585,37 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
 
 
                     <div className="form-group col-md-6">
-                        <label>Адрес выгрузки (10)</label>
+                        <div className="row">
+                            <div className="col-md-6">
+                                <label>Адрес выгрузки (10)</label>
+                                <Autocomplete
+                                    className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
+                                    options={addresses}
+                                    disablePortal
+                                    onChange={(e, newvalue) => { updateAddressInName(newvalue); setAddressB(newvalue) }}
+                                    sx={{ width: 300 }}
+                                    getOptionLabel={(option) => `${option.textAddress}`}
+                                    renderInput={(params) => <TextField {...params} label="Список адресов" />} />
 
-                        <Autocomplete
-                            className={checkObjectKeys(addressB) ? "not-valid-input-border" : ""}
-                            options={addresses}
-                            disablePortal
-                            onChange={(e, newvalue) => { updateAddressInName(newvalue); setAddressB(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />
+                                <label>{addressB && addressB.textAddress}</label>
 
-                        <label>{addressB && addressB.textAddress}</label>
+                                <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
+                                    Добавить адрес
+                                </button>
+                            </div>
 
-                        <button form="profile-form" className="btn btn-success mt-2" onClick={(e) => { handleAddressOpen(e) }}>
-                            Добавить адрес
-                        </button>
+                            <div className="col-md-6">
+                                <label>Время приемки на адресе</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    form="profile-form"
+                                    onChange={(e) => setLoadTime(e.target.value)}
+                                    value={loadTime}
+                                />
+                            </div>
+                        </div>
+
                     </div>
 
                     <div className="form-group col-md-6">
@@ -608,12 +631,30 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Единица измерения</label>
-                        <select className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => updateUnit(e.target.value)}>
-                            <option value="none">Единица измерения</option>
-                            <option value="0">М3</option>
-                            <option value="1">тонны</option>
-                        </select>
+                        <div>
+                            <label>Единица измерения</label>
+                            <select className="form-select" value={loadUnit} aria-label="Единица измерения" onChange={(e) => updateUnit(e.target.value)}>
+                                <option value="none">Единица измерения</option>
+                                <option value="0">М3</option>
+                                <option value="1">тонны</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div className="form-group col-md-6">
+                        <FormControl>
+                            <FormLabel id="radio-buttons-group-label">Отчетность по загрузке/выгрузке</FormLabel>
+                            <RadioGroup
+                                row
+                                aria-labelledby="radio-buttons-group-label"
+                                name="radio-buttons-group"
+                                value={reportLoadType}
+                                onChange={(e) => setReportLoadType(e.target.value)}>
+                                <FormControlLabel value="0" control={<Radio />} label="Загрузка" />
+                                <FormControlLabel value="1" control={<Radio />} label="Выгрузка" />
+                            </RadioGroup>
+                        </FormControl>
                     </div>
 
                     <div className="form-group col-md-6">
@@ -653,7 +694,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Себестоимость перевозки КарТэк руб/{gp && unitToString(gp.clientUnit)}</label>
+                        <label>Себестоимость перевозки КарТэк руб/{unitString}</label>
                         <input
                             type="text"
                             className={validated && price.length === 0 ? "form-control not-valid-input-border" : "form-control"}
@@ -700,7 +741,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
 
                     {!isExternal &&
                         <div className="form-group col-md-6">
-                            <label>Себестоимость перевозки (Водитель) руб/{gp && unitToString(gp.clientUnit)}</label>
+                            <label>Себестоимость перевозки (Водитель) руб/{unitString}</label>
                             <input
                                 type="text"
                                 className="form-control"
@@ -711,7 +752,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                     }
 
                     <div className="form-group col-md-6">
-                        <label>Себестоимость материала руб/{gp && unitToString(gp.clientUnit)}</label>
+                        <label>Себестоимость материала руб/{unitString}</label>
                         <input
                             type="text"
                             className="form-control"

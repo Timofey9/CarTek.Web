@@ -183,7 +183,6 @@ class ApiService {
                 }
             }
         );
-
     }
 
     post(url, data, headers = {}) {

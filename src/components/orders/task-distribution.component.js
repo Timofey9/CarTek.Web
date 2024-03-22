@@ -6,10 +6,14 @@ import DataTable from 'react-data-table-component';
 import DatePicker, { registerLocale } from "react-datepicker";
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import AdminEditTask from "./admin-edittask.component";
 import DriverTaskCarForm from './add-drivertaskCar.component';
+import DialogContent from '@mui/material/DialogContent';
+import Badge from '@mui/material/Badge';
 import { saveAs } from 'file-saver';
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
@@ -33,7 +37,22 @@ const CarsWork = () => {
     const [openEditTask, setOpenEditTask] = useState(false);
     const [localUser, setLocalUser] = useState({});
     const [filtered, setFiltered] = useState([]);
+    const [openLastComment, setOpenLastComment] = useState(false);
+    const [selectedComment, setSelectedComment] = useState({});
+
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена', 'Отменена'];
+
+    const handleOpenLastComment = (note) => {
+        if (note && note.text.length > 1) {
+            setSelectedComment(note);
+            setOpenLastComment(true);
+        }
+    }
+
+    const handleCloseLastComment = () => {
+        setOpenLastComment(false);
+        setSelectedComment({});
+    };
 
     const ExpandedComponent = ({ data }) => <pre>
         <DataTable
@@ -201,7 +220,14 @@ const CarsWork = () => {
         },
         {
             name: "Статус",
-            selector: (row, index) => <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
+            selector: (row, index) => row.lastNote && row.lastNote.text.length > 1 ?
+                <Button variant="text" onClick={e => handleOpenLastComment(row.lastNote)}>
+                    <Badge variant="dot" color="error" invisible={!row.lastNote || row.lastNote.text.length < 1}>
+                        <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>
+                    </Badge>
+                </Button>
+                : <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
+
             center: true,
             wrap: true,
             conditionalCellStyles: [
@@ -243,6 +269,7 @@ const CarsWork = () => {
                         }
                     }
                 }]
+
         },
         {
             name: "Открыть",
@@ -400,21 +427,22 @@ const CarsWork = () => {
                 </div>
             </div>
         </form>
-
-        <DataTable
-            columns={columns}
-            responsive
-            noHeader
-            conditionalRowStyles={conditionalRowStyles}
-            highlightOnHover
-            noDataComponent="Машин не найдено"
-            progressPending={loading}
-            customStyles={customStyles}
-            data={filtered}
-            expandableRows
-            expandableRowDisabled={rowPreDisabled}
-            expandableRowsComponent={ExpandedComponent}
-        />
+        <div className="col-sm-12 col-md-12">
+            <DataTable
+                columns={columns}
+                responsive
+                noHeader
+                conditionalRowStyles={conditionalRowStyles}
+                highlightOnHover
+                noDataComponent="Машин не найдено"
+                progressPending={loading}
+                customStyles={customStyles}
+                data={filtered}
+                expandableRows
+                expandableRowDisabled={rowPreDisabled}
+                expandableRowsComponent={ExpandedComponent}
+            />
+        </div>
 
         <Dialog
             fullScreen
@@ -442,6 +470,15 @@ const CarsWork = () => {
                 </Toolbar>
             </AppBar>
             <AdminEditTask driverTaskId={selectedTaskId} handleCloseTaskForm={handleCloseTaskForm}></AdminEditTask>
+        </Dialog>
+
+        <Dialog
+            open={openLastComment}
+            onClose={handleCloseLastComment}>
+            <DialogTitle>{new Date(selectedComment.dateCreated).toLocaleString('ru-Ru')}</DialogTitle>
+            <DialogContent dividers>
+                <Typography>{selectedComment.text}</Typography>
+            </DialogContent>
         </Dialog>
     </>;
 };

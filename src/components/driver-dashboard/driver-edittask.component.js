@@ -85,7 +85,7 @@ const DriverEditTask = () => {
     const [showUnitsError, setShowUnitsError] = useState(false);
     const [isExternal, setIsExternal] = useState(false);
     const [isExternalOrder, setIsExternalOrder] = useState(false);
-    const [externalTransporter, setExternalTransporter] = useState({ name:"ООО \"КарТэк\""});
+    const [externalTransporter, setExternalTransporter] = useState({ name: "ООО \"КарТэк\"" });
     let { driverTaskId } = useParams();
 
     const navigate = useNavigate();
@@ -135,8 +135,7 @@ const DriverEditTask = () => {
         }
     }
 
-    const checkUnit = (value, unit) =>
-    {
+    const checkUnit = (value, unit) => {
         if (unit === 'm3' && value > 38.99) {
             //return 38.99;
         }
@@ -318,8 +317,8 @@ const DriverEditTask = () => {
             if (volume2 > 0) {
                 value = volume2 / order.density;
                 setter1(value.toFixed(2))
-        }
-    } 
+            }
+    }
 
 
     const restoreTask = useDebouncedCallback((event) => {
@@ -713,7 +712,21 @@ const DriverEditTask = () => {
                     <dd className="col-sm-9"><a target="_blank" href={driverTask.locationA && `https://yandex.ru/maps/?pt=${driverTask.locationA.coordinates}&z=11&l=map`}>{driverTask.locationA && driverTask.locationA.textAddress}</a></dd>
 
                     <dt className="col-sm-3">Место выгрузки: </dt>
-                    <dd className="col-sm-9"><a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>{driverTask.locationB && driverTask.locationB.textAddress}</a></dd>
+                    <dd className="col-sm-9">
+                        <a target="_blank" href={driverTask.locationB && `https://yandex.ru/maps/?pt=${driverTask.locationB.coordinates}&z=11&l=map`}>
+                            {driverTask.locationB && driverTask.locationB.textAddress}
+                        </a>
+                    </dd>
+
+                    {order.loadTime && order.loadTime.length > 0 &&
+                        <>
+                            <dt className="col-sm-3">Время приемки до: </dt>
+                            <dd className="col-sm-9">
+                                {order.loadTime}
+
+                            </dd>
+                        </>}
+
 
                     {!isExternal && <>
                         <dt className="col-sm-3">Услуга: </dt>
@@ -736,7 +749,7 @@ const DriverEditTask = () => {
                         <dd className="col-sm-9">{driverTask.driverPrice}</dd>
 
                         <dt className="col-sm-3">Транспорт :</dt>
-                        <dd className="col-sm-9">По заявке назначено {order.driverTasks && order.driverTasks.length} а.м. Гос.номера: {order.driverTasks && order.driverTasks.map((dt) => { return (<span>{dt.car.plate}, </span>) })}</dd>
+                        <dd className="col-sm-9">{driverTask.transportAmountMessage}</dd>
                     </>}
 
                     <dt className="col-sm-3">Комментарий по заявке:</dt>
@@ -799,7 +812,7 @@ const DriverEditTask = () => {
 
                         <div className="form-group col-md-6">
                             <label>Перевозчик (6)</label>
-                            
+
                             <input
                                 disabled
                                 className={validated && transporter.length === 0 ? "form-control not-valid-input-border" : "form-control"}
@@ -808,7 +821,7 @@ const DriverEditTask = () => {
                                 value={externalTransporter.name} />
                         </div>
 
-                        {!isExternal && 
+                        {!isExternal &&
                             <div className="form-group col-md-6">
                                 <button className="btn btn-success mt-2" onClick={(e) => { handleClickOpen(e) }}>
                                     Добавить юр.лицо
@@ -935,7 +948,7 @@ const DriverEditTask = () => {
                                         type="number"
                                         step="0.1"
                                         form="profile-form"
-                                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value,'m3')}
+                                        onChange={(e) => updateVolume(setUnloadVolume, e.target.value, 'm3')}
                                         value={unloadVolume} />
                                 </div>
 
@@ -947,7 +960,7 @@ const DriverEditTask = () => {
                                             </button>
                                         </div>
                                     </div>
-                                }                             
+                                }
 
                                 <div className="col-md-5">
                                     <label>Тонны</label>

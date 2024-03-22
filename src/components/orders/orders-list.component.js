@@ -5,6 +5,7 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { saveAs } from 'file-saver';
@@ -12,6 +13,10 @@ import DriverTaskForm from './add-drivertask.component';
 import OrderForm from './add-order.component';
 import EditOrderForm from './view-order.component';
 import AdminEditTask from "./admin-edittask.component";
+import DialogTitle from '@mui/material/DialogTitle';
+import Typography from '@mui/material/Typography';
+import Badge from '@mui/material/Badge';
+
 import "./orders.css";
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
@@ -41,8 +46,22 @@ const OrdersList = () => {
     const [selectedTaskId, setSelectedTaskId] = useState(0);
     const [localUser, setLocalUser] = useState({});
     const [cloningOrder, setCloningOrder] = useState({});
+    const [openLastComment, setOpenLastComment] = useState(false);
+    const [selectedComment, setSelectedComment] = useState({});
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершена', 'Отменена'];
+
+    const handleOpenLastComment = (note) => {
+        if (note && note.text.length > 1) {
+            setSelectedComment(note);
+            setOpenLastComment(true);
+        }
+    }
+
+    const handleCloseLastComment = () => {
+        setOpenLastComment(false);
+        setSelectedComment({});
+    };
 
     const handleClickOpen = (orderId) => {
         setSelectedOrderId(orderId);
@@ -122,7 +141,9 @@ const OrdersList = () => {
     const downloadFullTasks = () => {
         ApiService.downloadFullTasksReport({
             startDate: startDate.toUTCString(),
-            endDate: endDate.toUTCString()
+            endDate: endDate.toUTCString(),
+            searchColumn: searchBy,
+            search: searchString,
         }).then(response => {
             let url = window.URL
                 .createObjectURL(new Blob([response.data]));
@@ -132,6 +153,8 @@ const OrdersList = () => {
 
     const downloadTnsFile = () => {
         ApiService.getTnsList({
+            searchColumn: searchBy,
+            search: searchString,
             startDate: startDate.toUTCString(),
             endDate: endDate.toUTCString()
         }).then(response => {
@@ -307,9 +330,13 @@ const OrdersList = () => {
         },
         {
             name: "Статус",
-            selector: (row, index) => <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
-            center: true,
-            wrap: true,
+            selector: (row, index) => row.lastNote && row.lastNote.text.length > 1 ?
+                <Button variant="text" onClick={e => handleOpenLastComment(row.lastNote)}>
+                    <Badge variant="dot" color="error" invisible={!row.lastNote || row.lastNote.text.length < 1}>
+                        <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>
+                    </Badge>
+                </Button>
+                : <div>{row.isCanceled ? "Отменена" : constStatuses[row.status]}</div>,
             conditionalCellStyles: [
                 {
                     when: row => row.status === 0,
@@ -349,7 +376,9 @@ const OrdersList = () => {
                         }
                     }
                 }
-            ]
+            ],
+            center: true,
+            wrap: true,
         },
         {
             name: "Дата",
@@ -569,6 +598,15 @@ const OrdersList = () => {
                 </Toolbar>
             </AppBar>
             <AdminEditTask driverTaskId={selectedTaskId} handleCloseTaskForm={handleCloseTaskForm}></AdminEditTask>
+        </Dialog>
+
+        <Dialog
+            open={openLastComment}
+            onClose={handleCloseLastComment}>
+            <DialogTitle>{new Date(selectedComment.dateCreated).toLocaleString('ru-Ru')}</DialogTitle>
+            <DialogContent dividers>
+                <Typography>{selectedComment.text}</Typography>
+            </DialogContent>
         </Dialog>
     </>);
 };

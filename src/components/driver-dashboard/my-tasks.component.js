@@ -261,7 +261,9 @@ const MyTasksList = () => {
         ApiService.getSalariesReportDriver({
             startDate: startDate.toUTCString(),
             endDate: endDate.toUTCString(),
-            driverId: driverId
+            driverId: driverId,
+            searchBy: searchBy,
+            searchString: searchString
         }).then(response => {
             let url = window.URL
                 .createObjectURL(new Blob([response.data]));

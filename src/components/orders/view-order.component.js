@@ -13,6 +13,11 @@ import AddressForm from './add-address.component'
 import MaterialForm from './add-material.component'
 import Divider from '@mui/material/Divider';
 import ShiftRadioButtonGroup from "../shiftradiobuttongroup";
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
 import "react-datepicker/dist/react-datepicker.css";
 import "./orders.css";
 import ru from 'date-fns/locale/ru';
@@ -29,6 +34,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [orderName, setOrderName] = useState("");
     const [materialsList, setMaterialsList] = useState([]);
     const [material, setMaterial] = useState({});
+    const [loadTime, setLoadTime] = useState("");
     const [volume, setVolume] = useState(0);
     const [loadUnit, setLoadUnit] = useState("none");
     const [unloadUnit, setUnloadUnit] = useState({});
@@ -63,6 +69,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
     const [externalTransporters, setExternalTransporters] = useState([]);
     const [discount, setDiscount] = useState(0);
     const [driverPrice, setDriverPrice] = useState();
+    const [reportLoadType, setReportLoadType] = useState('0');
 
     const shiftToShortString = (shift) => {
         switch (shift) {
@@ -197,6 +204,8 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                 setTransporterPrice(data.externalPrice);
                 setDiscount(data.discount);
                 setDriverPrice(data.driverPrice);
+                setReportLoadType(data.reportLoadType);
+                setLoadTime(data.loadTime);
             })
             .catch((error) => {
                 if (error.response.data.message) {
@@ -346,7 +355,9 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
             mileage: mileage,
             price: price,
             materialPrice: materialPrice,
-            density: density,            
+            density: density,
+            reportLoadType: reportLoadType,
+            loadTime: loadTime
         };
 
         if (isExternal) {
@@ -448,16 +459,34 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Адрес погрузки (8)</label>
-                        {isEdit && <Autocomplete
-                            options={addresses}
-                            disablePortal
-                            onChange={(e, newvalue) => { setAddressA(newvalue) }}
-                            sx={{ width: 300 }}
-                            getOptionLabel={(option) => `${option.textAddress}`}
-                            renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
+                        <div className="row">
+                            <div className="col-md-6">
+                                <label className="bold-label">Адрес погрузки (8)</label>
+                                {isEdit && <Autocomplete
+                                    options={addresses}
+                                    disablePortal
+                                    onChange={(e, newvalue) => { setAddressA(newvalue) }}
+                                    sx={{ width: 300 }}
+                                    getOptionLabel={(option) => `${option.textAddress}`}
+                                    renderInput={(params) => <TextField {...params} label="Список адресов" />} />}
 
-                        <label className="ml-5">{addressA && addressA.textAddress}</label>
+                                <label className="ml-5">{addressA && addressA.textAddress}</label>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="col-md-6">
+                                    <label>Время приемки на адресе</label>
+                                    <input
+                                        disabled={!isEdit}
+                                        type="text"
+                                        className="form-control"
+                                        form="profile-form"
+                                        onChange={(e) => setLoadTime(e.target.value)}
+                                        value={loadTime}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
@@ -561,6 +590,23 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
+                        <FormControl>
+                            <FormLabel id="radio-buttons-group-label">Отчетность по загрузке/выгрузке</FormLabel>
+                            <RadioGroup
+                                row
+                                aria-labelledby="radio-buttons-group-label"
+                                name="radio-buttons-group"
+                                value={reportLoadType}
+                                onChange={(e) => setReportLoadType(e.target.value)}>
+                                <FormControlLabel value='0' control={<Radio disabled={!isEdit} />} label="Загрузка" />
+                                <FormControlLabel value='1' control={<Radio disabled={!isEdit} />} label="Выгрузка" />
+                            </RadioGroup>
+                        </FormControl>
+                    </div>
+
+                    <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
+
+                    <div className="form-group col-md-6">
                         <label>Насыпной коэффициент</label>
                         <input
                             type="number"
@@ -606,7 +652,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Себестоимость перевозки КарТэк руб/{gp && unitToString(gp.clientUnit)}</label>
+                        <label className="bold-label">Себестоимость перевозки КарТэк руб/{unitToString(loadUnit)}</label>
                         <input
                             disabled={!isEdit}
                             type="text"
@@ -637,7 +683,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                             <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
-                        <label className="bold-label">Себестоимость перевозки {externalTransporter.name} руб/{gp && unitToString(gp.clientUnit)} </label>
+                        <label className="bold-label">Себестоимость перевозки {externalTransporter.name} руб/{unitToString(loadUnit)} </label>
                             <input
                                 disabled={!isEdit}
                                 type="text"
@@ -660,7 +706,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
 
                     {!isExternal && 
                         <div className="form-group col-md-6">
-                            <label className="bold-label">Себестоимость перевозки (Водитель) руб/{gp && unitToString(gp.clientUnit)}</label>
+                            <label className="bold-label">Себестоимость перевозки (Водитель) руб/{unitToString(loadUnit)}</label>
                             <input
                                 disabled={!isEdit}
                                 type="text"
@@ -671,7 +717,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                         </div>}
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Себестоимость материала руб/{gp && unitToString(gp.clientUnit)}</label>
+                        <label className="bold-label">Себестоимость материала руб/{unitToString(loadUnit)}</label>
                         <input
                             disabled={!isEdit}
                             type="text"

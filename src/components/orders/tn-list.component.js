@@ -104,6 +104,8 @@ const TnsList = () => {
 
     const downloadTnsFile = () => {
         ApiService.getTnsList({
+            searchColumn: searchBy,
+            search: searchString,
             startDate: startDate.toUTCString(),
             endDate: endDate.toUTCString()
         }).then(response => {
@@ -115,6 +117,8 @@ const TnsList = () => {
 
     const downloadSalariesFile = () => {
         ApiService.getSalariesReport({
+            searchColumn: searchBy,
+            search: searchString,
             startDate: startDate.toUTCString(),
             endDate: endDate.toUTCString()
         }).then(response => {
