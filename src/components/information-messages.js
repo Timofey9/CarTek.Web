@@ -7,6 +7,11 @@ import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 
 const MessagesList = () => {
     let cancelled = false;
@@ -42,7 +47,7 @@ const MessagesList = () => {
             .then(({ data }) => {
                 setReload(reload + 1);
                 !cancelled && setLoading(false);
-            });   
+            });
     }
 
     const handleClickOpenCreate = () => {
@@ -53,6 +58,22 @@ const MessagesList = () => {
         setOpen(false);
         setReload(reload + 1);
     };
+
+    const cards = list.map((message) =>
+        <Grid item xs={6}>
+            <Card>
+                <CardHeader title={new Date(message.dateCreated).toLocaleString()}
+                    action={localUser && !localUser.isDriver && <Button color="error" id={message.id} onClick={(e) => { deleteMessage(message.id) }} variant="outlined"><i className="fa fa-trash" aria-hidden="true"></i></Button>
+                    }>
+                </CardHeader>
+                <CardContent>
+                    <Typography variant="body2">
+                        {message.message}
+                    </Typography>
+                </CardContent>
+                </Card>
+        </Grid>
+    );
 
 
     const columns = [
@@ -71,12 +92,6 @@ const MessagesList = () => {
             wrap: true,
             grow: 3
         },
-        {
-            name: "Удалить",
-            selector: (row, index) => <Button color="error" id={row.id} onClick={(e) => { deleteMessage(row.id) }} variant="outlined"><i className="fa fa-trash" aria-hidden="true"></i></Button>,
-            sortable: false,
-            omit: localUser && (localUser.isDriver)
-        }
     ];
 
     const customStyles = {
@@ -102,17 +117,9 @@ const MessagesList = () => {
                         <header>Нет сообщений</header>
                     </section>
                     :
-                    <DataTable
-                        columns={columns}
-                        responsive
-                        noHeader
-                        highlightOnHover
-                        defaultSortFieldId={1}
-                        defaultSortAsc
-                        progressPending={loading}
-                        customStyles={customStyles}
-                        data={list}
-                    />}
+                    <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+                        {cards}
+                    </Grid>}
         </div>
 
         <Dialog

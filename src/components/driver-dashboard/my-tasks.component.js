@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ApiService from "../../services/cartekApiService";
 import DataTable from 'react-data-table-component';
 import DatePicker, { registerLocale } from "react-datepicker";
@@ -82,11 +82,12 @@ const MyTasksList = () => {
     const [loading, setLoading] = useState(true);
     const [totalNumber, setTotalNumber] = useState(0);
     const [pageSize, setPageSize] = useState(15);
-    const [pageNumber, setPageNumber] = useState(1);
+    const [searchParams, setSearchParams] = useSearchParams({});
+    const [pageNumber, setPageNumber] = useState(searchParams.getAll("page").length > 0 ? searchParams.getAll("page")[0] : 1);
     const [orders, setOrders] = useState([]);
     const [reload, setReload] = useState(0);
-    const [startDate, setStartDate] = useState(yesterday);
-    const [endDate, setEndDate] = useState(date2);
+    const [startDate, setStartDate] = useState(searchParams.getAll("startDate").length > 0 ? new Date(searchParams.getAll("startDate")[0]) : yesterday);
+    const [endDate, setEndDate] = useState(searchParams.getAll("endDate").length > 0 ? new Date(searchParams.getAll("endDate")[0]) : date2);
     const [searchBy, setSearchBy] = useState("clientName");
     const [searchString, setSearchString] = useState("");
     const [driverId, setDriverId] = useState(0);
@@ -94,6 +95,12 @@ const MyTasksList = () => {
 
     const search = () => {
         setReload(reload + 1);
+        setParams();
+    }
+
+    const setParams = () => {
+        let params = { page: pageNumber, searchBy: searchBy, searchString: searchString, startDate: startDate, endDate: endDate };
+        setSearchParams(params);
     }
 
     const intToShift = (shift) => {
@@ -161,6 +168,10 @@ const MyTasksList = () => {
         setLoading(false);
 
     }, [pageSize, pageNumber, searchBy, searchString, reload]);
+
+    useEffect(() => {
+        setParams();
+    }, [pageSize, pageNumber, startDate, endDate, reload]);
 
     const columns = [
         //{
@@ -349,6 +360,7 @@ const MyTasksList = () => {
             conditionalRowStyles={conditionalRowStyles}
             data={orders}
             pagination
+            paginationDefaultPage={pageNumber}
             expandableRows
             expandableRowDisabled={rowPreDisabled}
             expandableRowExpanded={rowPreExpanded}

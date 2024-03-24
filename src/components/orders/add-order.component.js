@@ -709,7 +709,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                                 <label>Выберите перевозчика</label>
                                 <Autocomplete
                                     options={externalOrgs}
-                                    disablePortal
+                                    disablePortal   
                                     onChange={(e, newvalue) => { setExternalTransporter(newvalue) }}
                                     id="combo-box-demo"
                                     sx={{ width: 300 }}
@@ -718,7 +718,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                             </div>
 
                             <div className="form-group col-md-6">
-                                <label>Себестоимость перевозки {externalTransporter.name}</label>
+                            <label>Себестоимость перевозки {externalTransporter && externalTransporter.name}</label>
                                 <input
                                     type="text"
                                     className={validated && transporterPrice.length === 0 ? "form-control not-valid-input-border" : "form-control"}
