@@ -301,6 +301,8 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
             setTransporterPrice(clonedOrder.transporterPrice);
             setIsExternal(clonedOrder.isExternal);
             setDriverPrice(clonedOrder.driverPrice);
+            setLoadTime(clonedOrder.loadTime);
+            setReportLoadType(clonedOrder.reportLoadType);
         }
     }, [addresses]);
 

@@ -128,7 +128,7 @@ function ExternalClientForm({ client, handleClose }) {
                         </div>
                         {isClient &&
                             <div className="col-md-2 m-3">
-                                <button disabled type="submit" form="profile-form" className="btn btn-danger" onClick={(e) => { handleDelete(e) }}>
+                                <button type="submit" form="profile-form" className="btn btn-danger" onClick={(e) => { handleDelete(e) }}>
                                     Удалить
                                 </button>
                             </div>}

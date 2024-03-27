@@ -73,7 +73,7 @@ class App extends Component {
             this.setState({
                 currentUser: user,
                 showAdminBoard: user.identity.isAdmin,
-                isDispatcher: user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper || user.identity.isLogistManager,
+                isDispatcher: user.identity.isAdmin || user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper || user.identity.isLogistManager,
                 showDriver: user.isDriver
             });
         }
@@ -162,7 +162,7 @@ class App extends Component {
                             {!showDriver && !isDispatcher && (
                                 <>
                                     <li className="nav-item">
-                                        <Link to={"/home"} className="nav-link">
+                                        <Link to={"/startquestionary"} className="nav-link">
                                             Осмотр
                                         </Link>
                                     </li>
@@ -174,7 +174,7 @@ class App extends Component {
                                     </li>
                                 </>)}
 
-                            {showAdminBoard && (
+                            {isDispatcher && (
                                 <li className="nav-item">
                                     <Link to={"/admin"} className="nav-link">
                                         Администрирование
@@ -211,8 +211,8 @@ class App extends Component {
                 <div className="container mt-3">
                     <Notification />
                     <Routes>
-                        <Route exact path="/" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
-                        <Route exact path="/home" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
+                        <Route exact path="/" element={<RequireAuth currentUser={currentUser}>{(!showDriver && isDispatcher) ? <BoardAdmin></BoardAdmin> : <DriverDashboard/>}</RequireAuth>} />
+                        <Route exact path="/startquestionary" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
                         <Route exact path="/login" element={<Login />} />
                         <Route exact path="/profile" element={<RequireAuth currentUser={currentUser}><Profile /></RequireAuth>} />
                         <Route exact path="/user" element={<RequireAuth currentUser={currentUser}><BoardUser /></RequireAuth>} />

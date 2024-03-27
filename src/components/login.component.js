@@ -85,7 +85,7 @@ class Login extends Component {
             if (isDriver) {
                 return <Navigate to="/driver-dashboard" />;
             } else {
-                return <Navigate to="/profile" />;
+                return <Navigate to="/admin" />;
             }
         }
 

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ApiService from "../services/cartekApiService";
 import MessageForm from "./information-message.form"
-import DataTable from 'react-data-table-component';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import AppBar from '@mui/material/AppBar';
@@ -59,56 +58,47 @@ const MessagesList = () => {
         setReload(reload + 1);
     };
 
-    const cards = list.map((message) =>
-        <Grid item xs={6}>
-            <Card>
-                <CardHeader title={new Date(message.dateCreated).toLocaleString()}
-                    action={localUser && !localUser.isDriver && <Button color="error" id={message.id} onClick={(e) => { deleteMessage(message.id) }} variant="outlined"><i className="fa fa-trash" aria-hidden="true"></i></Button>
-                    }>
-                </CardHeader>
-                <CardContent>
-                    <Typography variant="body2">
-                        {message.message}
-                    </Typography>
-                </CardContent>
+    const showMessage = (message) => {
+        
+        if (localUser && localUser.identity.isAdmin) {
+            return true;
+        }
+
+        if (message.messageType === 2) {
+            return true;
+        }
+
+        if (localUser && !localUser.isExternal && message.messageType === 0) {
+            return true;
+        }
+
+        if (localUser && localUser.isExternal && message.messageType === 1) {
+            return true;
+        }
+
+        return false;
+    };
+
+    const cards = list.map((message) => {
+        if (showMessage(message)) {
+            return <Grid item xs={6}>
+                <Card>
+                    <CardHeader title={new Date(message.dateCreated).toLocaleString()}
+                        action={localUser && !localUser.isDriver && <Button color="error" id={message.id} onClick={(e) => { deleteMessage(message.id) }} variant="outlined"><i className="fa fa-trash" aria-hidden="true"></i></Button>
+                        }>
+                    </CardHeader>
+                    <CardContent>
+                        <Typography variant="body2">
+                            {message.message}
+                        </Typography>
+                    </CardContent>
                 </Card>
-        </Grid>
+            </Grid>
+        }
+    }
     );
 
-
-    const columns = [
-        {
-            name: "Дата",
-            sortBy: "date",
-            selector: (row, index) => <div>{new Date(row.dateCreated).toLocaleString()}</div>,
-            sortable: false,
-            wrap: true,
-        },
-        {
-            name: "Сообщение",
-            sortBy: "coordinates",
-            selector: (row, index) => <div>{row.message}</div>,
-            sortable: false,
-            wrap: true,
-            grow: 3
-        },
-    ];
-
-    const customStyles = {
-        headCells: {
-            style: {
-                fontSize: '14px',
-                fontWeight: 'bold'
-            },
-        },
-        cells: {
-            style: {
-                fontSize: '14px'
-            },
-        }
-    };
     return <>
-
         <div>
             {localUser && !localUser.isDriver && <Button color="success" className="pull-right" onClick={(e) => handleClickOpenCreate()} variant="contained">Создать</Button>}
             {

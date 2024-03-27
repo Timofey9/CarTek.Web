@@ -31,7 +31,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useDebouncedCallback } from 'use-debounce';
 import EditTn from '../orders/edit-tn.component'
-
+import { TN_SERIES } from '../../common/constants'
 registerLocale('ru', ru);
 
 const DriverEditTask = () => {
@@ -79,13 +79,13 @@ const DriverEditTask = () => {
     const [openMaterial, setOpenMaterial] = useState(false);
     const [showSpinner, setShowSpinner] = useState(false);
     const [openEditTn, setOpenEditTn] = useState(false);
-    const [density, setDensity] = useState(0);
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
     const frequentlyUsed = ['ООО "КарТэк"', 'ЛСР Базовые'];
     const [showUnitsError, setShowUnitsError] = useState(false);
     const [isExternal, setIsExternal] = useState(false);
     const [isExternalOrder, setIsExternalOrder] = useState(false);
     const [externalTransporter, setExternalTransporter] = useState({ name: "ООО \"КарТэк\"" });
+    const [tnSeries, setTnSeries] = useState("");
     let { driverTaskId } = useParams();
 
     const navigate = useNavigate();
@@ -383,10 +383,11 @@ const DriverEditTask = () => {
         if (isExternalOrder) {
             formData.append("TransporterId", externalTransporter.id);
         }
-
+        console.log(tnSeries);
+        console.log(tnNumber);
         if (status === 4 && validate()) {
             formData.append("MaterialId", material.id);
-            formData.append("Number", tnNumber);
+            formData.append("Number", tnSeries+tnNumber);
             formData.append("GoId", go.id);
             formData.append("GpId", gp.id);
             formData.append("LoadVolume", loadVolume);
@@ -768,15 +769,26 @@ const DriverEditTask = () => {
                         </div>
 
                         <div className="form-group col-md-6">
-                            <label>Номер ТН</label>
-                            <input
-                                className={validated && tnNumber.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
-                                form="profile-form"
-                                onChange={(e) => setTnNumber(e.target.value)}
-                                value={tnNumber} />
+                            <div className="row">
+                                <div className="col-md-4">
+                                    <Autocomplete
+                                        autoSelect
+                                        freeSolo
+                                        onChange={(e, newvalue) => setTnSeries(newvalue)}
+                                        options={TN_SERIES.map((option) => option)}
+                                        renderInput={(params) => <TextField {...params} label="Серия ТН" />}
+                                    />
+                                </div>
+                                <div className="col-md-4">
+                                    <TextField className={validated && tnNumber.length === 0 ? "not-valid-input-border" : ""}
+                                        onChange={(e) => setTnNumber(e.target.value)}
+                                        required
+                                        label="Номер ТН"
+                                        defaultValue={tnNumber}
+                                    ></TextField>
+                                </div>
+                            </div>
                         </div>
-
 
                         <div className="form-group col-md-6">
                             <label>Грузоотправитель (1)</label>

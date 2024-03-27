@@ -25,6 +25,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useDebouncedCallback } from 'use-debounce';
 import EditTn from '../orders/edit-tn.component'
+import { TN_SERIES } from '../../common/constants'
 
 registerLocale('ru', ru);
 
@@ -80,6 +81,7 @@ const DriverEditSubTask = () => {
     const [isExternal, setIsExternal] = useState(false);
     const [isExternalOrder, setIsExternalOrder] = useState(false);
     const [externalTransporter, setExternalTransporter] = useState({ name: "ООО \"КарТэк\"" });
+    const [tnSeries, setTnSeries] = useState("");
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
 
@@ -241,6 +243,7 @@ const DriverEditSubTask = () => {
                 alert("Статус обновлен");
                 setFormData(new FormData());
                 setTnNumber("");
+                setTnSeries("");
                 setNote("");
                 setReload(reload + 1);
             })
@@ -308,7 +311,7 @@ const DriverEditSubTask = () => {
         if (validate())
         {
             formData.append("MaterialId", material.id);
-            formData.append("Number", tnNumber);
+            formData.append("Number", tnSeries + tnNumber);
             formData.append("GoId", go.id);
             formData.append("GpId", gp.id);
             formData.append("LoadVolume", loadVolume);
@@ -351,6 +354,7 @@ const DriverEditSubTask = () => {
                 alert("Статус обновлен");
                 setFormData(new FormData());
                 setTnNumber("");
+                setTnSeries("");
                 setNote("");
                 setReload(reload + 1);
             })
@@ -378,6 +382,8 @@ const DriverEditSubTask = () => {
     const clearForm = () => {
         setFormData(new FormData());
         setTnNumber("");
+        setTnSeries("");
+
         setLoadVolume("");
         setUnloadVolume("");
         setLoadVolume2("");
@@ -662,13 +668,25 @@ const DriverEditSubTask = () => {
                         </div>
 
                         <div className="form-group col-md-6">
-                            <label>Номер ТН</label>
-                            <input
-                                className={validated && tnNumber.length === 0 ? "form-control not-valid-input-border" : "form-control"}
-                                type="text"
-                                form="profile-form"
-                                onChange={(e) => setTnNumber(e.target.value)}
-                                value={tnNumber} />
+                            <div className="row">
+                                <div className="col-md-4">
+                                    <Autocomplete
+                                        autoSelect
+                                        freeSolo
+                                        onChange={(e, newvalue) => setTnSeries(newvalue)}
+                                        options={TN_SERIES.map((option) => option)}
+                                        renderInput={(params) => <TextField {...params} label="Серия ТН" />}
+                                    />
+                                </div>
+                                <div className="col-md-4">
+                                    <TextField className={validated && tnNumber.length === 0 ? "not-valid-input-border" : ""}
+                                        onChange={(e) => setTnNumber(e.target.value)}
+                                        required
+                                        label="Номер ТН"
+                                        defaultValue={tnNumber}
+                                    ></TextField>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="form-group col-md-6">
