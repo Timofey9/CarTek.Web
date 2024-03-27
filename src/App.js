@@ -72,8 +72,8 @@ class App extends Component {
         if (user) {
             this.setState({
                 currentUser: user,
-                showAdminBoard: user.identity.isAdmin,
-                isDispatcher: user.identity.isAdmin || user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper || user.identity.isLogistManager,
+                showAdminBoard: user.identity && user.identity.isAdmin,
+                isDispatcher: user.identity && (user.identity.isAdmin || user.identity.isDispatcher || user.identity.isInitialBookkeeper || user.identity.isSalaryBookkeeper || user.identity.isLogistManager),
                 showDriver: user.isDriver
             });
         }
@@ -151,7 +151,7 @@ class App extends Component {
                                         </Link>
                                     </li>
 
-                                    {currentUser.identity.isInitialBookkeeper && 
+                                    {currentUser && currentUser.identity.isInitialBookkeeper && 
                                         <li className="nav-item">
                                             <Link to={"/admin/clients"} className="nav-link">
                                                 Юр. лица
