@@ -44,6 +44,7 @@ import { history } from './helpers/history';
 import EventBus from "./common/EventBus";
 import UsersList from "./components/users-list.component";
 import CarComponent from "./components/car.component";
+import FaqComponent from "./components/faq.component";
 
 class App extends Component {
     constructor(props) {
@@ -244,6 +245,7 @@ class App extends Component {
                         <Route exact path="/startquestionary" element={<RequireAuth currentUser={currentUser}><Home /></RequireAuth>} />
                         <Route exact path="/login" element={<Login />} />
                         <Route exact path="/profile" element={<RequireAuth currentUser={currentUser}><Profile /></RequireAuth>} />
+                        <Route exact path="/faq" element={<RequireAuth currentUser={currentUser}><FaqComponent /></RequireAuth>} />
                         <Route exact path="/user" element={<RequireAuth currentUser={currentUser}><BoardUser /></RequireAuth>} />
                         <Route exact path="/cars" element={<RequireAuth currentUser={currentUser}><CarsList /></RequireAuth>} />
                         <Route exact path="/driver-dashboard" element={<RequireAuth isDriverComponent={true} currentUser={currentUser}><DriverDashboard /></RequireAuth>} />
