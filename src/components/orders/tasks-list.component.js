@@ -28,7 +28,7 @@ const rowPreExpanded = row => row.subTasksCount > 0;
 const columnsSubTasks = [
     {
         name: "Номер рейса",
-        selector: (row, index) => row.sequenceNumber + 1,
+        selector: (row, index) => index + 1,
         wrap: true,
         center: true
     },

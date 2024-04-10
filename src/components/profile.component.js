@@ -15,15 +15,18 @@ class Profile extends Component {
       <div className="container">
         <header className="jumbotron">
           <h3>
-            <strong>Текущий пользователь: {currentUser.identity.lastName} {currentUser.identity.firstName} {currentUser.identity.middleName} - {currentUser.identity.login}</strong>
+            <strong>{currentUser.identity.lastName} {currentUser.identity.firstName} {currentUser.identity.middleName}</strong>
           </h3>
-        </header>
+            </header>
+            <p>
+                <strong>Логин:</strong> {currentUser.identity.login}
+            </p>
             <p>
                 <strong>Роль:</strong> {currentUser.identity && getRoleString(currentUser.identity)}
             </p>
-        <p>
-          <strong>Телефон:</strong> {currentUser.identity.phone}
-        </p>
+            <p>
+              <strong>Телефон:</strong> {currentUser.identity.phone}
+            </p>
       </div>
     );
   }

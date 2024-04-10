@@ -22,7 +22,6 @@ import Divider from '@mui/material/Divider';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import ViewTn from "./view-tn";
-import ButtonGroup from '@mui/material/ButtonGroup';
 import { useDebouncedCallback } from 'use-debounce';
 import "react-datepicker/dist/react-datepicker.css";
 import ru from 'date-fns/locale/ru';
@@ -219,8 +218,8 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
     function deleteSubTask(taskId) {
         ApiService.deleteSubtask(taskId)
             .then(({ data }) => {
-                alert("Подадача удалена");
-                handleCloseTaskForm();
+                alert("Подзадача удалена");
+                setReload(reload + 1);
             }).
             catch((error) => {
                 if (error.response.data.message) {
@@ -473,7 +472,7 @@ const AdminEditTask = ({ driverTaskId, handleCloseTaskForm }) => {
                     {subTasks.map((task, taskIndex) => {
                         return (
                             <div className="col-md-2">
-                                <label>Рейс #{task.sequenceNumber + 1}</label>
+                                <label>Рейс #{taskIndex + 1}</label>
                                 <button onClick={() => handleClickSubTaskTnOpen(task.id)} className="btn btn-success mr-10">ТН</button>
                                 <button className="btn btn-danger" onClick={() => deleteSubTask(task.id)} className="btn btn-danger mr-10"><i className="fa fa-trash" aria-hidden="true"></i></button>
                                 <Stepper orientation="vertical" activeStep={task.status}>
