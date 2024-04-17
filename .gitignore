@@ -25,3 +25,9 @@ yarn-error.log*
 /.vscode
 /.vs/cartek
 /src/.vs
+/.vs/CarTek.Web/FileContentIndex/5c8e375c-f2df-4972-953c-089fb066de5c.vsidx
+/.vs/CarTek.Web/v17
+/.vs/CarTek.Web/v17/.wsuo
+/.vs/CarTek.Web/v17/DocumentLayout.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
