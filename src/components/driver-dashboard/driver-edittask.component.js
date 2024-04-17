@@ -89,6 +89,7 @@ const DriverEditTask = () => {
     let { driverTaskId } = useParams();
 
     const navigate = useNavigate();
+    const ALPHA_NUMERIC_DASH_REGEX = /[0-9]/;
 
     const clearFileInput = (ctrl) => {
         try {
@@ -99,6 +100,17 @@ const DriverEditTask = () => {
             ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
         }
         setContinueWork(true);
+    }
+
+    const updateTnSeries = (newValue) => {
+        var withNoDigits = newValue.replace(/[0-9]/g, '');
+        console.log(withNoDigits);
+        setTnSeries(withNoDigits);
+    }
+
+    const updateTnNumber = (newValue) => {
+        var withNoLetters = newValue.replace(/\D/g, '');
+        setTnNumber(withNoLetters);
     }
 
     const clearFileInputById = (id) => {
@@ -772,16 +784,21 @@ const DriverEditTask = () => {
                             <div className="row">
                                 <div className="col-md-4">
                                     <Autocomplete
-                                        autoSelect
+                                        autoSelect                                        
                                         freeSolo
-                                        onChange={(e, newvalue) => setTnSeries(newvalue)}
+                                        onChange={(e, newvalue) => updateTnSeries(newvalue)}
                                         options={TN_SERIES.map((option) => option)}
-                                        renderInput={(params) => <TextField {...params} label="Серия ТН" />}
+                                        renderInput={(params) => <TextField onKeyDown={(event) => {
+                                            if (ALPHA_NUMERIC_DASH_REGEX.test(event.key)) {
+                                                event.preventDefault();
+                                            }
+                                        }} {...params} label="Серия ТН" />}
                                     />
                                 </div>
                                 <div className="col-md-4">
                                     <TextField className={validated && tnNumber.length === 0 ? "not-valid-input-border" : ""}
-                                        onChange={(e) => setTnNumber(e.target.value)}
+                                        onChange={(e) => updateTnNumber(e.target.value)}
+                                        value={tnNumber}
                                         required
                                         label="Номер ТН"
                                         defaultValue={tnNumber}

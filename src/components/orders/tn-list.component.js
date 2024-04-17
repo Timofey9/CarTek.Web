@@ -128,6 +128,19 @@ const TnsList = () => {
         });
     };
 
+    const downloadSalariesTableFile = () => {
+        ApiService.downloadDriverSalaryTable({
+            searchColumn: searchBy,
+            search: searchString,
+            startDate: startDate.toUTCString(),
+            endDate: endDate.toUTCString()
+        }).then(response => {
+            let url = window.URL
+                .createObjectURL(new Blob([response.data]));
+            saveAs(url, "сводная_таблица_зп.xlsx");
+        });
+    };
+
     const columns = [
         {
             name: "Номер ТН",
@@ -295,6 +308,8 @@ const TnsList = () => {
                                     <Button onClick={(e) => { e.preventDefault(); downloadSalariesFile(); }}>Реестр ЗП</Button>
                                 </>
                             }
+                            {localUser.identity && localUser.identity.isAdmin && 
+                                <Button onClick={(e) => { e.preventDefault(); downloadSalariesTableFile(); }}>Сводная таблица ЗП</Button>}
                         </ButtonGroup>
                     </div>
                 </div>

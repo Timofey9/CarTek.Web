@@ -93,6 +93,16 @@ const DriverEditSubTask = () => {
         setConfirmationOpen(true);
     };
 
+    const updateTnSeries = (newValue) => {
+        var withNoDigits = newValue.replace(/[0-9]/g, '');
+        setTnSeries(withNoDigits);
+    }
+
+    const updateTnNumber = (newValue) => {
+        var withNoLetters = newValue.replace(/\D/g, '');
+        setTnNumber(withNoLetters);
+    }
+
     const clearFileInputById = (id) => {
         var ctrl = document.getElementById(id);
         try {
@@ -673,14 +683,14 @@ const DriverEditSubTask = () => {
                                     <Autocomplete
                                         autoSelect
                                         freeSolo
-                                        onChange={(e, newvalue) => setTnSeries(newvalue)}
+                                        onChange={(e, newvalue) => updateTnSeries(newvalue)}
                                         options={TN_SERIES.map((option) => option)}
                                         renderInput={(params) => <TextField {...params} label="Серия ТН" />}
                                     />
                                 </div>
                                 <div className="col-md-4">
                                     <TextField className={validated && tnNumber.length === 0 ? "not-valid-input-border" : ""}
-                                        onChange={(e) => setTnNumber(e.target.value)}
+                                        onChange={(e) => updateTnNumber(e.target.value)}
                                         required
                                         label="Номер ТН"
                                         defaultValue={tnNumber}
