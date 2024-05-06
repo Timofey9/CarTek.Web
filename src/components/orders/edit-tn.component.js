@@ -89,7 +89,8 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
         formData.append("Number", tnNumber);
         formData.append("GoId", go.id);
         formData.append("GpId", gp.id);
-        formData.append("LoadVolume", lv);
+        if (lv)
+            formData.append("LoadVolume", lv);
         formData.append("Unit", unit);
         if (lv2)
             formData.append("LoadVolume2", lv2);

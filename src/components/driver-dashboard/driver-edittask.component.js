@@ -786,6 +786,7 @@ const DriverEditTask = () => {
                                     <Autocomplete
                                         autoSelect                                        
                                         freeSolo
+                                        className={checkObjectKeys(tnSeries) ? "not-valid-input-border" : ""}
                                         onChange={(e, newvalue) => updateTnSeries(newvalue)}
                                         options={TN_SERIES.map((option) => option)}
                                         renderInput={(params) => <TextField onKeyDown={(event) => {
