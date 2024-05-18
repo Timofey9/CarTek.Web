@@ -101,8 +101,6 @@ class ApiService {
                                     "RefreshToken": refreshToken
                                 }).then(response => {
                                     if (response) {
-                                        console.log("refreshed");
-                                        console.log(this._isRefreshing);
                                         localStorage.setItem("user", JSON.stringify(response.data));
                                         this._processQueue(null, response.data.token);
                                         this._isRefreshing = false;
@@ -113,8 +111,6 @@ class ApiService {
                                         return Promise.reject(error);
                                     }
                                 }).catch((error) => {
-                                    console.log("refresh failed1");
-                                    console.log(this._isRefreshing);
                                     EventBus.dispatch("logout", {});
                                     this._processQueue(error, null);
                                     this._isRefreshing = false;

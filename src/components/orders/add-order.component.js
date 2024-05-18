@@ -451,9 +451,10 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                     setTasksToCreate(array);
                 }).
                 catch((error) => {
-                    if (error.response.data.message) {
+                    if (error.response && error.response.data.message) {
                         setMessage(error.response.data.message);
                     }
+                    alert("Ошибка создания заявки " + error);
                 });
         }
     }
