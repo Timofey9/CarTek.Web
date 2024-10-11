@@ -58,20 +58,34 @@ const UsersList = () => {
         },
         {
             name: "Роль",
-            selector: (row, index) => row.isAdmin,
+            selector: (row, index) => getRole(row),
             sortable: false
         },
         {
             name: "Телефон",
             selector: (row, index) => row.phone,
             sortable: false
-        },
-        {
-            name: "Почта",
-            selector: (row, index) => row.email,
-            sortable: false
         }
     ];
+
+    const getRole = (user) => {
+        if (user.isAdmin) {
+            return "Логист-администратор";
+        }else
+        if (user.isDispatcher) {
+            return "Диспетчер";
+        }else
+        if (user.isInitialBookkeeper) {
+            return "Бухгалтер первички";
+        }else
+        if (user.isSalaryBookkeeper) {
+            return "Бухгалтер ЗП";
+        } else if (user.isLogistManager) {
+            return "Менеджер-логист";
+        } else{
+            return "Механик";
+        }
+    }
 
     const customStyles = {
         headCells: {

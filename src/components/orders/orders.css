@@ -1,0 +1,26 @@
+.bold-label {
+    font-weight: bold;
+}
+
+.mr-10{
+    margin-right: 5px;
+}
+
+.ml-3{
+    margin-left: 0.8em;
+}
+
+.ml-5 {
+    margin-left: 5px;
+}
+
+
+.not-valid-input-border {
+    border: solid 2px red;
+    border-radius: 3px;
+}
+
+.align-left {
+    display: flex !important;
+    justify-content: left !important;
+}

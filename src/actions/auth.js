@@ -45,8 +45,8 @@ export const register = (username, email, password) => (dispatch) => {
   );
 };
 
-export const login = (username, password) => (dispatch) => {
-    return ApiService.login(username, password).then(
+export const login = (username, password, isDriver) => (dispatch) => {
+    return ApiService.login(username, password, isDriver).then(
       (data) => {
       dispatch({
         type: LOGIN_SUCCESS,
@@ -56,7 +56,12 @@ export const login = (username, password) => (dispatch) => {
       return Promise.resolve();
     },
         (error) => {
-            const message = (error.response && error.response.data && error.response.data.message) || error.response.data || error.toString();
+            console.log(error);
+            const message = (error && error.response
+                && error.response.data
+                && error.response.data.message)
+                || error.response.data
+                || error.toString();
 
       dispatch({
         type: LOGIN_FAIL,

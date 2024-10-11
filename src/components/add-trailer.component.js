@@ -49,7 +49,7 @@ function TrailerForm() {
                     setAxelsCount(data.axelsCount);
                 }).
                 catch((error) => {
-                    setMessage(error.response.data);
+                    setMessage(error.response.data.status);
                 });
         }
         setLoading(false);
@@ -85,7 +85,7 @@ function TrailerForm() {
                         navigate("/admin/trailers/");
                     }).
                     catch((error) => {
-                        setMessage(error.response);
+                        setMessage(error.response.data.status);
                     });
             } else {
                 ApiService.createTrailer(newTrailer)
@@ -95,7 +95,7 @@ function TrailerForm() {
                     }).
                     catch((error) => {
                         if (error.response.data) {
-                            setMessage(error.response.data);
+                            setMessage(error.response.data.status);
                         }
                     });
                 }
@@ -117,7 +117,7 @@ function TrailerForm() {
                     navigate("/admin/trailers/");
                 })
                 .catch((error) => {
-                    setMessage(error.response.data);
+                    setMessage(error.response.data.status);
                     setLoading(false);
                 })
         }

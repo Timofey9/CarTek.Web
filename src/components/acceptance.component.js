@@ -172,7 +172,7 @@ function AcceptanceComponent() {
 
                     <div className="row d-flex justify-content-center">
                         <div className="col-md-4">{driver.fullName}</div>
-                        <div className="col-md-4"><input type="password" placeholder="Пароль" onChange={(e) => setDriverPassword(e.target.value)}></input></div>
+                        <div className="col-md-4"><input type="text" placeholder="Пароль" onChange={(e) => setDriverPassword(e.target.value)}></input></div>
                     </div>
 
                     <div className="row d-flex justify-content-center mt-3">

@@ -1,0 +1,22 @@
+.bold-label {
+    font-weight: bold;
+}
+
+.mr-10 {
+    margin-right: 5px;
+}
+
+.ml-3 {
+    margin-left: 0.8em;
+}
+
+.not-valid-input-border {
+    border: solid 2px red !important;
+    border-radius: 3px;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -9,8 +9,8 @@ import {
 const user = JSON.parse(localStorage.getItem("user"));
 
 const initialState = user
-  ? { isLoggedIn: true, user }
-  : { isLoggedIn: false, user: null };
+    ? { isLoggedIn: true, user, isDriver: user.isDriver }
+    : { isLoggedIn: false, user: null, isDriver: false };
 
 export default function (state = initialState, action) {
   const { type, payload } = action;
@@ -26,17 +26,19 @@ export default function (state = initialState, action) {
         ...state,
         isLoggedIn: false,
       };
-    case LOGIN_SUCCESS:
+      case LOGIN_SUCCESS:
       return {
         ...state,
-        isLoggedIn: true,
-        user: payload.user,
+          isLoggedIn: true,
+          user: payload.user,
+          isDriver: payload.user.isDriver
       };
     case LOGIN_FAIL:
       return {
         ...state,
         isLoggedIn: false,
-        user: null,
+          user: null,
+          isDriver: false
       };
     case LOGOUT:
       return {

@@ -15,18 +15,40 @@ class Profile extends Component {
       <div className="container">
         <header className="jumbotron">
           <h3>
-            <strong>Текущий пользователь: {currentUser.identity.lastName} {currentUser.identity.firstName} {currentUser.identity.middleName} - {currentUser.identity.login}</strong>
+            <strong>{currentUser.identity.lastName} {currentUser.identity.firstName} {currentUser.identity.middleName}</strong>
           </h3>
-        </header>
+            </header>
             <p>
-                <strong>Роль:</strong> {currentUser.identity.isAdmin ? "Администратор" : "Механик"}
+                <strong>Логин:</strong> {currentUser.identity.login}
             </p>
-        <p>
-          <strong>Телефон:</strong> {currentUser.identity.phone}
-        </p>
+            <p>
+                <strong>Роль:</strong> {currentUser.identity && getRoleString(currentUser.identity)}
+            </p>
+            <p>
+              <strong>Телефон:</strong> {currentUser.identity.phone}
+            </p>
       </div>
     );
   }
+}
+
+function getRoleString(identity) {
+    if (identity.isAdmin) {
+        return "Администратор";
+    } else
+        if (identity.isDispatcher) {
+            return "Диспетчер";
+        } else
+            if (identity.isInitialBookkeeper) {
+                return "Бухгалтер первички";
+            } else
+                if (identity.isSalaryBookkeeper) {
+                    return "Бухгалтер ЗП";
+                }else
+                if (identity.isLogistManager) {
+                    return "Менеджер-логист";
+                } else
+                    return "Механик";
 }
 
 function mapStateToProps(state) {

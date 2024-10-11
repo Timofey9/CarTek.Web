@@ -9,11 +9,35 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Provider } from "react-redux";
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { ErrorBoundary } from "react-error-boundary";
+
+
+function Fallback({ error, resetErrorBoundary }) {
+	// Call resetErrorBoundary() to reset the error boundary and retry the render.
+	console.log(error);
+	return (
+		<div role="alert">
+			<p>Что-то пошло не так! Сделайте скриншот ошибки и отправьте администратору</p>
+			<pre style={{ color: "red" }}>{error.stack}</pre>
+
+			<div>
+				<button onClick={() => resetErrorBoundary()} className="btn btn-success">Вернуться</button>
+			</div>
+		</div>
+	);
+}
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <Provider store={store}>
-		<App />
+	<Provider store={store}>
+		<ErrorBoundary
+			FallbackComponent={Fallback}
+			onReset={(details) => {
+				// Reset the state of your app so the error doesn't happen again
+			}}>
+			<App />
+		</ErrorBoundary>
 	</Provider>
 );
 
