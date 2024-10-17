@@ -122,7 +122,7 @@ function CarForm() {
             isExternal: isExternal
         };
 
-        if (externalTransporter.id !== undefined) {
+        if (externalTransporter && externalTransporter.id !== undefined) {
             newCar.externalTransporterId = externalTransporter.id;
         }
 
