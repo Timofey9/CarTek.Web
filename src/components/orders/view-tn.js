@@ -70,7 +70,7 @@ function ViewTn({ driverTaskId, isSubTask, handleClose }) {
                 if (data.transporter && data.transporter.length > 0) {
                     setTransporter(data.transporter);
                 } else {
-                    setTransporter("ООО \"КарТэк\"");
+                    setTransporter("ООО \"Легион\"");
                 }
             }).
             catch((error) => {

@@ -652,7 +652,7 @@ function EditOrderForm({ orderId, handleCloseOrderForm }) {
                     <Divider className="mt-3" sx={{ borderBottomWidth: 3 }, { bgcolor: "black" }}></Divider>
 
                     <div className="form-group col-md-6">
-                        <label className="bold-label">Себестоимость перевозки КарТэк руб/{unitToString(loadUnit)}</label>
+                        <label className="bold-label">Себестоимость перевозки Легион руб/{unitToString(loadUnit)}</label>
                         <input
                             disabled={!isEdit}
                             type="text"

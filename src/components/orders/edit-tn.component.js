@@ -196,7 +196,7 @@ function EditTn({ driverTaskId, isSubTask, handleClose }) {
                 if (data.transporter && data.transporter.length > 0) {
                     setTransporter(data.transporter);
                 } else {
-                    setTransporter("ООО \"КарТэк\"");
+                    setTransporter("ООО \"Легион\"");
                 }
 
                 if (data.pickUpArrivalTime) {

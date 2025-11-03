@@ -697,7 +697,7 @@ function OrderForm({ clonedOrder, handleCloseOrderForm }) {
                     </div>
 
                     <div className="form-group col-md-6">
-                        <label>Себестоимость перевозки КарТэк руб/{unitString}</label>
+                        <label>Себестоимость перевозки Легион руб/{unitString}</label>
                         <input
                             type="text"
                             className={validated && price.length === 0 ? "form-control not-valid-input-border" : "form-control"}

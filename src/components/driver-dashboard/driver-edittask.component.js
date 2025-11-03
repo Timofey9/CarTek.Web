@@ -71,7 +71,7 @@ const DriverEditTask = () => {
     const [continueWork, setContinueWork] = useState(false);
     const [rerender, setrerender] = useState(0);
     const [validated, setValidated] = useState(true);
-    const [transporter, setTransporter] = useState("ООО \"КарТэк\"");
+    const [transporter, setTransporter] = useState("ООО \"Легион\"");
     const [customer, setCustomer] = useState({});
     const [confirmationOpen, setConfirmationOpen] = useState(false);
     const [open, setOpen] = useState(false);
@@ -80,7 +80,7 @@ const DriverEditTask = () => {
     const [showSpinner, setShowSpinner] = useState(false);
     const [openEditTn, setOpenEditTn] = useState(false);
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
-    const frequentlyUsed = ['ООО "КарТэк"', 'ЛСР Базовые'];
+    const frequentlyUsed = ['ООО "Легион"', 'ЛСР Базовые'];
     const [showUnitsError, setShowUnitsError] = useState(false);
     const [isExternal, setIsExternal] = useState(false);
     const [isExternalOrder, setIsExternalOrder] = useState(false);
@@ -617,7 +617,7 @@ const DriverEditTask = () => {
         ApiService.getClients()
             .then(({ data }) => {
                 data.forEach(t => {
-                    if (t.clientName.includes('ЛСР Базовые') || t.clientName.includes('ООО "КарТэк"')) {
+                    if (t.clientName.includes('ЛСР Базовые') || t.clientName.includes('ООО "Легион"')) {
                         t.frequentlyUsed = 'Часто используемые';
                     } else {
                         t.frequentlyUsed = 'Все';

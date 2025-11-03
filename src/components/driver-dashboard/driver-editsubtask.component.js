@@ -80,7 +80,7 @@ const DriverEditSubTask = () => {
     const [rerender, setrerender] = useState(0);
     const [isExternal, setIsExternal] = useState(false);
     const [isExternalOrder, setIsExternalOrder] = useState(false);
-    const [externalTransporter, setExternalTransporter] = useState({ name: "ООО \"КарТэк\"" });
+    const [externalTransporter, setExternalTransporter] = useState({ name: "ООО \"Легион\"" });
     const [tnSeries, setTnSeries] = useState("");
 
     const constStatuses = ['Назначена', 'Принята', 'На линии', 'Прибыл на склад загрузки', 'Погрузка', 'Выписка ТН (первая часть)', 'Прибыл на объект выгрузки', 'Выгрузка', 'Выписка документов', 'Завершить'];
