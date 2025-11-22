@@ -69,7 +69,7 @@ function MessageForm({handleClose }) {
                             name="radio-buttons-group"
                             value={messageType}
                             onChange={(e) => setMessageType(e.target.value)}>
-                                <FormControlLabel value="0" control={<Radio />} label="Для водителей КарТэк" />
+                                <FormControlLabel value="0" control={<Radio />} label="Для водителей Легион" />
                                 <FormControlLabel value="1" control={<Radio />} label="Для наемных водителей" />
                                 <FormControlLabel value="2" control={<Radio />} label="Для всех" />
                             </RadioGroup>

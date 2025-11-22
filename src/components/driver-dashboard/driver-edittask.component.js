@@ -84,7 +84,7 @@ const DriverEditTask = () => {
     const [showUnitsError, setShowUnitsError] = useState(false);
     const [isExternal, setIsExternal] = useState(false);
     const [isExternalOrder, setIsExternalOrder] = useState(false);
-    const [externalTransporter, setExternalTransporter] = useState({ name: "ООО \"КарТэк\"" });
+    const [externalTransporter, setExternalTransporter] = useState({ name: "ООО \Легион\"" });
     const [tnSeries, setTnSeries] = useState("");
     let { driverTaskId } = useParams();
 
